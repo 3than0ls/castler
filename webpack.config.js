@@ -14,15 +14,5 @@ module.exports = {
     devtool: 'inline-source-map',
     plugins: [
         new CleanWebpackPlugin(),
-    ],
-    module: {
-        rules: [
-            {
-                test: /\.(png|svg|jpg|gif)$/,
-                use: [
-                    'file-loader'
-                ]
-            }
-        ]   
-  }
+    ]
 };
