@@ -10,14 +10,10 @@ const config = require('./../webpack.config.js');
 const compiler = webpack(config);
 
 app.use(express.static(path.join(__dirname, './src/')));
-// include public static files later
-
-console.log(config.output.publicPath);
 
 app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath
 }));
-
   
 module.exports = app;
 
