@@ -18,5 +18,13 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index.html'
         })
-    ]
+    ],
+    module: {
+      rules: [
+        {
+          test: /\.worker\.js$/,
+          use: { loader: 'worker-loader' }
+        }
+      ]
+    }
 };
