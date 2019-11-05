@@ -24,7 +24,14 @@ module.exports = {
         {
           test: /\.worker\.js$/,
           use: { loader: 'worker-loader' }
+        },
+        {
+            test: /\.(png|svg|jpg|gif)$/,
+            use: [
+                'file-loader'
+            ]
         }
+        
       ]
     }
 };

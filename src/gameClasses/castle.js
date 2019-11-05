@@ -1,5 +1,5 @@
 import { stage } from "./../game.js";
-import { loader } from "./../loader.js";
+import { loader, assets } from "./../loader.js";
 
 export class Castle {
     constructor(clientID) {
@@ -9,12 +9,12 @@ export class Castle {
 
     }
     render() {
-        this.graphic = new PIXI.Sprite(loader.resources[`assets/blueCastle.png`].texture);
+        //console.log(JSON.stringify(loader.resources));
+        this.graphic = new PIXI.Sprite(loader.resources['blueCastle'].texture);
         // instantiation
         this.graphic.anchor.x = 0.5;
         this.graphic.anchor.y = 0.5;
         this.graphic.position.set(this.x, this.y);
-        console.log('rendered');
         
         let graphic = this.graphic;
         stage.addChild(graphic);

@@ -12,15 +12,16 @@
   "license": "ISC",
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
+    "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
-    "webpack-dev-middleware": "^3.7.2"
+    "webpack-dev-middleware": "^3.7.2",
+    "worker-loader": "^2.0.0"
   },
   "dependencies": {
     "express": "^4.17.1",
     "path": "^0.12.7",
-    "socket.io": "^2.3.0",
-    "worker-loader": "^2.0.0"
+    "socket.io": "^2.3.0"
   }
 }
