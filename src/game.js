@@ -1,6 +1,12 @@
-import { Castle } from "./gameClasses/castle.js";
+import { Player } from "./gameClasses/player.js";
 
-const socket = io();
+export const socket = io();
+/*
+    find way to make it so:
+    1) load images
+    2) connect socket
+    3) update
+*/
 
 // Create renderer
 export const renderer = PIXI.autoDetectRenderer();
@@ -29,25 +35,24 @@ worker.addEventListener('message', function(e) {
     requestAnimationFrame(animate);
 });
 
-
-
-function connected() {
-    console.log('connected');
-};
-const castle = new Castle(socket.io.engine.id)
+const player = new Player(socket.io.engine.id);
 
 export function setup() {
     console.log('finished loading');
-    castle.render();
+
+    player.render();
 
     animate();
 }
 
+socket.on('connect', () => {
+    console.log('connected');
+});
+
 function animate() {
-    castle.update();
+    player.update();
+
     console.log('animating');
     renderer.render(stage);
 }
 
-
-socket.on('connect', connected);
