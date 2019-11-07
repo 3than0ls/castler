@@ -3,6 +3,8 @@ const path = require('path');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
+const UserState = require('./serverStates/userState.js');
+
 const app = express();
 const http = require('http').Server(app);
 
@@ -22,9 +24,13 @@ const serverState = {
     users: {}
 }
 
-io.on('connection', function(socket) {
-    serverState[socket.id] = socket;
-    console.log(socket.id + " has connected.");
+io.on('connection', socket => {
+    serverState[socket.id] = new UserState(socket.id);
+    console.log("Client data: " + JSON.stringify(serverState[socket.id]));
+
+    socket.on('clientState', data => {
+        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle);
+    });
 
 })
   

@@ -52,7 +52,7 @@ socket.on('connect', () => {
 function animate() {
     player.update();
 
-    console.log('animating');
+    
     renderer.render(stage);
 }
 
