@@ -32,7 +32,6 @@ export class Player {
         this.a.press = () => {
             if (this.w.isDown || this.s.isDown) {
                 this.vx = -this.speed * Math.sin(45);
-                console.log('left')
             } else {
                 this.vx = -this.speed;
             }
@@ -47,7 +46,6 @@ export class Player {
         this.w.press = () => {
             if (this.a.isDown || this.d.isDown) {
                 this.vy = -this.speed * Math.sin(45);
-                console.log('up')
             } else {
                 this.vy = -this.speed;
             }
@@ -62,7 +60,6 @@ export class Player {
         this.d.press = () => {
             if (this.w.isDown || this.s.isDown) {
                 this.vx = this.speed * Math.sin(45);
-                console.log('right')
             } else {
                 this.vx = this.speed;
             }
@@ -77,7 +74,6 @@ export class Player {
         this.s.press = () => {
             if (this.a.isDown || this.d.isDown) {
                 this.vy = this.speed * Math.sin(45);
-                console.log('down')
             } else {
                 this.vy = this.speed;
             }
@@ -118,9 +114,10 @@ export class Player {
         this.testShape.position.set(500, 500);
         let testShape = this.testShape;
         this.viewpoint.addChild(testShape);
+        
 
         // render viewpoint to stage
-        this.viewpoint.position.set(this.globalX, this.globalY);
+        this.viewpoint.position.set(-this.globalX+this.x, -this.gloalY+this.y); // adjust so its positioned in the middle
         let viewpoint = this.viewpoint;
         stage.addChild(viewpoint);
     }
@@ -134,10 +131,9 @@ export class Player {
         /* viewpoint testing */
         let testShape = this.testShape;
         this.viewpoint.addChild(testShape);
-        console.log(this.testShape.getGlobalPosition().x);
+        
 
-
-        this.viewpoint.position.set(-this.globalX, -this.globalY);
+        this.viewpoint.position.set(-this.globalX+this.x, -this.globalY+this.y);
         let viewpoint = this.viewpoint; // render viewpoint to stage
         stage.addChild(viewpoint);
     }

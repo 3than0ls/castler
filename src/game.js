@@ -1,6 +1,13 @@
 import { Player } from "./gameClasses/player.js";
+import { userUpdate } from "./sockets/userUpdate.js";
 
 export const socket = io();
+
+// create client state
+export const clientState = {
+    enemies: {}
+}
+
 /*
     find way to make it so:
     1) load images
@@ -35,11 +42,12 @@ worker.addEventListener('message', function(e) {
     requestAnimationFrame(animate);
 });
 
-const player = new Player(socket.io.engine.id);
+// create player
+export const player = new Player(socket.io.engine.id);
 
 export function setup() {
     console.log('finished loading');
-
+    userUpdate(socket, clientState);
     player.render();
 
     animate();

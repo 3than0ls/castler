@@ -1,7 +1,7 @@
-export const clientEmit = (socket, data) => function() {
+export const clientEmit = (socket, data) => {
     socket.emit('clientState', {
-        x: data.globalX,
-        y: data.globalY,
+        globalX: data.globalX,
+        globalY: data.globalY,
         angle: data.angle,
         id: socket.id,
     });
