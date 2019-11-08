@@ -62,7 +62,9 @@ export class Enemy {
     }
 
     delete() { // delete user when disconnected
-        player.viewpoint.removeChild(this.graphic);
+        let bodyGraphic = this.bodyGraphic 
+        let axeHandGraphic = this.axeHandGraphic;
+        player.viewpoint.removeChild(bodyGraphic, axeHandGraphic);
         // add more
     }
 }

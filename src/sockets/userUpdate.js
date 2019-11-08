@@ -27,6 +27,7 @@ export const userUpdate = (socket, clientState) => {
         for(let i = 0; i < userDifference.length; i++) {
             clientState.enemies[userDifference[i]].delete();
             delete clientState.enemies[userDifference[i]];
+            console.log(clientState.enemies[userDifference[i]])
         }
     });
 };
