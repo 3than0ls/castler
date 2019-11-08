@@ -114,7 +114,10 @@ export class Player {
         this.testShape.position.set(500, 500);
         let testShape = this.testShape;
         this.viewpoint.addChild(testShape);
+
         
+        // allow viewpoint to have sortable children
+        this.viewpoint.sortableChildren = true;
 
         // render viewpoint to stage
         this.viewpoint.position.set(-this.globalX+this.x, -this.gloalY+this.y); // adjust so its positioned in the middle

@@ -27,6 +27,10 @@ export class Enemy {
         this.axeHandGraphic.anchor.y = 0.55;
         this.axeHandGraphic.position.set(this.globalX, this.globalY);
 
+        // give it a high zIndex to render it over other objects
+        this.bodyGraphic.zIndex = 50;
+        this.axeHandGraphic.zIndex = 49;
+
         // finally, render each to the viewpoint of player, different from rendering to stage
         let axeHandGraphic = this.axeHandGraphic;
         let bodyGraphic = this.bodyGraphic;
