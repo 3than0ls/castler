@@ -1,11 +1,12 @@
-import { stage, socket, renderer } from "./../game.js";
-import { loader, assets } from "./../loader.js";
+import { stage, socket, renderer, player } from "./../game.js";
+import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/clientEmit.js";
+import { ratio } from "./../utils/windowResize.js";
 
 export class Player {
     constructor(clientID) {
         this.x = window.innerWidth/2;
-        this.y = window.innerHeight/2;
+        this.y = window.innerHeight/2; // are these really needed?
 
         this.globalX = 40;
         this.globalY = 0;
@@ -13,6 +14,9 @@ export class Player {
 
         this.mouseX;
         this.mouseY;
+
+        this.displayHand = 'hand';
+        this.handSprites = {};
 
         this.vx = 0;
         this.vy = 0;
@@ -22,11 +26,16 @@ export class Player {
         // player game stats
         this.speed = 2;
     }
+
     movementKeys() {
+        // movement keys
         this.w = keyboard(87);
         this.a = keyboard(65);
         this.s = keyboard(83);
         this.d = keyboard(68);
+
+        this.e = keyboard(69);
+
 
         // Left
         this.a.press = () => {
@@ -83,6 +92,15 @@ export class Player {
                 this.vy = 0;
             }
         };
+
+        this.e.press = () => {
+            stage.removeChild(this.handSprites[this.displayHand]);
+            this.displayHand = 'axeHand';
+        }
+        this.e.release = () => {
+            stage.removeChild(this.handSprites[this.displayHand]);
+            this.displayHand = 'hand';
+        }
     }
 
     render() {
@@ -93,21 +111,16 @@ export class Player {
         this.bodyGraphic.anchor.y = 0.5;
         this.bodyGraphic.position.set(this.x, this.y);
 
-        // render hands (maybe later, when multiple hands are added, make each one pre loaded and switch which one is rendered)
-        // each one has a different name: normal hands will be handGraphic, axe will be axeHandGraphic
-        this.axeHandGraphic = new PIXI.Sprite(loader.resources['axeHand'].texture);
-        // set positions
-        this.axeHandGraphic.anchor.x = 0.4; // anchor positions have been pre calculated
-        this.axeHandGraphic.anchor.y = 0.55;
-        this.axeHandGraphic.position.set(this.x, this.y);
+        // render and create hands
+        Player.createHandSprites(this.handSprites, this.x, this.y);
 
         // movement keys
         this.movementKeys();
 
         // finally, render each to the stage
-        let axeHandGraphic = this.axeHandGraphic;
+        let handGraphic = this.handSprites[this.displayHand];
         let bodyGraphic = this.bodyGraphic;
-        stage.addChild(axeHandGraphic, bodyGraphic); // hands drawn below body
+        stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
 
         /* viewpoint testing */
         this.testShape = new PIXI.Sprite(loader.resources['blueCastle'].texture);
@@ -115,7 +128,7 @@ export class Player {
         let testShape = this.testShape;
         this.viewpoint.addChild(testShape);
 
-        
+
         // allow viewpoint to have sortable children
         this.viewpoint.sortableChildren = true;
 
@@ -143,12 +156,12 @@ export class Player {
     
     update() {
         // update mouse position variables
-        this.mouseX = renderer.plugins.interaction.mouse.global.x;
-        this.mouseY = renderer.plugins.interaction.mouse.global.y;
+        this.mouseX = renderer.plugins.interaction.mouse.global.x/ratio;
+        this.mouseY = renderer.plugins.interaction.mouse.global.y/ratio;
 
-        // update positioning
-        this.x = this.bodyGraphic.x;
-        this.y = this.bodyGraphic.y;
+        // update positioning to x and y display (not global). x and y will only ever change in screen resizes
+        this.bodyGraphic.position.set(this.x, this.y);
+        this.handSprites[this.displayHand].position.set(this.x, this.y)
 
         // update global positioning
         this.globalX += this.vx;
@@ -157,23 +170,54 @@ export class Player {
 
         // update angle 
         this.angle = -Math.atan2(this.mouseX - this.x, this.mouseY - this.y);
-        this.axeHandGraphic.rotation = this.angle;
+        this.handSprites[this.displayHand].rotation = this.angle;
         this.bodyGraphic.rotation = this.angle;
 
         // update viewpoint
         this.viewpointUpdate();
 
         // add graphics to stage
+        let handGraphic = this.handSprites[this.displayHand];
         let bodyGraphic = this.bodyGraphic;
-        let axeHandGraphic = this.axeHandGraphic;
-        stage.addChild(axeHandGraphic, bodyGraphic);
+        stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
 
         // emit client info to server
         clientEmit(socket, {
             globalX: this.globalX,
             globalY: this.globalY,
             angle: this.angle,
+            displayHand: this.displayHand
         });
+    }
+
+    resizeAdjust(x, y) {
+        // re adjusts viewpoint and position of player when the window is resized
+        this.x = x;
+        this.y = y;
+    }
+
+    static createHandSprites(handSprites, x, y) {
+        /* this creates all hand sprites and puts them into the dictionary handSprites.
+           handSprites are given a key (that describes what kind) which is connected to their corresponding sprite
+           enemy and player classes have a displayHand string which is used as a key to pick which handSprite is currently being displayed.
+           ex: displayHand = 'hand';
+               handSprites[displayHand] references the handSprite 'hand', which is then rendered.
+        */
+        // creates sprites and sets anchor positions and locations for them
+        handSprites['hand'] = new PIXI.Sprite(loader.resources['hand'].texture);
+        handSprites['hand'].anchor.x = 0.5;
+        handSprites['hand'].anchor.y = 0.5;
+        handSprites['hand'].position.set(x, y);
+        handSprites['hand'].zIndex = 49;
+
+        // axe hand
+        handSprites['axeHand'] = new PIXI.Sprite(loader.resources['axeHand'].texture);
+        handSprites['axeHand'].anchor.x = 0.4; // anchor positions have been pre calculated
+        handSprites['axeHand'].anchor.y = 0.55;
+        handSprites['axeHand'].position.set(x, y);
+        handSprites['axeHand'].zIndex = 49;
+
+        // etc.
     }
 }
 

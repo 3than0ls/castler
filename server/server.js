@@ -29,7 +29,7 @@ io.on('connection', socket => {
     console.log("Client data: " + JSON.stringify(serverState.users[socket.id]));
 
     socket.on('clientState', data => {
-        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle);
+        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.displayHand);
     });
 
 

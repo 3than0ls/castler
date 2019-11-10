@@ -6,7 +6,7 @@ export const userUpdate = (socket, clientState) => {
         for(let i = 0; i < userIDs.length; i++) {
             // if new player found, add it
             if (!clientState.enemies[userIDs[i]] && userIDs[i] !== socket.id) { // if not user isnt already found and isn't the client
-                console.log('client side enemy created'); // if not, create new enemy and add it to client state
+                // if new id and info found, create new enemy and add it to client state
                 let data = serverStateUsers[userIDs[i]];
                 const newEnemy = new Enemy(data.clientID, -data.globalX, -data.globalY);
                 newEnemy.render(); // render enemy
@@ -16,7 +16,7 @@ export const userUpdate = (socket, clientState) => {
             if (userIDs[i] !== socket.id) { // if the server sent player id isn't the client id
                 let data = serverStateUsers[userIDs[i]];
                 clientState.enemies[userIDs[i]].animate(
-                    data.globalX, data.globalY, data.angle
+                    data.globalX, data.globalY, data.angle, data.displayHand
                 );
             }
         }
@@ -27,7 +27,6 @@ export const userUpdate = (socket, clientState) => {
         for(let i = 0; i < userDifference.length; i++) {
             clientState.enemies[userDifference[i]].delete();
             delete clientState.enemies[userDifference[i]];
-            console.log(clientState.enemies[userDifference[i]])
         }
     });
 };

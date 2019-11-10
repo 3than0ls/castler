@@ -1,6 +1,7 @@
 import { Player } from "./gameClasses/player.js";
 import { userUpdate } from "./sockets/userUpdate.js";
 
+
 export const socket = io();
 
 // create client state
@@ -35,6 +36,7 @@ renderer.render(stage); // add stage to renderer
 
 // Web Worker to updated our game
 import Worker from "worker-loader!./webWorker/worker.js"; // import worker and use worker loader rule specified in webpack config
+import { resize } from "./utils/windowResize.js";
 const worker = new Worker();
 // post ticks and listen for messages received to updated
 worker.postMessage('tick');
@@ -45,11 +47,16 @@ worker.addEventListener('message', function(e) {
 // create player
 export const player = new Player(socket.io.engine.id);
 
+
 export function setup() {
     console.log('finished loading');
     userUpdate(socket, clientState);
     player.render();
 
+    // resize renderer and game when needed
+    resize();
+    window.onresize = resize;
+    
     animate();
 }
 

@@ -3,6 +3,7 @@ export const clientEmit = (socket, data) => {
         globalX: data.globalX,
         globalY: data.globalY,
         angle: data.angle,
+        displayHand: data.displayHand,
         id: socket.id,
     });
 }
@@ -12,4 +13,5 @@ export const clientEmit = (socket, data) => {
     data.globalX,
     data.globalY,
     data.angle,
+    data.displayHand
 */

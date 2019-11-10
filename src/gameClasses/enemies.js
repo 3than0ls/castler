@@ -1,5 +1,6 @@
 import { stage, player } from "./../game.js";
-import { loader } from "./../loader.js";
+import { loader } from "./../utils/loader.js";
+import { Player } from "./player.js";
 
 export class Enemy {
     constructor(clientID, globalX, globalY) {
@@ -7,6 +8,9 @@ export class Enemy {
         this.globalX = globalX;
         this.globalY = globalY;
         this.clientID = clientID;
+
+        this.displayHand = 'hand';
+        this.handSprites = {}
 
         this.vx = 0;
         this.vy = 0; // maybe used later?
@@ -20,24 +24,20 @@ export class Enemy {
         this.bodyGraphic.anchor.y = 0.5;
         this.bodyGraphic.position.set(this.globalX, this.globalY);
 
-        // render hands
-        this.axeHandGraphic = new PIXI.Sprite(loader.resources['axeHand'].texture);
-        // set positions
-        this.axeHandGraphic.anchor.x = 0.4; // anchor positions have been pre calculated
-        this.axeHandGraphic.anchor.y = 0.55;
-        this.axeHandGraphic.position.set(this.globalX, this.globalY);
+        // render and create hand sprites
+        Player.createHandSprites(this.handSprites, this.globalX, this.globalY);
 
         // give it a high zIndex to render it over other objects
         this.bodyGraphic.zIndex = 50;
-        this.axeHandGraphic.zIndex = 49;
+        this.handSprites[this.displayHand].zIndex = 49;
 
         // finally, render each to the viewpoint of player, different from rendering to stage
-        let axeHandGraphic = this.axeHandGraphic;
+        let handGraphic = this.handSprites[this.displayHand];
         let bodyGraphic = this.bodyGraphic;
-        player.viewpoint.addChild(axeHandGraphic, bodyGraphic); // hands drawn below body
+        player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }
 
-    animate(globalX, globalY, angle) {
+    animate(globalX, globalY, angle, displayHand) {
         // the animate function is different from the update in player class
         // animate takes input supplied from the server and applies it to the enemies
         // update positioning
@@ -46,25 +46,27 @@ export class Enemy {
         // update angle 
         this.angle = angle;
 
+        // remove current displayed hand (which may be different) and then update it
+        player.viewpoint.removeChild(this.handSprites[this.displayHand]);
+        this.displayHand = displayHand;
+
         // update rendered position
-        console.log(globalX);
-        console.log(angle);
-        this.axeHandGraphic.position.set(globalX, globalY);
+        this.handSprites[this.displayHand].position.set(globalX, globalY);  // <- remove the this in displayhand later
         this.bodyGraphic.position.set(globalX, globalY);
         // update rendered angle
-        this.axeHandGraphic.rotation = angle;
+        this.handSprites[this.displayHand].rotation = angle;
         this.bodyGraphic.rotation = angle;
 
         // add graphics to stage
-        let bodyGraphic = this.bodyGraphic;
-        let axeHandGraphic = this.axeHandGraphic;
-        player.viewpoint.addChild(axeHandGraphic, bodyGraphic);
+        let handGraphic = this.handSprites[this.displayHand];
+        let bodyGraphic = this.bodyGraphic;                
+        player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }
 
     delete() { // delete user when disconnected
         let bodyGraphic = this.bodyGraphic 
-        let axeHandGraphic = this.axeHandGraphic;
-        player.viewpoint.removeChild(bodyGraphic, axeHandGraphic);
+        let hand = this.handSprites[this.displayHand];
+        player.viewpoint.removeChild(bodyGraphic, hand);
         // add more
     }
 }

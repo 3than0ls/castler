@@ -3,11 +3,13 @@ module.exports = class UserState {
         this.clientID = clientID;
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
-        this.angle = angle || 0; // may cause issues with player being temporarily rendered in incorrect places
+        this.angle = angle || 0;
+        this.displayHand = 'hand';
     }
-    updateClientInfo(globalX, globalY, angle) {
+    updateClientInfo(globalX, globalY, angle, displayHand) {
         this.globalX = globalX;
         this.globalY = globalY;
         this.angle = angle;
+        this.displayHand = displayHand;
     }
 }
