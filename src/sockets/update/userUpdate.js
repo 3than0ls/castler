@@ -1,4 +1,4 @@
-import { Enemy } from "../gameClasses/enemies";
+import { Enemy } from "../../gameClasses/enemies";
 
 export const userUpdate = (socket, clientState) => {
     socket.on('userStates', serverStateUsers => {

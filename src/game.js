@@ -1,12 +1,14 @@
 import { Player } from "./gameClasses/player.js";
-import { userUpdate } from "./sockets/userUpdate.js";
+import { userUpdate } from "./sockets/update/userUpdate.js";
+import { resourceUpdate } from "./sockets/update/resourceUpdate.js";
 
 
 export const socket = io();
 
 // create client state
 export const clientState = {
-    enemies: {}
+    enemies: {},
+    resources: {},
 }
 
 /*
@@ -51,12 +53,14 @@ export const player = new Player(socket.io.engine.id);
 export function setup() {
     console.log('finished loading');
     userUpdate(socket, clientState);
+    resourceUpdate(socket, clientState);
+    
     player.render();
 
     // resize renderer and game when needed
     resize();
     window.onresize = resize;
-    
+
     animate();
 }
 

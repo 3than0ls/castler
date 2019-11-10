@@ -7,6 +7,7 @@ import blueCastle from "./../assets/blueCastle.png"; // test image- may remove l
 import playerBody from "./../assets/playerBody.png";
 import axeHand from "./../assets/axeHand.png";
 import hand from "./../assets/hand.png";
+import rock from "./../assets/rock.png";
 
 console.log('loading...');
 
@@ -18,4 +19,5 @@ loader
     .add('axeHand', axeHand)
     .add('hand', hand)
     .add('playerBody', playerBody)
+    .add('rock', rock)
     .load(setup);

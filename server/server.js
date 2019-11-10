@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
 const UserState = require('./serverStates/userState.js');
+const ResourceState = require('./serverStates/resourceState.js');
 
 const app = express();
 const http = require('http').Server(app);
@@ -21,8 +22,15 @@ app.use(webpackDevMiddleware(compiler, {
 const io = require('socket.io')(http);
 
 const serverState = {
-    users: {}
+    users: {},
+    resources: {}, 
 }
+
+function createResource() {
+    let resource = new ResourceState(-600, -600, 'rock');
+    serverState.resources[resource.resourceID] = resource;
+};
+createResource();
 
 io.on('connection', socket => {
     serverState.users[socket.id] = new UserState(socket.id);
@@ -30,6 +38,10 @@ io.on('connection', socket => {
 
     socket.on('clientState', data => {
         serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.displayHand);
+    });
+
+    socket.on('resourceState', data => {
+        serverState.resources[data.resourceID].updateClientInfo(data.globalX, data.globalY, data.amount);
     });
 
 
@@ -42,6 +54,7 @@ io.on('connection', socket => {
 
 function update(serverState) {  
     io.sockets.emit('userStates', serverState.users);
+    io.sockets.emit('resourceStates', serverState.resources);
 }
   
 setInterval(() => {update(serverState)}, 1000/60);
