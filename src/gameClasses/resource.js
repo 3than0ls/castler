@@ -1,5 +1,7 @@
 import { socket, player } from "../game";
 import { loader } from "../utils/loader";
+import { bump } from "../bump/bump";
+import { ratio, gameWidth } from "../utils/windowResize";
 
 export class Resource {
     constructor(resourceID, type, amount, globalX, globalY) {
@@ -13,6 +15,7 @@ export class Resource {
 
     render() {
         this.resourceGraphic = new PIXI.Sprite(loader.resources[this.type].texture);
+        this.resourceGraphic.circular = true; // bump js settings
         
         // set positions
         this.resourceGraphic.anchor.x = 0.5; 
@@ -21,6 +24,10 @@ export class Resource {
 
         let resourceGraphic = this.resourceGraphic;
         player.viewpoint.addChild(resourceGraphic); // hands drawn below body
+    }
+
+    collide(playerGraphic) {
+        bump.circleCollision(this.resourceGraphic, playerGraphic, true, true);
     }
 
     harvest() {

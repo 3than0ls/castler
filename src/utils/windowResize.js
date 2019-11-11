@@ -2,8 +2,10 @@ import { renderer, stage, player } from "../game.js";
 
 // script to resize window when changed
 
-const gameWidth = 1920;
-const gameHeight = 970;
+// default widths to 1920, 970
+
+export const gameWidth = 1920;
+export const gameHeight = 970;
 
 export var ratio = Math.max(window.innerWidth/gameWidth, window.innerHeight/gameHeight);
 export function resize() {

@@ -38,7 +38,6 @@ renderer.render(stage); // add stage to renderer
 
 // Web Worker to updated our game
 import Worker from "worker-loader!./webWorker/worker.js"; // import worker and use worker loader rule specified in webpack config
-import { resize } from "./utils/windowResize.js";
 const worker = new Worker();
 // post ticks and listen for messages received to updated
 worker.postMessage('tick');
@@ -48,6 +47,10 @@ worker.addEventListener('message', function(e) {
 
 // create player
 export const player = new Player(socket.io.engine.id);
+
+// game window resize functions
+import { resize } from "./utils/windowResize.js";
+resize();
 
 
 export function setup() {

@@ -1,7 +1,8 @@
-import { stage, socket, renderer, player } from "./../game.js";
+import { stage, socket, renderer, player, clientState } from "./../game.js";
 import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/clientEmit.js";
-import { ratio } from "./../utils/windowResize.js";
+import { ratio, gameWidth } from "./../utils/windowResize.js";
+import { bump } from "../bump/bump.js";
 
 export class Player {
     constructor(clientID) {
@@ -106,6 +107,7 @@ export class Player {
     render() {
         // render body graphic
         this.bodyGraphic = new PIXI.Sprite(loader.resources['playerBody'].texture);
+        this.bodyGraphic.circular = true; // bump js settings
         // set positions
         this.bodyGraphic.anchor.x = 0.5;
         this.bodyGraphic.anchor.y = 0.5;
@@ -122,14 +124,7 @@ export class Player {
         let bodyGraphic = this.bodyGraphic;
         stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
 
-        /* viewpoint testing */
-        this.testShape = new PIXI.Sprite(loader.resources['blueCastle'].texture);
-        this.testShape.position.set(500, 500);
-        let testShape = this.testShape;
-        this.viewpoint.addChild(testShape);
-
-
-        // allow viewpoint to have sortable children
+        // allow viewpoint to have sortable children, so zIndex works
         this.viewpoint.sortableChildren = true;
 
         // render viewpoint to stage
@@ -143,11 +138,7 @@ export class Player {
             things that appear to move when the player moves are added to the viewpoint display group
             once added, when the player inputs movement commands, anything in the viewpoint display group will move rather than the player
             this gives the illusion that the player is moving, rather than everything else
-        */
-        /* viewpoint testing */
-        let testShape = this.testShape;
-        this.viewpoint.addChild(testShape);
-        
+        */        
 
         this.viewpoint.position.set(-this.globalX+this.x, -this.globalY+this.y);
         let viewpoint = this.viewpoint; // render viewpoint to stage
@@ -181,6 +172,9 @@ export class Player {
         let bodyGraphic = this.bodyGraphic;
         stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
 
+        // test and handle collisions 
+        this.resourceCollision();
+
         // emit client info to server
         clientEmit(socket, {
             globalX: this.globalX,
@@ -188,6 +182,13 @@ export class Player {
             angle: this.angle,
             displayHand: this.displayHand
         });
+    }
+
+    resourceCollision() {
+        const resourceIDs = Object.keys(clientState.resources);
+        for(let i = 0; i < resourceIDs.length; i++) {
+            clientState.resources[resourceIDs[i]].collide(this.bodyGraphic);
+        }
     }
 
     resizeAdjust(x, y) {

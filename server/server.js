@@ -27,7 +27,7 @@ const serverState = {
 }
 
 function createResource() {
-    let resource = new ResourceState(-600, -600, 'rock');
+    let resource = new ResourceState(400, 400, 'rock');
     serverState.resources[resource.resourceID] = resource;
 };
 createResource();
