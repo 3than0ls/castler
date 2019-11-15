@@ -7,7 +7,7 @@ export class Resource {
     constructor(resourceID, type, amount, globalX, globalY) {
         this.type = type;
         this.resourceID = resourceID;
-        this.amount = amount;
+        this.amount = amount; // resources contain a certain amount you can harvest from, maybe change variable name
 
         this.globalX = globalX;
         this.globalY = globalY;
@@ -27,7 +27,7 @@ export class Resource {
     }
 
     collide(playerGraphic) {
-        bump.circleCollision(this.resourceGraphic, playerGraphic, true, true);
+        bump.circleResourceCollision(this.resourceGraphic, playerGraphic, true, true);
     }
 
     harvest() {

@@ -26,18 +26,25 @@ const serverState = {
     resources: {}, 
 }
 
-function createResource() {
-    let resource = new ResourceState(400, 400, 'rock');
-    serverState.resources[resource.resourceID] = resource;
+function createResourceTest() {
+    // creates a test map with resources
+    for(let i = 0; i < 8; i++) {
+        for(let j = 0; j < 8; j++) {
+            let type = 'rock';
+            if(j % 2 == 0 || i % 2 == 0) type = 'tree'
+            let resource = new ResourceState(-800+i*400, -800+j*400, type);
+            serverState.resources[resource.resourceID] = resource;
+        }
+    }
 };
-createResource();
+createResourceTest();
 
 io.on('connection', socket => {
     serverState.users[socket.id] = new UserState(socket.id);
     console.log("Client data: " + JSON.stringify(serverState.users[socket.id]));
 
     socket.on('clientState', data => {
-        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.displayHand);
+        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
     });
 
     socket.on('resourceState', data => {

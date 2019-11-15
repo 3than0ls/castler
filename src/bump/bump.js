@@ -1,4 +1,5 @@
 import { gameWidth } from "../utils/windowResize";
+import { player } from "../game";
 
 // added an export of an instance of Bump class at the bottom
 class Bump { 
@@ -274,11 +275,6 @@ class Bump {
   should bounce off the second sprite.
   The sprites can contain an optional mass property that should be greater than 1.
 
-  Edit: included the ratio to the width in calculating the velocity
-  I turned (c2.width / 2) in this function to ((c2.width / 2)/gameWidthWindowRatio)
-           (c1.width / 2) in this function to ((c1.width / 2)/gameWidthWindowRatio)
-
-
   */
 
   circleCollision(c1, c2, bounce = false, global = false) {
@@ -291,8 +287,6 @@ class Bump {
     let magnitude, combinedRadii, overlap,
       vx, vy, dx, dy, s = {},
       hit = false;
-
-    let gameWidthWindowRatio = window.innerWidth/gameWidth; // use this in calculating the combined ratios of the radii
 
     //Calculate the vector between the circles’ center points
     if (global) {
@@ -310,7 +304,7 @@ class Bump {
     magnitude = Math.sqrt(vx * vx + vy * vy);
 
     //Add together the circles' combined half-widths
-    combinedRadii = c1.radius*gameWidthWindowRatio + c2.radius*gameWidthWindowRatio;
+    combinedRadii = c1.radius + c2.radius;
 
     //Figure out if there's a collision
     if (magnitude < combinedRadii) {
@@ -340,6 +334,95 @@ class Bump {
       //circle 1's position
       c1.x -= overlap * dx;
       c1.y -= overlap * dy;
+
+      //Bounce
+      if (bounce) {
+        //Create a collision vector object, `s` to represent the bounce "surface".
+        //Find the bounce surface's x and y properties
+        //(This represents the normal of the distance vector between the circles)
+        s.x = vy;
+        s.y = -vx;
+
+        //Bounce c1 off the surface
+        this.bounceOffSurface(c1, s);
+      }
+    }
+    return hit;
+  }
+
+  /*
+  circleResourceCollision, and edited version of circleCollision
+  ---------------
+  same math and logic as circleCollision
+
+  Edits: added a gameWidthWindowRatio variable, which is used in calculating the combined radii.
+         rather than having the second circle (the resource) visibly bounce off, we take the collision vector results and add them to the player global locaions
+
+  */
+
+  circleResourceCollision(c1, c2, bounce = false, global = false) {
+
+    //Add collision properties
+    if (!c1._bumpPropertiesAdded) this.addCollisionProperties(c1); 
+    if (!c2._bumpPropertiesAdded) this.addCollisionProperties(c2); 
+    
+
+    let magnitude, combinedRadii, overlap,
+      vx, vy, dx, dy, s = {},
+      hit = false;
+
+    let gameWidthWindowRatio = window.innerWidth/gameWidth; // use this in calculating the combined ratios of the radii
+
+    //Calculate the vector between the circles’ center points
+    if (global) {
+      //Use global coordinates
+      vx = (c2.gx + ((c2.width / 2)) - c2.xAnchorOffset) - (c1.gx + ((c1.width / 2)) - c1.xAnchorOffset);
+      vy = (c2.gy + ((c2.width / 2)) - c2.yAnchorOffset) - (c1.gy + ((c1.width / 2)) - c1.yAnchorOffset);
+    } else {
+      //Use local coordinates
+      vx = (c2.x + ((c2.width / 2)) - c2.xAnchorOffset) - (c1.x + ((c1.width / 2)) - c1.xAnchorOffset);
+      vy = (c2.y + ((c2.width / 2)) - c2.yAnchorOffset) - (c1.y + ((c1.width / 2)) - c1.yAnchorOffset);
+    }
+
+    //Find the distance between the circles by calculating
+    //the vector's magnitude (how long the vector is)
+    magnitude = Math.sqrt(vx * vx + vy * vy);
+
+    //Add together the circles' combined half-widths
+    combinedRadii = c1.radius*gameWidthWindowRatio + c2.radius*gameWidthWindowRatio; // edited this line
+
+    //Figure out if there's a collision
+    if (magnitude < combinedRadii) {
+
+      //Yes, a collision is happening
+      hit = true;
+
+      //Find the amount of overlap between the circles
+      overlap = combinedRadii - magnitude;
+
+      //Add some "quantum padding". This adds a tiny amount of space
+      //between the circles to reduce their surface tension and make
+      //them more slippery. "0.3" is a good place to start but you might
+      //need to modify this slightly depending on the exact behaviour
+      //you want. Too little and the balls will feel sticky, too much
+      //and they could start to jitter if they're jammed together
+      let quantumPadding = 0.3;
+      overlap += quantumPadding;
+
+      //Normalize the vector
+      //These numbers tell us the direction of the collision
+      dx = vx / magnitude;
+      dy = vy / magnitude;
+
+      //Move circle 1 out of the collision by multiplying
+      //the overlap with the normalized vector and subtract it from
+      //circle 1's position
+      // c1.x -= overlap * dx;
+      // c1.y -= overlap * dy;
+
+      // rather than moving circle 1 out of collision, we add the overlap muliplied by the vector to the player global positions
+      player.globalX += (overlap * dx);
+      player.globalY += (overlap * dy);
 
       //Bounce
       if (bounce) {

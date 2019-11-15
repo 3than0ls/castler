@@ -16,7 +16,7 @@ export const userUpdate = (socket, clientState) => {
             if (userIDs[i] !== socket.id) { // if the server sent player id isn't the client id
                 let data = serverStateUsers[userIDs[i]];
                 clientState.enemies[userIDs[i]].animate(
-                    data.globalX, data.globalY, data.angle, data.displayHand
+                    data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand
                 );
             }
         }

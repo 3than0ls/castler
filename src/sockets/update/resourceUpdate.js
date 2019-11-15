@@ -4,7 +4,7 @@ export const resourceUpdate = (socket, clientState) => {
     socket.on('resourceStates', serverStateResources => {
         const resourceIDs = Object.keys(serverStateResources);
         for(let i = 0; i < resourceIDs.length; i++) {
-            // if new player found, add it
+            // if new resource found, add it
             if (!clientState.resources[resourceIDs[i]]) {
                 // if new id and info found, create new resource and add it to client state
                 let data = serverStateResources[resourceIDs[i]];

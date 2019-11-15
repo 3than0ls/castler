@@ -5,6 +5,7 @@ import { Player } from "./player.js";
 export class Enemy {
     constructor(clientID, globalX, globalY) {
         // basically is the same as player class, but without any required user input parts
+        // basically a puppet, which is controlled by server sent data
         this.globalX = globalX;
         this.globalY = globalY;
         this.clientID = clientID;
@@ -37,7 +38,7 @@ export class Enemy {
         player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }
 
-    animate(globalX, globalY, angle, displayHand) {
+    animate(globalX, globalY, angle, swingAngle, displayHand) {
         // the animate function is different from the update in player class
         // animate takes input supplied from the server and applies it to the enemies
         // update positioning
@@ -55,6 +56,7 @@ export class Enemy {
         this.bodyGraphic.position.set(globalX, globalY);
         // update rendered angle
         this.handSprites[this.displayHand].rotation = angle;
+        this.handSprites[this.displayHand].angle += swingAngle // add on the swingAngle angle, in degrees
         this.bodyGraphic.rotation = angle;
 
         // add graphics to stage

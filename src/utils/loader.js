@@ -8,6 +8,7 @@ import playerBody from "./../assets/playerBody.png";
 import axeHand from "./../assets/axeHand.png";
 import hand from "./../assets/hand.png";
 import rock from "./../assets/rock.png";
+import tree from "./../assets/tree.png";
 
 console.log('loading...');
 
@@ -20,4 +21,5 @@ loader
     .add('hand', hand)
     .add('playerBody', playerBody)
     .add('rock', rock)
+    .add('tree', tree)
     .load(setup);

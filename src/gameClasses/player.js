@@ -25,7 +25,17 @@ export class Player {
         this.viewpoint = new PIXI.Container();
 
         // player game stats
-        this.speed = 2;
+        this.speed = 4;
+        this.harvestSpeed = 2;
+
+        // player statuses and small stuff
+        // swing animation variables
+        this.swingAngle = 0;
+        this.swingAvailable = true;
+        this.stopRotation = 40;
+        this.swingBack = false;
+        // mouse variable
+        this.mouseHeld = false;
     }
 
     movementKeys() {
@@ -35,7 +45,9 @@ export class Player {
         this.s = keyboard(83);
         this.d = keyboard(68);
 
-        this.e = keyboard(69);
+        this.one = keyboard(49);
+        this.two = keyboard(50);
+        this.three = keyboard(51);
 
 
         // Left
@@ -93,15 +105,58 @@ export class Player {
                 this.vy = 0;
             }
         };
-
-        this.e.press = () => {
-            stage.removeChild(this.handSprites[this.displayHand]);
-            this.displayHand = 'axeHand';
-        }
-        this.e.release = () => {
+        this.one.release = () => {
             stage.removeChild(this.handSprites[this.displayHand]);
             this.displayHand = 'hand';
         }
+        this.two.release = () => {
+            stage.removeChild(this.handSprites[this.displayHand]);
+            this.swingAvailable = true;
+            this.displayHand = 'axeHand';
+        }
+        this.three.release = () => {
+            stage.removeChild(this.handSprites[this.displayHand]);
+            this.displayHand = 'pickaxeHand';
+        }
+    }
+
+    swing() {
+        if (this.swingAvailable) {
+            this.swingAngle = 0;
+            this.stopRotation = 70;
+            this.swingBack = false;
+            
+            this.swingAvailable = false;
+        }
+        
+        if (!this.swingBack) {
+            this.swingAngle += this.harvestSpeed;
+        } else {
+            this.swingAngle -= this.harvestSpeed;
+        }
+
+        if (this.swingAngle < this.stopRotation) {
+        } else if (this.swingAngle >= this.stopRotation) {
+            this.swingBack = true;
+        }
+        
+        if (this.swingAngle <= 0 && this.swingBack) { // end of animation - swingAvailable is true (another swing is available)
+            // harvest: if collided with resource, call resource function
+            this.swingAvailable = true;
+            this.swingAngle = 0;
+            console.log('swing angle equalis zero')
+        }
+
+        this.handSprites[this.displayHand].angle += this.swingAngle;
+    }
+
+    mouse() {
+        renderer.plugins.interaction.on('mousedown', () => {
+            this.mouseHeld = true;
+        });
+        renderer.plugins.interaction.on('mouseup', () => {
+            this.mouseHeld = false;
+        })
     }
 
     render() {
@@ -118,6 +173,8 @@ export class Player {
 
         // movement keys
         this.movementKeys();
+        // mouse event detection
+        this.mouse();
 
         // finally, render each to the stage
         let handGraphic = this.handSprites[this.displayHand];
@@ -152,7 +209,7 @@ export class Player {
 
         // update positioning to x and y display (not global). x and y will only ever change in screen resizes
         this.bodyGraphic.position.set(this.x, this.y);
-        this.handSprites[this.displayHand].position.set(this.x, this.y)
+        this.handSprites[this.displayHand].position.set(this.x, this.y);
 
         // update global positioning
         this.globalX += this.vx;
@@ -167,6 +224,13 @@ export class Player {
         // update viewpoint
         this.viewpointUpdate();
 
+        // detect clicks and respond
+        if (this.mouseHeld || this.swingAngle > 0) { // if mouse held or effectively the swing has already started
+            this.swing();
+        } else {
+            this.swingAvailable = true;
+        }
+
         // add graphics to stage
         let handGraphic = this.handSprites[this.displayHand];
         let bodyGraphic = this.bodyGraphic;
@@ -180,6 +244,7 @@ export class Player {
             globalX: this.globalX,
             globalY: this.globalY,
             angle: this.angle,
+            swingAngle: this.swingAngle,
             displayHand: this.displayHand
         });
     }

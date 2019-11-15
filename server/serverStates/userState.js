@@ -4,12 +4,14 @@ module.exports = class UserState {
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
         this.angle = angle || 0;
+        this.swingAngle = 0;
         this.displayHand = 'hand';
     }
-    updateClientInfo(globalX, globalY, angle, displayHand) {
+    updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {
         this.globalX = globalX;
         this.globalY = globalY;
         this.angle = angle;
+        this.swingAngle = swingAngle;
         this.displayHand = displayHand;
     }
 }
