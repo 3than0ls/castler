@@ -225,7 +225,7 @@ export class Player {
         this.viewpointUpdate();
 
         // detect clicks and respond
-        if (this.mouseHeld || this.swingAngle > 0) { // if mouse held or effectively the swing has already started
+        if (this.mouseHeld || this.swingAngle > 0) { // if mouse held or effectively the swing has already started 
             this.swing();
         } else {
             this.swingAvailable = true;
