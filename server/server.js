@@ -27,30 +27,44 @@ const serverState = {
 }
 
 function createResourceTest() {
-    // creates a test map with resources
-    for(let i = 0; i < 8; i++) {
-        for(let j = 0; j < 8; j++) {
+    /*/ creates a test map with resources
+    for(let i = 0; i < 2; i++) {
+        for(let j = 0; j < 2; j++) {
             let type = 'rock';
-            if(j % 2 == 0 || i % 2 == 0) type = 'tree'
-            let resource = new ResourceState(-800+i*400, -800+j*400, type);
+            if (j % 2 == 0 ) type = 'tree'
+            let resource = new ResourceState(-400+i*400, -400+j*400, type);
             serverState.resources[resource.resourceID] = resource;
         }
-    }
+    }*/
+    let resource = new ResourceState(300, 300, 'rock');
+    serverState.resources[resource.resourceID] = resource;
+    let resource2 = new ResourceState(-350, -270, 'tree');
+    serverState.resources[resource2.resourceID] = resource2;
 };
 createResourceTest();
 
 io.on('connection', socket => {
     serverState.users[socket.id] = new UserState(socket.id);
+    // on received events, data.id should be equal to socket.id
     console.log("Client data: " + JSON.stringify(serverState.users[socket.id]));
 
     socket.on('clientState', data => {
         serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
     });
 
-    socket.on('resourceState', data => {
-        serverState.resources[data.resourceID].updateClientInfo(data.globalX, data.globalY, data.amount);
+    socket.on('harvest', data => {
+        // subtract the amount harvested from the resource
+        serverState.resources[data.resourceID].harvest(data.amount);
+        // add the amount harvested to the clients resource pile
+        serverState.users[data.id].harvest(serverState.resources[data.resourceID].type, data.amount);
+        // emit harvest event occuring
+        io.emit('harvested', { // harvested only provides a visual effect, and nothing else
+            vx: data.vx,
+            vy: data.vy,
+            resourceID: data.resourceID,
+            harvestSpeed: data.harvestSpeed
+        });
     });
-
 
     // when disconnected, remove user from server state
     socket.on('disconnect', () => {

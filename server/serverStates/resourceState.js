@@ -4,11 +4,16 @@ module.exports = class ResourceState {
         this.type = type;
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
+        this.playerHit = false;
         this.amount = 50;
     }
-    updateClientInfo(globalX, globalY, amount) {
+    harvest(amount) {
+        this.amount -= amount;
+    }
+    updateClientInfo(globalX, globalY, amount, playerHit) {
         this.globalX = globalX;
         this.globalY = globalY;
         this.amount = amount;
+        this.playerHit = playerHit;
     }
 }

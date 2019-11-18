@@ -2,6 +2,7 @@ import { gameWidth } from "../utils/windowResize";
 import { player } from "../game";
 
 // added an export of an instance of Bump class at the bottom
+
 class Bump { 
   constructor(renderingEngine = PIXI) {
     if (renderingEngine === undefined) throw new Error("Please assign a rendering engine in the constructor before using bump.js"); 

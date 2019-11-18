@@ -6,6 +6,21 @@ module.exports = class UserState {
         this.angle = angle || 0;
         this.swingAngle = 0;
         this.displayHand = 'hand';
+
+        this.resources = {
+            'wood': 0,
+            'stone': 0,
+        }
+    }
+    harvest(type, amount) {
+        switch(type) {
+            case 'tree':
+                this.resources['wood'] += amount;
+                break;
+            case 'rock':
+                this.resources['stone'] += amount;
+                break;
+        }
     }
     updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {
         this.globalX = globalX;

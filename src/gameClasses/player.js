@@ -3,21 +3,24 @@ import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/clientEmit.js";
 import { ratio, gameWidth } from "./../utils/windowResize.js";
 import { bump } from "../bump/bump.js";
+import { harvest } from "../sockets/harvest.js";
 
 export class Player {
     constructor(clientID) {
         this.x = window.innerWidth/2;
         this.y = window.innerHeight/2; // are these really needed?
 
-        this.globalX = 40;
+        this.globalX = 0;
         this.globalY = 0;
         this.clientID = clientID;
 
         this.mouseX;
         this.mouseY;
 
+        // hand related variables
         this.displayHand = 'hand';
         this.handSprites = {};
+        this.collisionPoints = {};
 
         this.vx = 0;
         this.vy = 0;
@@ -26,7 +29,7 @@ export class Player {
 
         // player game stats
         this.speed = 4;
-        this.harvestSpeed = 2;
+        this.harvestSpeed = 3;
 
         // player statuses and small stuff
         // swing animation variables
@@ -107,6 +110,7 @@ export class Player {
         };
         this.one.release = () => {
             stage.removeChild(this.handSprites[this.displayHand]);
+            this.swingAvailable = true;
             this.displayHand = 'hand';
         }
         this.two.release = () => {
@@ -116,6 +120,7 @@ export class Player {
         }
         this.three.release = () => {
             stage.removeChild(this.handSprites[this.displayHand]);
+            this.swingAvailable = true;
             this.displayHand = 'pickaxeHand';
         }
     }
@@ -139,14 +144,21 @@ export class Player {
         } else if (this.swingAngle >= this.stopRotation) {
             this.swingBack = true;
         }
+
+        // harvest: if collided with resource during swing, call resource function
+        if (!this.swingAvailable) this.resourceHarvest();
         
         if (this.swingAngle <= 0 && this.swingBack) { // end of animation - swingAvailable is true (another swing is available)
-            // harvest: if collided with resource, call resource function
+            /* test tracking
+            let circle = new PIXI.Graphics();
+            circle.beginFill(0x9966FF);
+            circle.drawCircle(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y, 10);
+            circle.endFill();
+            this.viewpoint.addChild(circle);
+            */
             this.swingAvailable = true;
             this.swingAngle = 0;
-            console.log('swing angle equalis zero')
         }
-
         this.handSprites[this.displayHand].angle += this.swingAngle;
     }
 
@@ -170,6 +182,9 @@ export class Player {
 
         // render and create hands
         Player.createHandSprites(this.handSprites, this.x, this.y);
+
+        // create client needed hand/tool collision points
+        this.updateCollisionPoints();
 
         // movement keys
         this.movementKeys();
@@ -216,6 +231,9 @@ export class Player {
         this.globalY += this.vy;
         // perhaps a viewpoint window update here
 
+        // update client needed hand/tool collision points
+        this.updateCollisionPoints();
+
         // update angle 
         this.angle = -Math.atan2(this.mouseX - this.x, this.mouseY - this.y);
         this.handSprites[this.displayHand].rotation = this.angle;
@@ -225,7 +243,7 @@ export class Player {
         this.viewpointUpdate();
 
         // detect clicks and respond
-        if (this.mouseHeld || this.swingAngle > 0) { // if mouse held or effectively the swing has already started 
+        if ((this.mouseHeld || this.swingAngle > 0) && this.displayHand === 'axeHand') { // if mouse held or effectively the swing has already started 
             this.swing();
         } else {
             this.swingAvailable = true;
@@ -256,10 +274,56 @@ export class Player {
         }
     }
 
+    resourceHarvest() {
+        const resourceIDs = Object.keys(clientState.resources);
+        for (let i = 0; i < resourceIDs.length; i++) {
+            if (clientState.resources[resourceIDs[i]].handSpriteCollision(this.collisionPoints[this.displayHand]) && !clientState.resources[resourceIDs[i]].alreadyHit) {
+                clientState.resources[resourceIDs[i]].alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
+                // create velocity and direction in which a resource bumps towards
+                let a = clientState.resources[resourceIDs[i]].globalX - this.globalX;
+                let b = clientState.resources[resourceIDs[i]].globalY - this.globalY;
+                const vx = (Math.asin(a / Math.hypot(a, b))*10);
+                const vy = (Math.asin(b / Math.hypot(a, b))*10);
+
+                // then emit harvest
+                harvest(socket, {
+                    resourceID: clientState.resources[resourceIDs[i]].resourceID,
+                    amount: 1,
+                    vx: vx,
+                    vy: vy,
+                    harvestSpeed: this.harvestSpeed
+                })
+            }
+            if (this.swingAngle <= 0) { // once swing resets, reset alreadyHit to falsesss
+                clientState.resources[resourceIDs[i]].alreadyHit = false;
+            }
+        }
+    }
+
     resizeAdjust(x, y) {
         // re adjusts viewpoint and position of player when the window is resized
         this.x = x;
         this.y = y;
+    }
+
+    updateCollisionPoints() {
+        this.collisionPoints['axeHand'] = {
+            x: this.globalX + 
+            (this.handSprites['axeHand'].width/
+            (this.handSprites['axeHand'].width/this.bodyGraphic.width))*Math.sin(-this.angle - (this.swingAngle * (Math.PI/180))), // update based on angle
+
+            y: this.globalY +
+            (this.handSprites['axeHand'].height/
+            (this.handSprites['axeHand'].height/this.bodyGraphic.height))*Math.cos(-this.angle - (this.swingAngle * (Math.PI/180)))
+        }
+        /* point test, to see where the collision point for axeHand is
+        this.pointTest = new PIXI.Graphics();
+        this.pointTest.lineStyle(4, 0xFF3300, 1);
+        this.pointTest.beginFill(0x66CCFF);
+        this.pointTest.drawCircle(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y, 10);
+        this.pointTest.endFill();
+        this.pointTest.position.set(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y);
+        this.viewpoint.addChild(this.pointTest)*/
     }
 
     static createHandSprites(handSprites, x, y) {

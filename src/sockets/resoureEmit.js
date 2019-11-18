@@ -3,7 +3,9 @@ export const resourceEmit = (socket, data) => {
         globalX: data.globalX,
         globalY: data.globalY,
         resourceID: data.resourceID,
-        amount: data.amount
+        amount: data.amount,
+        playerHit: data.playerHit,
+        id: socket.id
     });
 }
 
@@ -12,4 +14,6 @@ export const resourceEmit = (socket, data) => {
     data.globalX,
     data.globalY,
     data.resourceID,
+    data.amount
+    data.playerHit
 */

@@ -1,7 +1,7 @@
 import { Player } from "./gameClasses/player.js";
 import { userUpdate } from "./sockets/update/userUpdate.js";
 import { resourceUpdate } from "./sockets/update/resourceUpdate.js";
-
+import { charm } from './charm/charm.js';
 
 export const socket = io();
 
@@ -12,10 +12,15 @@ export const clientState = {
 }
 
 /*
-    find way to make it so:
-    1) load images
-    2) connect socket
-    3) update
+    TO DO:
+    clean up code
+    BIG:
+    Player GUI
+    weapons (poke rather than swing) and animals (entity rather than resource)
+
+    SMALL:
+    particle (dust js) when resource is hit
+    more different resources
 */
 
 // Create renderer
@@ -72,9 +77,10 @@ socket.on('connect', () => {
 });
 
 function animate() {
+    charm.update();
+
     player.update();
 
-    
     renderer.render(stage);
 }
 
