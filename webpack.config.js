@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     mode: 'development',
     entry: {
-        app: './src/game.js'
+        app: './public/game.js'
     },
     output: {
         filename: 'bundle.js',
@@ -16,22 +16,40 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            template: 'src/index.html'
+            template: 'public/index.html'
         })
     ],
     module: {
       rules: [
         {
-          test: /\.worker\.js$/,
-          use: { loader: 'worker-loader' }
+            test: /\.worker\.js$/,
+            use: { 
+                loader: 'worker-loader' 
+            }
+        },
+        {
+            test: /\.css$/,
+            use: [
+              'style-loader',
+              'css-loader'
+            ],
         },
         {
             test: /\.(png|svg|jpg|gif)$/,
             use: [
                 'file-loader'
             ]
+        },
+        {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env', '@babel/preset-react'],
+                }
+            }
         }
-        
       ]
     }
 };

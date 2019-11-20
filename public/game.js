@@ -3,6 +3,9 @@ import { userUpdate } from "./sockets/update/userUpdate.js";
 import { resourceUpdate } from "./sockets/update/resourceUpdate.js";
 import { charm } from './charm/charm.js';
 
+// react testing
+import "./UI/index.js";
+
 export const socket = io();
 
 // create client state

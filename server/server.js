@@ -12,8 +12,8 @@ const http = require('http').Server(app);
 const config = require('../webpack.config.js');
 const compiler = webpack(config);
 
-app.use(express.static(path.join(__dirname, './src/')));
-app.use(express.static(path.join(__dirname, './../public')));
+// app.use(express.static(path.join(__dirname, './src/')));
+app.use(express.static(path.join(__dirname, './public/')));
 
 app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath
@@ -31,7 +31,7 @@ function createResourceTest() {
     for(let i = 0; i < 2; i++) {
         for(let j = 0; j < 2; j++) {
             let type = 'rock';
-            if (j % 2 == 0 ) type = 'tree'
+            if (j % 2 == 0 ) type = 'tree'a
             let resource = new ResourceState(-400+i*400, -400+j*400, type);
             serverState.resources[resource.resourceID] = resource;
         }
