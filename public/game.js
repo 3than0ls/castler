@@ -1,10 +1,11 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { charm } from './charm/charm.js';
 import { Player } from "./gameClasses/player.js";
 import { userUpdate } from "./sockets/update/userUpdate.js";
 import { resourceUpdate } from "./sockets/update/resourceUpdate.js";
-import { charm } from './charm/charm.js';
 
 // react testing
-import "./UI/index.js";
+import "./UI/inventory.js";
 
 export const socket = io();
 
