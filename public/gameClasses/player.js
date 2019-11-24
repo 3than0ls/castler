@@ -31,6 +31,12 @@ export class Player {
         this.speed = 4;
         this.harvestSpeed = 3;
 
+        // player inventory and resources
+        this.resources = {
+            'wood': 0,
+            'stone': 0,
+        };
+
         // player statuses and small stuff
         // swing animation variables
         this.swingAngle = 0;
@@ -215,6 +221,13 @@ export class Player {
         this.viewpoint.position.set(-this.globalX+this.x, -this.globalY+this.y);
         let viewpoint = this.viewpoint; // render viewpoint to stage
         stage.addChild(viewpoint);
+    }
+
+    inventoryUpdate(resources) {
+        const resourceKeys = Object.keys(resources);
+        for (let i = 0; i < resourceKeys.length; i++) {
+            this.resources[resourceKeys[i]] = resources[resourceKeys[i]];
+        }
     }
     
     update() {

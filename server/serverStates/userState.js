@@ -8,7 +8,7 @@ module.exports = class UserState {
         this.displayHand = 'hand';
 
         this.resources = {
-            'wood': 0,
+            'wood': 10,
             'stone': 0,
         }
     }

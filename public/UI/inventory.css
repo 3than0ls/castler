@@ -1,0 +1,35 @@
+.overlay {
+    border-radius: 10px;
+    width: 8%;
+    max-width: 200px;
+    min-width: 150px;
+    height: auto;
+    margin: 0.5vh 0.5vw;
+    text-align: center;
+    background: rgba(100, 100, 100, 0.5);
+}
+
+.items {
+    display: inline-block;
+    width: 50%;
+    max-width: 300px;
+    text-align: center;
+    height: auto;
+    
+    font-size: 100%;
+
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.75vh;
+    margin-bottom: 0.5vh;
+}
+
+.images {
+    width: 50%;
+    min-width: 100px;
+    max-width: 60%;
+    height: auto;
+
+    margin-left: auto;
+    margin-right: auto;
+}

@@ -48,6 +48,8 @@ io.on('connection', socket => {
     // on received events, data.id should be equal to socket.id
     console.log("Client data: " + JSON.stringify(serverState.users[socket.id]));
 
+    socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // "create" the client inventory by updating it, maybe move to a connect event
+
     socket.on('clientState', data => {
         serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
     });
@@ -64,6 +66,7 @@ io.on('connection', socket => {
             resourceID: data.resourceID,
             harvestSpeed: data.harvestSpeed
         });
+        socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // update the clients inventory
     });
 
     // when disconnected, remove user from server state

@@ -1,11 +1,12 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { charm } from './charm/charm.js';
 import { Player } from "./gameClasses/player.js";
 import { userUpdate } from "./sockets/update/userUpdate.js";
 import { resourceUpdate } from "./sockets/update/resourceUpdate.js";
-
-// react testing
-import "./UI/inventory.js";
+import { inventoryUpdate } from './sockets/update/inventoryUpdate.js';
 
 export const socket = io();
 
@@ -56,11 +57,16 @@ worker.addEventListener('message', function(e) {
 
 // create player
 export const player = new Player(socket.io.engine.id);
+console.log('player created');
 
 // game window resize functions
 import { resize } from "./utils/windowResize.js";
 resize();
 
+inventoryUpdate(socket);
+
+// react overlay
+import { Inventory } from "./UI/inventory.js"; // maybe move to a player method?
 
 export function setup() {
     console.log('finished loading');
@@ -68,6 +74,7 @@ export function setup() {
     resourceUpdate(socket, clientState);
     
     player.render();
+    ReactDOM.render(<Inventory />, document.getElementById('root'));
 
     // resize renderer and game when needed
     resize();
