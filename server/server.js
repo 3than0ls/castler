@@ -51,7 +51,7 @@ io.on('connection', socket => {
     socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // "create" the client inventory by updating it, maybe move to a connect event
 
     socket.on('clientState', data => {
-        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
+        serverState.users[data.id].updateClientInfo(data.globalsdX, data.globalY, data.angle, data.swingAngle, data.displayHand);
     });
 
     socket.on('harvest', data => {

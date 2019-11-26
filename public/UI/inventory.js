@@ -13,20 +13,20 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import './inventory.css';
 
 // images
-import tree from "./../assets/tree.png";
-import rock from "./../assets/rock.png";
+import stone from "./../assets/stone.png";
+import wood from "./../assets/wood.png";
 import { player } from './../game';
 
 export class Inventory extends React.Component {
     constructor() {
         super();
-            this.state = {
-                tree: tree,
-                rock: rock,
+        this.state = {
+            woodImage: wood,
+            stoneImage: stone,
 
-                wood: player.resources['wood'],
-                stone: player.resources['stone'],
-            }
+            wood: player.resources['wood'],
+            stone: player.resources['stone'],
+        }
     }
     componentDidMount() {
         this.timerID = setInterval(() => this.tick(), 60); // learn more about this
@@ -42,16 +42,16 @@ export class Inventory extends React.Component {
     }
 
     render() {
-        return(
-            <React.Fragment>
+        return( // return react fragment
+            <> 
                 <h1 className='overlay'>hello!</h1>
                 <Col className='overlay'>
                     <Row className='items' variant="primary">Wood x{this.state.wood}</Row>
-                    <Row variant="primary"><Image className='images' src={this.state.tree}/></Row>
+                    <Row variant="primary"><Image className='images' src={this.state.woodImage}/></Row>
                     <Row className='items' variant="primary">Stone x{this.state.stone}</Row>
-                    <Row variant="primary"><Image className='images' src={this.state.rock}/></Row>
+                    <Row variant="primary"><Image className='images' src={this.state.stoneImage}/></Row>
                 </Col>
-            </React.Fragment>
+            </>
         )
     }
 }
