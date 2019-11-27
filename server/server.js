@@ -48,10 +48,12 @@ io.on('connection', socket => {
     // on received events, data.id should be equal to socket.id
     console.log("Client data: " + JSON.stringify(serverState.users[socket.id]));
 
-    socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // "create" the client inventory by updating it, maybe move to a connect event
+    socket.emit('playerInit', {
+        resources: serverState.users[socket.id].resources
+    }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
-        serverState.users[data.id].updateClientInfo(data.globalsdX, data.globalY, data.angle, data.swingAngle, data.displayHand);
+        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
     });
 
     socket.on('harvest', data => {

@@ -1,9 +1,9 @@
-import { stage, socket, renderer, player, clientState } from "./../game.js";
+import { stage, socket, renderer, clientState, particleContainer } from "./../game.js";
 import { loader, assets } from "./../utils/loader.js";
-import { clientEmit } from "../sockets/clientEmit.js";
+import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio, gameWidth } from "./../utils/windowResize.js";
 import { bump } from "../bump/bump.js";
-import { harvest } from "../sockets/harvest.js";
+import { harvest } from "../sockets/player/harvest.js";
 
 export class Player {
     constructor(clientID) {
@@ -29,7 +29,7 @@ export class Player {
 
         // player game stats
         this.speed = 4;
-        this.harvestSpeed = 3;
+        this.harvestSpeed = 4;
 
         // player inventory and resources
         this.resources = {

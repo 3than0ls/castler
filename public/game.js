@@ -2,13 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { charm } from './charm/charm.js';
-import { Player } from "./gameClasses/player.js";
-import { userUpdate } from "./sockets/update/userUpdate.js";
-import { resourceUpdate } from "./sockets/update/resourceUpdate.js";
-import { inventoryUpdate } from './sockets/update/inventoryUpdate.js';
-
 export const socket = io();
+
+import { charm } from './charm/charm.js';
+import { dust } from './dust/dust.js';
+import { Player } from "./gameClasses/player.js";
+import { resize } from "./utils/windowResize.js";
 
 // create client state
 export const clientState = {
@@ -20,12 +19,14 @@ export const clientState = {
     TO DO:
     clean up code
     BIG:
-    Player GUI
+    Player GUI (improve)
+    health system
     weapons (poke rather than swing) and animals (entity rather than resource)
 
     SMALL:
     particle (dust js) when resource is hit
     more different resources
+    organize assets folder
 */
 
 // Create renderer
@@ -37,14 +38,15 @@ renderer.autoDensity = true;
 renderer.backgroundColor = 0x0077AA;
 renderer.antialias = true;
 renderer.resize(window.innerWidth, window.innerHeight);
-
 document.body.appendChild(renderer.view); // add renderer to html document
 
 // Create Stage
 export const stage = new PIXI.Container();
-
 renderer.render(stage); // add stage to renderer
 
+
+// create player
+export const player = new Player(socket.io.engine.id);
 
 // Web Worker to updated our game
 import Worker from "worker-loader!./webWorker/worker.js"; // import worker and use worker loader rule specified in webpack config
@@ -55,23 +57,14 @@ worker.addEventListener('message', function(e) {
     requestAnimationFrame(animate);
 });
 
-// create player
-export const player = new Player(socket.io.engine.id);
-console.log('player created');
-
-// game window resize functions
-import { resize } from "./utils/windowResize.js";
-resize();
-
-inventoryUpdate(socket);
+import { socketUpdate, clientInit } from './sockets/index.js'; // imports socket update, but also calls playerInit in this file
+clientInit(socket); 
 
 // react overlay
 import { Inventory } from "./UI/inventory.js"; // maybe move to a player method?
 
 export function setup() {
-    console.log('finished loading');
-    userUpdate(socket, clientState);
-    resourceUpdate(socket, clientState);
+    socketUpdate(socket);
     
     player.render();
     ReactDOM.render(<Inventory />, document.getElementById('root'));
@@ -83,12 +76,9 @@ export function setup() {
     animate();
 }
 
-socket.on('connect', () => {
-    console.log('connected');
-});
-
 function animate() {
     charm.update();
+    dust.update();
 
     player.update();
 

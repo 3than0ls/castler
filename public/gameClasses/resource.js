@@ -1,13 +1,24 @@
-import { socket, player, stage, renderer } from "../game";
+import { socket, player, particleContainer } from "../game";
 import { loader } from "../utils/loader";
 import { bump } from "../bump/bump";
 import { ratio, gameWidth } from "../utils/windowResize";
 import { charm } from "../charm/charm.js";
-import { resourceEmit } from "../sockets/resoureEmit";
+import { dust } from "../dust/dust.js";
 
 export class Resource {
     constructor(resourceID, type, amount, globalX, globalY) {
         this.type = type;
+        switch(type) {
+            case 'tree':
+                this.resourceName = 'wood';
+                break;
+            case 'rock':
+                this.resourceName = 'stone';
+                break;
+            default:
+                this.resourceName = 'unidentified'
+                break;
+        }
         this.resourceID = resourceID;
         this.amount = amount; // resources contain a certain amount you can harvest from, maybe change variable name
         
@@ -39,12 +50,28 @@ export class Resource {
     }
 
     hit(vx=10, vy=10, harvestSpeed) {
+        // create an effect where the resource appears to have bumped when hit
         let waypoints = [
             [this.globalX, this.globalY],
             [this.globalX+vx, this.globalY+vy],
             [this.globalX, this.globalY]
         ]
         charm.walkPath(this.resourceGraphic, waypoints, harvestSpeed*8, "smoothstep");
+        // emit particle when hit
+        dust.create(
+            this.globalX,
+            this.globalY,
+            () => new PIXI.Sprite(loader.resources[this.resourceName.concat('Particle')].texture),
+            player.viewpoint,
+            50,
+            0,
+            true,
+            0, 6.28,
+            12, 24,
+            1.5, 2,
+            0.005, 0.01,
+            0.005, 0.01, // sometimes for a split second, it renders over the resource sprite, fix?
+        );
     }
 
     harvest(multiplier) {
