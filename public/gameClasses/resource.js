@@ -49,7 +49,7 @@ export class Resource {
         return bump.hitTestPoint(collisionPoint, this.resourceGraphic);
     }
 
-    hit(vx=10, vy=10, harvestSpeed) {
+    hit(vx=10, vy=10, collisionX, collisionY, harvestSpeed) {
         // create an effect where the resource appears to have bumped when hit
         let waypoints = [
             [this.globalX, this.globalY],
@@ -59,11 +59,11 @@ export class Resource {
         charm.walkPath(this.resourceGraphic, waypoints, harvestSpeed*8, "smoothstep");
         // emit particle when hit
         dust.create(
-            this.globalX,
-            this.globalY,
+            collisionX,
+            collisionY,
             () => new PIXI.Sprite(loader.resources[this.resourceName.concat('Particle')].texture),
             player.viewpoint,
-            50,
+            25,
             0,
             true,
             0, 6.28,
@@ -72,10 +72,6 @@ export class Resource {
             0.005, 0.01,
             0.005, 0.01, // sometimes for a split second, it renders over the resource sprite, fix?
         );
-    }
-
-    harvest(multiplier) {
-        this.amount += 1*Math.round(multiplier);
     }
     
     animate(globalX, globalY, amount, playerHit) {

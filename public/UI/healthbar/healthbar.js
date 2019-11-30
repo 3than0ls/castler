@@ -1,0 +1,45 @@
+import React from 'react';
+
+// how in the actual hell does react bootstrap work? find out
+
+// react bootstrap components
+import ProgressBar from 'react-bootstrap/ProgressBar'
+
+// custom style sheet
+import './healthbar.css';
+import './../styles.css';
+
+import { player } from '../../game';
+
+export class HealthBar extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            nowHealth: player.health,
+        }
+    }
+
+    componentDidMount() {
+        this.timerID = setInterval(() => this.tick(), 60); // learn more about this
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
+
+    tick() { 
+        this.setState({
+            nowHealth: player.health
+        });
+    }
+
+    render() {
+        return( // return react fragment
+            <> 
+                <div className="healthbarWrapper">
+                    <ProgressBar variant="round" className="healthbar" now={this.state.nowHealth}/>  
+                </div>
+            </>
+        )
+    }
+}

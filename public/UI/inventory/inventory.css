@@ -1,0 +1,21 @@
+.items {
+    pointer-events: none;
+    display: inline-block;
+    max-width: 300px;
+    text-align: center;
+    height: auto;
+    
+    font-size: 100%;
+
+    margin: 0 auto;
+}
+
+.images {
+    pointer-events: none;
+    width: 50%;
+    min-width: 100px;
+    max-width: 60%;
+    height: auto;
+
+    margin: 0.6vh auto;
+}

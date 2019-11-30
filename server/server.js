@@ -65,6 +65,8 @@ io.on('connection', socket => {
         io.emit('harvested', { // harvested only provides a visual effect, and nothing else
             vx: data.vx,
             vy: data.vy,
+            collisionX: data.collisionX,
+            collisionY: data.collisionY,
             resourceID: data.resourceID,
             harvestSpeed: data.harvestSpeed
         });

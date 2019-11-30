@@ -60,14 +60,14 @@ worker.addEventListener('message', function(e) {
 import { socketUpdate, clientInit } from './sockets/index.js'; // imports socket update, but also calls playerInit in this file
 clientInit(socket); 
 
-// react overlay
-import { Inventory } from "./UI/inventory.js"; // maybe move to a player method?
+// import and render react overlay
+import { App } from "./UI/index.js";
+ReactDOM.render(<App />, document.getElementById('root'));
 
 export function setup() {
     socketUpdate(socket);
     
     player.render();
-    ReactDOM.render(<Inventory />, document.getElementById('root'));
 
     // resize renderer and game when needed
     resize();

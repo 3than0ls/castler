@@ -1,0 +1,36 @@
+.healthbar {
+    pointer-events: none;
+    position: fixed;
+
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+
+    background: rgba(0, 0, 0, 0);
+
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.healthbarWrapper {
+    pointer-events: none;
+    position: fixed;
+
+    border-radius: 10px;
+
+    width: 30vw;
+    height: 5vh;
+
+    min-width: 300px;
+    min-height: 30px;
+
+    left: 50%;
+    bottom: 5%;
+    transform: translate(-50%);
+    background: rgba(100, 100, 100, 0.5);
+}
+
+.bg-round {
+    border-radius: 10px;
+    background: rgb(200, 0, 0)
+}

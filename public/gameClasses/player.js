@@ -27,9 +27,13 @@ export class Player {
 
         this.viewpoint = new PIXI.Container();
 
+        // player status
+        this.health = 80;
+
         // player game stats
+        this.maxHealth = 100;
         this.speed = 4;
-        this.harvestSpeed = 4;
+        this.harvestSpeed = 2;
 
         // player inventory and resources
         this.resources = {
@@ -304,6 +308,8 @@ export class Player {
                     amount: 1,
                     vx: vx,
                     vy: vy,
+                    collisionX: this.collisionPoints[this.displayHand].x,
+                    collisionY: this.collisionPoints[this.displayHand].y,
                     harvestSpeed: this.harvestSpeed
                 })
             }

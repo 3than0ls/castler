@@ -2,7 +2,7 @@ import { Resource } from "../../gameClasses/resource";
 
 export const resourceUpdate = (socket, clientState) => {
     socket.on('harvested', data => {
-        clientState.resources[data.resourceID].hit(data.vx, data.vy, data.harvestSpeed);
+        clientState.resources[data.resourceID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
     });
     socket.on('resourceStates', serverStateResources => {
         const resourceIDs = Object.keys(serverStateResources);

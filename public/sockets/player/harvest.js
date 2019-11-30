@@ -4,6 +4,8 @@ export const harvest = (socket, data) => {
         amount: data.amount,
         vx: data.vx,
         vy: data.vy,
+        collisionX: data.collisionX,
+        collisionY: data.collisionY,
         harvestSpeed: data.harvestSpeed,
         id: socket.id,
     })
@@ -15,4 +17,6 @@ export const harvest = (socket, data) => {
     data.amount
     data.vx
     data.vy
+    data.collisionX
+    data.collisionY
 */
