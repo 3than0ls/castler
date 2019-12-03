@@ -10,10 +10,4 @@ module.exports = class ResourceState {
     harvest(amount) {
         this.amount -= amount;
     }
-    updateClientInfo(globalX, globalY, amount, playerHit) {
-        this.globalX = globalX;
-        this.globalY = globalY;
-        this.amount = amount;
-        this.playerHit = playerHit;
-    }
 }

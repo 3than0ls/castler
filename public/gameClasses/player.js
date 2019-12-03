@@ -151,12 +151,12 @@ export class Player {
         }
 
         if (this.swingAngle < this.stopRotation) {
+            // harvest: if collided with resource during swing and before stop rotation, call resource function
+            this.resourceHarvest();
         } else if (this.swingAngle >= this.stopRotation) {
             this.swingBack = true;
         }
 
-        // harvest: if collided with resource during swing, call resource function
-        if (!this.swingAvailable) this.resourceHarvest();
         
         if (this.swingAngle <= 0 && this.swingBack) { // end of animation - swingAvailable is true (another swing is available)
             /* test tracking
@@ -299,8 +299,8 @@ export class Player {
                 // create velocity and direction in which a resource bumps towards
                 let a = clientState.resources[resourceIDs[i]].globalX - this.globalX;
                 let b = clientState.resources[resourceIDs[i]].globalY - this.globalY;
-                const vx = (Math.asin(a / Math.hypot(a, b))*10);
-                const vy = (Math.asin(b / Math.hypot(a, b))*10);
+                let vx = (Math.asin(a / Math.hypot(a, b))*10);
+                let vy = (Math.asin(b / Math.hypot(a, b))*10);
 
                 // then emit harvest
                 harvest(socket, {
@@ -325,21 +325,21 @@ export class Player {
         this.y = y;
     }
 
-    updateCollisionPoints() {
+    updateCollisionPoints() { // the math is a bit off, can check later
         this.collisionPoints['axeHand'] = {
-            x: this.globalX + 
-            (this.handSprites['axeHand'].width/
-            (this.handSprites['axeHand'].width/this.bodyGraphic.width))*Math.sin(-this.angle - (this.swingAngle * (Math.PI/180))), // update based on angle
+            x: this.globalX - 
+            (this.handSprites['axeHand'].width/(this.handSprites['axeHand'].width/this.bodyGraphic.width))
+            *-Math.sin(-this.angle + 1 - (this.swingAngle * (Math.PI/180))), // update based on angle
 
-            y: this.globalY +
-            (this.handSprites['axeHand'].height/
-            (this.handSprites['axeHand'].height/this.bodyGraphic.height))*Math.cos(-this.angle - (this.swingAngle * (Math.PI/180)))
+            y: this.globalY - 
+            (this.handSprites['axeHand'].height/(this.handSprites['axeHand'].height/this.bodyGraphic.height))
+            *-Math.cos(-this.angle + 1 - (this.swingAngle * (Math.PI/180)))
         }
         /* point test, to see where the collision point for axeHand is
         this.pointTest = new PIXI.Graphics();
         this.pointTest.lineStyle(4, 0xFF3300, 1);
         this.pointTest.beginFill(0x66CCFF);
-        this.pointTest.drawCircle(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y, 10);
+        this.pointTest.drawCircle(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y, 2);
         this.pointTest.endFill();
         this.pointTest.position.set(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y);
         this.viewpoint.addChild(this.pointTest)*/

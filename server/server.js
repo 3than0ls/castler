@@ -5,6 +5,8 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 
 const UserState = require('./serverStates/userState.js');
 const ResourceState = require('./serverStates/resourceState.js');
+const EntityState = require('./serverStates/entityState.js');
+const EntityAI = require('./serverStates/entityAI.js');
 
 const app = express();
 const http = require('http').Server(app);
@@ -14,7 +16,6 @@ const compiler = webpack(config);
 
 // app.use(express.static(path.join(__dirname, './src/')));
 app.use(express.static(path.join(__dirname, './public/')));
-
 app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath
 }));
@@ -24,24 +25,29 @@ const io = require('socket.io')(http);
 const serverState = {
     users: {},
     resources: {}, 
+    entities: {
+        entityState: {}, // the data we send to the client holding positioning and other info about entities
+        entityAI: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
+    },
 }
 
 function createResourceTest() {
-    /*/ creates a test map with resources
-    for(let i = 0; i < 2; i++) {
-        for(let j = 0; j < 2; j++) {
-            let type = 'rock';
-            if (j % 2 == 0 ) type = 'tree'a
-            let resource = new ResourceState(-400+i*400, -400+j*400, type);
-            serverState.resources[resource.resourceID] = resource;
-        }
-    }*/
     let resource = new ResourceState(300, 300, 'rock');
     serverState.resources[resource.resourceID] = resource;
-    let resource2 = new ResourceState(-350, -270, 'tree');
+    let resource2 = new ResourceState(-100, -100, 'tree');
     serverState.resources[resource2.resourceID] = resource2;
 };
 createResourceTest();
+
+
+function createEntityTest() {
+    for (let i = 0; i < 50; i ++) {
+        let entity = new EntityState(75, -75, 'duck', 'passive');
+        serverState.entities.entityState[entity.entityID] = entity;
+        serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
+    }
+};
+createEntityTest();
 
 io.on('connection', socket => {
     serverState.users[socket.id] = new UserState(socket.id);
@@ -81,12 +87,20 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {  
+    // emit data
     io.sockets.emit('userStates', serverState.users);
     io.sockets.emit('resourceStates', serverState.resources);
+    io.sockets.emit('entityStates', serverState.entities.entityState);
+    
+    // updates states and call the entity AIs
+    const entityIDs = Object.keys(serverState.entities.entityAI);
+    for(let i = 0; i < entityIDs.length; i++) {
+        serverState.entities.entityAI[entityIDs[i]].update(serverState);
+    }
 }
   
-setInterval(() => {update(serverState)}, 1000/60);
 
 http.listen(3000, () => {
+    setInterval(() => {update(serverState)}, 1000/60);
     console.log('listening on localhost:3000');
 });
