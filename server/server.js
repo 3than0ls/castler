@@ -34,14 +34,14 @@ const serverState = {
 function createResourceTest() {
     let resource = new ResourceState(300, 300, 'rock');
     serverState.resources[resource.resourceID] = resource;
-    let resource2 = new ResourceState(-100, -100, 'tree');
+    let resource2 = new ResourceState(-160, -170, 'tree');
     serverState.resources[resource2.resourceID] = resource2;
 };
 createResourceTest();
 
 
 function createEntityTest() {
-    for (let i = 0; i < 50; i ++) {
+    for (let i = 0; i < 4; i ++) {
         let entity = new EntityState(75, -75, 'duck', 'passive');
         serverState.entities.entityState[entity.entityID] = entity;
         serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
@@ -77,6 +77,28 @@ io.on('connection', socket => {
             harvestSpeed: data.harvestSpeed
         });
         socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // update the clients inventory
+    });
+
+    socket.on('attack', data => {
+        // subtract the amount of health that the entity took
+        serverState.entities.entityAI[data.entityID].attacked(data.damage, data.vx, data.vy);
+
+        /* if the entity was killed */
+        if (serverState.entities.entityState[data.entityID].killed()) {
+            // add the amount harvested from kill to client inventory
+            // serverState.users[data.id].killed(type, amount)
+        }
+
+        // emit attack event occuring
+        io.emit('attacked', { // attacked only provides a visual effect, and nothing else
+            vx: data.vx,
+            vy: data.vy,
+            collisionX: data.collisionX,
+            collisionY: data.collisionY,
+            entityID: data.entityID,
+            entitySpeed: data.entitySpeed
+        });
+        // socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // update the clients inventory
     });
 
     // when disconnected, remove user from server state

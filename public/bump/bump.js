@@ -352,16 +352,16 @@ class Bump {
   }
 
   /*
-  circleResourceCollision, and edited version of circleCollision
+  circleGameCollision, and edited version of circleCollision
   ---------------
   same math and logic as circleCollision
 
   Edits: added a gameWidthWindowRatio variable, which is used in calculating the combined radii.
-         rather than having the second circle (the resource) visibly bounce off, we take the collision vector results and add them to the player global locaions
+         rather than having the second circle (the resource/entity) visibly bounce off, we take the collision vector results and add them to the player global locations
 
   */
 
-  circleResourceCollision(c1, c2, bounce = false, global = false) {
+  circleGameCollision(c1, c2, bounce = false, global = false) {
 
     //Add collision properties
     if (!c1._bumpPropertiesAdded) this.addCollisionProperties(c1); 

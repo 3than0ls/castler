@@ -42,14 +42,14 @@ export class Resource {
     }
 
     collide(playerGraphic) {
-        return bump.circleResourceCollision(this.resourceGraphic, playerGraphic, true, true);
+        return bump.circleGameCollision(this.resourceGraphic, playerGraphic, true, true);
     }
 
     handSpriteCollision(collisionPoint) {
         return bump.hitTestPoint(collisionPoint, this.resourceGraphic);
     }
 
-    hit(vx=10, vy=10, collisionX, collisionY, harvestSpeed) {
+    hit(vx, vy, collisionX, collisionY, harvestSpeed) {
         // create an effect where the resource appears to have bumped when hit
         let waypoints = [
             [this.globalX, this.globalY],

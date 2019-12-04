@@ -3,7 +3,8 @@ import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio, gameWidth } from "./../utils/windowResize.js";
 import { bump } from "../bump/bump.js";
-import { harvest } from "../sockets/player/harvest.js";
+import { harvest } from "../sockets/resources/harvest.js";
+import { attack } from "../sockets/entities/attack.js";
 
 export class Player {
     constructor(clientID) {
@@ -34,6 +35,7 @@ export class Player {
         this.maxHealth = 100;
         this.speed = 4;
         this.harvestSpeed = 2;
+        this.attackSpeed = 2;
 
         // player inventory and resources
         this.resources = {
@@ -119,19 +121,28 @@ export class Player {
             }
         };
         this.one.release = () => {
-            stage.removeChild(this.handSprites[this.displayHand]);
-            this.swingAvailable = true;
-            this.displayHand = 'hand';
+            if (this.displayHand !== 'hand') {
+                stage.removeChild(this.handSprites[this.displayHand]);
+                this.swingAngle = 0;
+                this.swingAvailable = true;
+                this.displayHand = 'hand';
+            }
         }
         this.two.release = () => {
-            stage.removeChild(this.handSprites[this.displayHand]);
-            this.swingAvailable = true;
-            this.displayHand = 'axeHand';
+            if (this.displayHand !== 'axeHand') {
+                stage.removeChild(this.handSprites[this.displayHand]);
+                this.swingAngle = 0;
+                this.swingAvailable = true;
+                this.displayHand = 'axeHand';
+            }
         }
         this.three.release = () => {
-            stage.removeChild(this.handSprites[this.displayHand]);
-            this.swingAvailable = true;
-            this.displayHand = 'pickaxeHand';
+            if (this.displayHand !== 'swordHand') {
+                stage.removeChild(this.handSprites[this.displayHand]);
+                this.swingAngle = 0;
+                this.swingAvailable = true;
+                this.displayHand = 'swordHand';
+            }
         }
     }
 
@@ -144,15 +155,22 @@ export class Player {
             this.swingAvailable = false;
         }
         
+        
         if (!this.swingBack) {
-            this.swingAngle += this.harvestSpeed;
+            if (this.displayHand === "axeHand") this.swingAngle += this.harvestSpeed;
+            else if (this.displayHand === "swordHand") this.swingAngle += this.attackSpeed;
         } else {
-            this.swingAngle -= this.harvestSpeed;
+            if (this.displayHand === "axeHand") this.swingAngle -= this.harvestSpeed;
+            else if (this.displayHand === "swordHand") this.swingAngle -= this.attackSpeed;
         }
 
         if (this.swingAngle < this.stopRotation) {
             // harvest: if collided with resource during swing and before stop rotation, call resource function
-            this.resourceHarvest();
+            if (this.displayHand === "axeHand") {
+                this.resourceHarvest();
+            } else if (this.displayHand === "swordHand") {
+                this.entityAttack();
+            }
         } else if (this.swingAngle >= this.stopRotation) {
             this.swingBack = true;
         }
@@ -260,7 +278,7 @@ export class Player {
         this.viewpointUpdate();
 
         // detect clicks and respond
-        if ((this.mouseHeld || this.swingAngle > 0) && this.displayHand === 'axeHand') { // if mouse held or effectively the swing has already started 
+        if ((this.mouseHeld || this.swingAngle > 0) && this.displayHand !== "hand") { // if mouse held or effectively the swing has already started 
             this.swing();
         } else {
             this.swingAvailable = true;
@@ -271,8 +289,8 @@ export class Player {
         let bodyGraphic = this.bodyGraphic;
         stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
 
-        // test and handle collisions 
-        this.resourceCollision();
+        // test and handle collisions  for resources and entities
+        this.collisions();
 
         // emit client info to server
         clientEmit(socket, {
@@ -284,27 +302,32 @@ export class Player {
         });
     }
 
-    resourceCollision() {
+    collisions() {
         const resourceIDs = Object.keys(clientState.resources);
-        for(let i = 0; i < resourceIDs.length; i++) {
+        for (let i = 0; i < resourceIDs.length; i++) {
             clientState.resources[resourceIDs[i]].collide(this.bodyGraphic);
+        }
+        const entityIDs = Object.keys(clientState.entities); 
+        for (let i = 0; i < entityIDs.length; i++) {
+            clientState.entities[entityIDs[i]].collide(this.bodyGraphic)
         }
     }
 
     resourceHarvest() {
         const resourceIDs = Object.keys(clientState.resources);
         for (let i = 0; i < resourceIDs.length; i++) {
-            if (clientState.resources[resourceIDs[i]].handSpriteCollision(this.collisionPoints[this.displayHand]) && !clientState.resources[resourceIDs[i]].alreadyHit) {
-                clientState.resources[resourceIDs[i]].alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
+            let resource = clientState.resources[resourceIDs[i]];
+            if (resource.handSpriteCollision(this.collisionPoints[this.displayHand]) && !resource.alreadyHit) {
+                resource.alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
                 // create velocity and direction in which a resource bumps towards
-                let a = clientState.resources[resourceIDs[i]].globalX - this.globalX;
-                let b = clientState.resources[resourceIDs[i]].globalY - this.globalY;
+                let a = resource.globalX - this.collisionPoints[this.displayHand].x;
+                let b = resource.globalY - this.collisionPoints[this.displayHand].y;
                 let vx = (Math.asin(a / Math.hypot(a, b))*10);
                 let vy = (Math.asin(b / Math.hypot(a, b))*10);
 
                 // then emit harvest
                 harvest(socket, {
-                    resourceID: clientState.resources[resourceIDs[i]].resourceID,
+                    resourceID: resource.resourceID,
                     amount: 1,
                     vx: vx,
                     vy: vy,
@@ -313,11 +336,43 @@ export class Player {
                     harvestSpeed: this.harvestSpeed
                 })
             }
-            if (this.swingAngle <= 0) { // once swing resets, reset alreadyHit to falsesss
-                clientState.resources[resourceIDs[i]].alreadyHit = false;
+            if (this.swingAngle <= 0) { // once swing resets, reset alreadyHit to false
+                resource.alreadyHit = false;
             }
         }
     }
+
+    entityAttack() {
+        const entityIDs = Object.keys(clientState.entities);
+        for (let i = 0; i < entityIDs.length; i++) {
+            let entity = clientState.entities[entityIDs[i]];
+            if (entity.handSpriteCollision(this.collisionPoints[this.displayHand]) && !entity.alreadyHit) {
+                entity.alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
+
+                // create velocity and direction in which an entity gets hit towards
+                let a = entity.globalX - this.collisionPoints[this.displayHand].x;
+                let b = entity.globalY - this.collisionPoints[this.displayHand].y;
+                let vx = (Math.asin(a / Math.hypot(a, b))*10);
+                let vy = (Math.asin(b / Math.hypot(a, b))*10);
+
+                // then emit harvest
+                attack(socket, {
+                    entityID: entity.entityID,
+                    damage: 1,
+                    vx: vx,
+                    vy: vy,
+                    collisionX: this.collisionPoints[this.displayHand].x,
+                    collisionY: this.collisionPoints[this.displayHand].y,
+                    attackSpeed: this.attackSpeed
+                })
+            }
+            if (this.swingAngle <= 0) { // once swing resets, reset alreadyHit to false
+                entity.alreadyHit = false;
+            }
+        }
+    }
+
+
 
     resizeAdjust(x, y) {
         // re adjusts viewpoint and position of player when the window is resized
@@ -328,21 +383,32 @@ export class Player {
     updateCollisionPoints() { // the math is a bit off, can check later
         this.collisionPoints['axeHand'] = {
             x: this.globalX - 
-            (this.handSprites['axeHand'].width/(this.handSprites['axeHand'].width/this.bodyGraphic.width))
-            *-Math.sin(-this.angle + 1 - (this.swingAngle * (Math.PI/180))), // update based on angle
+            (this.handSprites['axeHand'].width+this.bodyGraphic.width-50)/2
+            *-Math.sin(-this.angle - (-0.95 + this.swingAngle * (Math.PI/180))), // update based on angle
 
             y: this.globalY - 
-            (this.handSprites['axeHand'].height/(this.handSprites['axeHand'].height/this.bodyGraphic.height))
-            *-Math.cos(-this.angle + 1 - (this.swingAngle * (Math.PI/180)))
+            (this.handSprites['axeHand'].height+this.bodyGraphic.height-50)/2
+            *-Math.cos(-this.angle - (-0.95 + this.swingAngle * (Math.PI/180)))
         }
-        /* point test, to see where the collision point for axeHand is
+        this.collisionPoints['swordHand'] = {
+            x: this.globalX - 
+            (this.handSprites['swordHand'].width+this.bodyGraphic.width-20)/2
+            *-Math.sin(-this.angle - (-1.2 + this.swingAngle * (Math.PI/180))), // update based on angle
+
+            y: this.globalY - 
+            (this.handSprites['swordHand'].height+this.bodyGraphic.height-20)/2
+            *-Math.cos(-this.angle - (-1.2 + this.swingAngle * (Math.PI/180)))
+        }
+        /* point test, to see where the collision point for tested is
+        let tested = this.displayHand;
         this.pointTest = new PIXI.Graphics();
         this.pointTest.lineStyle(4, 0xFF3300, 1);
         this.pointTest.beginFill(0x66CCFF);
-        this.pointTest.drawCircle(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y, 2);
+        this.pointTest.drawCircle(this.collisionPoints[tested].x/2 + this.x/2, this.collisionPoints[tested].y/2 + this.y/2, 2);
+        this.pointTest.zIndex = -10;
         this.pointTest.endFill();
-        this.pointTest.position.set(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y);
-        this.viewpoint.addChild(this.pointTest)*/
+        this.pointTest.position.set(this.collisionPoints[tested].x/2 + this.x/2, this.collisionPoints[tested].y/2 + this.y/2);
+        stage.addChild(this.pointTest)*/
     }
 
     static createHandSprites(handSprites, x, y) {
@@ -365,6 +431,14 @@ export class Player {
         handSprites['axeHand'].anchor.y = 0.55;
         handSprites['axeHand'].position.set(x, y);
         handSprites['axeHand'].zIndex = 49;
+
+        // sword hand
+        handSprites['swordHand'] = new PIXI.Sprite(loader.resources['swordHand'].texture);
+        handSprites['swordHand'].anchor.x = 0.256; // anchor positions have been pre calculated
+        handSprites['swordHand'].anchor.y = 0.38;
+        handSprites['swordHand'].position.set(x, y);
+        handSprites['swordHand'].zIndex = 49;
+
 
         // etc.
     }

@@ -7,11 +7,10 @@ module.exports = class EntityState {
         this.angle = Math.round((Math.random() - 0.5) * 360);
         this.playerHit = false;
         this.neutrality = nuetrality || "passive";
+
+        this.health = 100;
     }
-    update(globalX, globalY, angle, neutrality) {
-        this.globalX = globalX;
-        this.globalY = globalY;
-        this.angle = angle;
-        this.neutrality = neutrality;
+    killed() {
+        return this.health <= 0;
     }
 }

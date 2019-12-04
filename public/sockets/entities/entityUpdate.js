@@ -1,6 +1,9 @@
 import { Entity } from "../../gameClasses/entity";
 
 export const entityUpdate = (socket, clientState) => {
+    socket.on('attacked', data => {
+        clientState.entities[data.entityID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.attackSpeed);
+    });
     socket.on('entityStates', serverStateEntities => {
         const entityIDs = Object.keys(serverStateEntities);
         for(let i = 0; i < entityIDs.length; i++) {

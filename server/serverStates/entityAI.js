@@ -18,7 +18,6 @@ module.exports = class EntityAI {
         this.walkFinish = true;
         // avoid
         this.avoidResourceDistance = 300;
-        this.avoidEntityDistance = 150;
     }
 
     tick() {
@@ -52,7 +51,7 @@ module.exports = class EntityAI {
                     this.entityState.globalY - serverStateResources[resourceIDs[i]].globalY,
                     this.entityState.globalX - serverStateResources[resourceIDs[i]].globalX
                 )) * 180 / Math.PI;
-                this.stopDistance = 100;
+                this.stopDistance = 3;
                 this.rotateFinish = false;
                 this.walkFinish = false;
             }
@@ -75,14 +74,26 @@ module.exports = class EntityAI {
     }
 
     walk() {
-        this.distance++;
-        this.entityState.globalX += Math.sin(this.entityState.angle * (Math.PI/180)) * this.speed;
-        this.entityState.globalY += -Math.cos(this.entityState.angle * (Math.PI/180)) * this.speed;
-
         if (this.distance >= this.stopDistance) {
             this.walkFinish = true;
             this.distance = 0;
+        } else {
+            this.distance++;
+            this.entityState.globalX += Math.sin(this.entityState.angle * (Math.PI/180)) * this.speed;
+            this.entityState.globalY += -Math.cos(this.entityState.angle * (Math.PI/180)) * this.speed;
+    
         }
+    }
+
+    attacked(damage, vx, vy) {
+        this.entityState.health -= damage;
+        this.entityState.globalX += vx;
+        this.entityState.globalY += vy;
+
+        this.walkFinish = true;
+        this.stopDistance = 0;
+        this.rotateFinish = true;
+        this.entityState.stopAngle = this.entityState.angle;
     }
 
     move() {
