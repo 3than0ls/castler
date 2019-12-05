@@ -8,6 +8,8 @@ module.exports = class EntityState {
         this.playerHit = false;
         this.neutrality = nuetrality || "passive";
 
+        this.lootAmount = 1;
+
         this.health = 100;
     }
     killed() {

@@ -39,12 +39,12 @@ export class Entity {
     }
 
     hit(vx, vy, collisionX, collisionY, attackSpeed) {
-        charm.slide(this.entityGraphic, this.globalX+vx, this.globalY+vy, 40, "deceleration");
+        charm.slide(this.entityGraphic, this.globalX+vx, this.globalY+vy, attackSpeed*8, "deceleration");
         // emit particle when hit
         dust.create(
             collisionX,
             collisionY,
-            () => new PIXI.Sprite(loader.resources['woodParticle'].texture),
+            () => new PIXI.Sprite(loader.resources['bloodParticle'].texture),
             player.viewpoint,
             25,
             0,
@@ -52,9 +52,54 @@ export class Entity {
             0, 6.28,
             12, 24,
             1.5, 2,
-            0.005, 0.01,
-            0.005, 0.01, // sometimes for a split second, it renders over the resource sprite, fix?
+            0.02, 0.04,
+            0.02, 0.04,
         );
+    }
+
+    die(collisionX, collisionY) {
+        // emit particle when died
+        let deathParticle;
+        switch (this.type) {
+            case "duck":
+                deathParticle = "feather";
+                break;
+            default:
+                deathParticle = "bloodParticle";
+                break;
+        }
+        dust.create(
+            this.globalX,
+            this.globalY,
+            () => new PIXI.Sprite(loader.resources[deathParticle].texture),
+            player.viewpoint,
+            140,
+            0,
+            true,
+            0, 6.28,
+            20, 35,
+            0.25, 0.8,
+            0, 0,
+            0.01, 0.02,
+            0.01, 0.1,
+        );
+        dust.create(
+            this.globalX,
+            this.globalY,
+            () => new PIXI.Sprite(loader.resources['bloodParticle'].texture),
+            player.viewpoint,
+            25,
+            0,
+            true,
+            0, 6.28,
+            12, 24,
+            1.5, 2,
+            0.01, 0.02,
+            0.01, 0.02,
+        );
+        charm.fadeOut(this.entityGraphic, 30).onComplete = () => {
+            this.delete();
+        }
     }
     
     animate(globalX, globalY, angle, nuetrality) {
@@ -69,5 +114,10 @@ export class Entity {
         // add graphics to stage
         let entityGraphic = this.entityGraphic;       
         player.viewpoint.addChild(entityGraphic); // hands drawn below body
+    }
+
+    delete() { // delete user when disconnected
+        let entityGraphic = this.entityGraphic;
+        player.viewpoint.removeChild(entityGraphic);
     }
 }

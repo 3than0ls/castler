@@ -20,11 +20,13 @@ export class Inventory extends React.Component {
     constructor() {
         super();
         this.state = {
+            playerInventory: player.inventory,
+
             woodImage: wood,
             stoneImage: stone,
 
-            wood: player.resources['wood'],
-            stone: player.resources['stone'],
+            wood: player.inventory['wood'],
+            stone: player.inventory['stone'],
         }
     }
     componentDidMount() {
@@ -35,20 +37,31 @@ export class Inventory extends React.Component {
     }
     tick() { 
         this.setState({
-            wood: player.resources['wood'],
-            stone: player.resources['stone'],
+            playerInventory: player.inventory
         });
     }
 
     render() {
+        const inventory = [];
+        for (let [item, amount] of Object.entries(this.state.playerInventory)) {
+            inventory.push(
+                <div key={item}>
+                    <Row className='items' variant="primary">{item}{" x"}{amount}</Row>
+                    <Row variant="primary"><Image className='images' src={this.state[item.concat('Image')]}/></Row>
+                </div>
+            )
+        }
+        /* 
+            <Row className='items' variant="primary">Wood x{this.state.wood}</Row>
+            <Row variant="primary"><Image className='images' src={this.state.woodImage}/></Row>
+            <Row className='items' variant="primary">Stone x{this.state.stone}</Row>
+            <Row variant="primary"><Image className='images' src={this.state.stoneImage}/></Row>
+        */
         return( // return react fragment
             <> 
                 <h1 className='overlayBox'>hello!</h1>
                 <Col className='overlayBox'>
-                    <Row className='items' variant="primary">Wood x{this.state.wood}</Row>
-                    <Row variant="primary"><Image className='images' src={this.state.woodImage}/></Row>
-                    <Row className='items' variant="primary">Stone x{this.state.stone}</Row>
-                    <Row variant="primary"><Image className='images' src={this.state.stoneImage}/></Row>
+                    {inventory}
                 </Col>
             </>
         )

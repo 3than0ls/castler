@@ -7,18 +7,26 @@ module.exports = class UserState {
         this.swingAngle = 0;
         this.displayHand = 'hand';
 
-        this.resources = {
+        this.inventory = {
             'wood': 10,
             'stone': 0,
+            'meat': 0,
         }
     }
     harvest(type, amount) {
         switch(type) {
             case 'tree':
-                this.resources['wood'] += amount;
+                this.inventory['wood'] += amount;
                 break;
             case 'rock':
-                this.resources['stone'] += amount;
+                this.inventory['stone'] += amount;
+                break;
+        }
+    }
+    kill(type, amount) { // later maybe combine kill and harvest
+        switch(type) {
+            case 'duck':
+                this.inventory['meat'] += amount;
                 break;
         }
     }

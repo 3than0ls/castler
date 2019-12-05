@@ -63,7 +63,6 @@ clientInit(socket);
 
 // import and render react overlay
 import { App } from "./UI/index.js";
-import { Entity } from './gameClasses/entity.js';
 ReactDOM.render(<App />, document.getElementById('root'));
 
 export function setup() {

@@ -32,17 +32,20 @@ const serverState = {
 }
 
 function createResourceTest() {
-    let resource = new ResourceState(300, 300, 'rock');
-    serverState.resources[resource.resourceID] = resource;
-    let resource2 = new ResourceState(-160, -170, 'tree');
-    serverState.resources[resource2.resourceID] = resource2;
+    for (let i = 0; i < 12; i ++) {
+        let resource = new ResourceState(700*Math.sin(i*30*(Math.PI/180)), 700*Math.cos(i*30*(Math.PI/180)), 'tree');
+        serverState.resources[resource.resourceID] = resource;
+        /*
+        let resource2 = new ResourceState(500*Math.sin((i)*(Math.PI/180)), 500*Math.cos((i)*(Math.PI/180)), 'rock');
+        serverState.resources[resource2.resourceID] = resource2;*/
+    }
 };
 createResourceTest();
 
 
 function createEntityTest() {
-    for (let i = 0; i < 4; i ++) {
-        let entity = new EntityState(75, -75, 'duck', 'passive');
+    for (let i = 0; i < 10; i ++) {
+        let entity = new EntityState(0, 0, 'duck', 'passive');
         serverState.entities.entityState[entity.entityID] = entity;
         serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
     }
@@ -55,7 +58,7 @@ io.on('connection', socket => {
     console.log("Client data: " + JSON.stringify(serverState.users[socket.id]));
 
     socket.emit('playerInit', {
-        resources: serverState.users[socket.id].resources
+        inventory: serverState.users[socket.id].inventory
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
@@ -76,29 +79,38 @@ io.on('connection', socket => {
             resourceID: data.resourceID,
             harvestSpeed: data.harvestSpeed
         });
-        socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // update the clients inventory
+        socket.emit('inventoryUpdate', serverState.users[socket.id].inventory) // update the clients inventory
     });
 
     socket.on('attack', data => {
         // subtract the amount of health that the entity took
-        serverState.entities.entityAI[data.entityID].attacked(data.damage, data.vx, data.vy);
+        let entityAI = serverState.entities.entityAI[data.entityID]
+        let entityState = serverState.entities.entityState[data.entityID]
+        entityAI.attacked(data.damage, data.vx, data.vy);
 
         /* if the entity was killed */
-        if (serverState.entities.entityState[data.entityID].killed()) {
+        if (entityState.killed()) {
             // add the amount harvested from kill to client inventory
-            // serverState.users[data.id].killed(type, amount)
+            serverState.users[data.id].kill(entityState.type, entityState.lootAmount);
+            io.emit('killed', {
+                collisionX: data.collisionX,
+                collisionY: data.collisionY,
+                entityID: data.entityID,
+            });
+            socket.emit('inventoryUpdate', serverState.users[socket.id].inventory) // update the clients inventory
+            delete serverState.entities.entityAI[entityState.entityID];
+            delete serverState.entities.entityState[entityState.entityID];
+        } else {
+            // emit attack event occuring
+            io.emit('attacked', { // attacked only provides a visual effect, and nothing else
+                vx: data.vx,
+                vy: data.vy,
+                collisionX: data.collisionX,
+                collisionY: data.collisionY,
+                entityID: data.entityID,
+                entitySpeed: data.entitySpeed
+            });
         }
-
-        // emit attack event occuring
-        io.emit('attacked', { // attacked only provides a visual effect, and nothing else
-            vx: data.vx,
-            vy: data.vy,
-            collisionX: data.collisionX,
-            collisionY: data.collisionY,
-            entityID: data.entityID,
-            entitySpeed: data.entitySpeed
-        });
-        // socket.emit('inventoryUpdate', serverState.users[socket.id].resources) // update the clients inventory
     });
 
     // when disconnected, remove user from server state

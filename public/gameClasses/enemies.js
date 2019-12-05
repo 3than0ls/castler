@@ -69,6 +69,6 @@ export class Enemy {
         let bodyGraphic = this.bodyGraphic 
         let hand = this.handSprites[this.displayHand];
         player.viewpoint.removeChild(bodyGraphic, hand);
-        // add more
+        // add more sprite removals if needed
     }
 }

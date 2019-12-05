@@ -13,6 +13,8 @@ import tree from "./../assets/tree.png";
 import woodParticle from "./../assets/woodParticle.png";
 import stoneParticle from "./../assets/stoneParticle.png";
 import duck from './../assets/duck.png';
+import bloodParticle from './../assets/bloodParticle.png';
+import feather from './../assets/feather.png';
 
 console.log('loading...');
 
@@ -29,4 +31,6 @@ loader
     .add('stoneParticle', stoneParticle)
     .add('woodParticle', woodParticle)
     .add('duck', duck)
+    .add('bloodParticle', bloodParticle)
+    .add('feather', feather)
     .load(setup);

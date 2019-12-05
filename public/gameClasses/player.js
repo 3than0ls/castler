@@ -34,13 +34,15 @@ export class Player {
         // player game stats
         this.maxHealth = 100;
         this.speed = 4;
+        this.damage = 50;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
 
         // player inventory and resources
-        this.resources = {
+        this.inventory = {
             'wood': 0,
             'stone': 0,
+            'meat': 0,
         };
 
         // player statuses and small stuff
@@ -245,11 +247,8 @@ export class Player {
         stage.addChild(viewpoint);
     }
 
-    inventoryUpdate(resources) {
-        const resourceKeys = Object.keys(resources);
-        for (let i = 0; i < resourceKeys.length; i++) {
-            this.resources[resourceKeys[i]] = resources[resourceKeys[i]];
-        }
+    inventoryUpdate(inventory) {
+        this.inventory = inventory;
     }
     
     update() {
@@ -358,7 +357,7 @@ export class Player {
                 // then emit harvest
                 attack(socket, {
                     entityID: entity.entityID,
-                    damage: 1,
+                    damage: this.damage,
                     vx: vx,
                     vy: vy,
                     collisionX: this.collisionPoints[this.displayHand].x,

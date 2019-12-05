@@ -4,6 +4,10 @@ export const entityUpdate = (socket, clientState) => {
     socket.on('attacked', data => {
         clientState.entities[data.entityID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.attackSpeed);
     });
+    socket.on('killed', data => {
+        clientState.entities[data.entityID].die(data.collisionX, data.collisionY);
+        delete clientState.entities[data.entityID];
+    })
     socket.on('entityStates', serverStateEntities => {
         const entityIDs = Object.keys(serverStateEntities);
         for(let i = 0; i < entityIDs.length; i++) {
@@ -21,14 +25,13 @@ export const entityUpdate = (socket, clientState) => {
                 data.globalX, data.globalY, data.angle, data.nuetrality
             );
         }
-        /*
-        // delete disconnected players
-        const enemyIDs = Object.keys(clientState.enemies);
+        // delete dead entities
+        const clientEntityIDs = Object.keys(clientState.entities);
         // filters server ids from client ids, and if theres a difference remove it
-        let userDifference = enemyIDs.filter(function(i) {return userIDs.indexOf(i) < 0; }); 
-        for(let i = 0; i < userDifference.length; i++) {
-            clientState.enemies[userDifference[i]].delete();
-            delete clientState.enemies[userDifference[i]];
-        }*/
+        let entityDifference = entityIDs.filter(function(i) {return clientEntityIDs.indexOf(i) < 0; }); 
+        for(let i = 0; i < entityDifference.length; i++) {
+            clientState.entities[entityDifference[i]].delete();
+            delete clientState.entities[entityDifference[i]];
+        }
     });
 };
