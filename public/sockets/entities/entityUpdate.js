@@ -11,12 +11,12 @@ export const entityUpdate = (socket, clientState) => {
     socket.on('entityStates', serverStateEntities => {
         const entityIDs = Object.keys(serverStateEntities);
         for(let i = 0; i < entityIDs.length; i++) {
-            // if new resource found, add it
+            // if new entity found, add it
             if (!clientState.entities[entityIDs[i]]) {
-                // if new id and info found, create new resource and add it to client state
+                // if new id and info found, create new entity and add it to client state
                 let data = serverStateEntities[entityIDs[i]];
                 const newEntity = new Entity(data.entityID, data.type, data.nuetrality, data.amount, data.globalX, data.globalY);
-                newEntity.render(); // render resource
+                newEntity.render(); // render entity
                 clientState.entities[entityIDs[i]] = newEntity;
             }
             

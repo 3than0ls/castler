@@ -23,11 +23,11 @@ module.exports = class UserState {
                 break;
         }
     }
-    kill(type, amount) { // later maybe combine kill and harvest
-        switch(type) {
-            case 'duck':
-                this.inventory['meat'] += amount;
-                break;
+    kill(lootDrops) { // later maybe combine kill and harvest
+        const lootDropKeys = Object.keys(lootDrops);
+        for (let i = 0; i < lootDropKeys.length; i ++) {
+            if (!this.inventory[lootDropKeys[i]]) this.inventory[lootDropKeys[i]] = 0;
+            this.inventory[lootDropKeys[i]] += lootDrops[lootDropKeys[i]];
         }
     }
     updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {

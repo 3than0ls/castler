@@ -19,7 +19,14 @@ export class Entity {
     render() {
         this.entityGraphic = new PIXI.Sprite(loader.resources[this.type].texture);
         this.entityGraphic.circular = true; // bump js settings
-        this.entityGraphic.radius = (this.entityGraphic.width * 0.798)/2; // 0.798 is only for duck
+        switch (this.type) {
+            case "duck":
+                this.entityGraphic.radius = (this.entityGraphic.width * 0.798)/2; // 0.798 is pre calculated
+                break;
+            case "boar": 
+                this.entityGraphic.radius = (this.entityGraphic.width * 0.827)/2; // 0.798 is pre calculated
+                break;
+        }
         
         // set positions
         this.entityGraphic.anchor.x = 0.5; 
@@ -31,7 +38,7 @@ export class Entity {
     }
 
     collide(playerGraphic) {
-        return bump.circleGameCollision(this.entityGraphic, playerGraphic, true, true);
+        return bump.circleGameCollision(this.entityGraphic, playerGraphic, true, true, 'entity');
     }
 
     handSpriteCollision(collisionPoint) {
@@ -39,7 +46,7 @@ export class Entity {
     }
 
     hit(vx, vy, collisionX, collisionY, attackSpeed) {
-        charm.slide(this.entityGraphic, this.globalX+vx, this.globalY+vy, attackSpeed*8, "deceleration");
+        // charm.slide(this.entityGraphic, this.globalX+vx, this.globalY+vy, 60, "deceleration");
         // emit particle when hit
         dust.create(
             collisionX,
@@ -57,12 +64,15 @@ export class Entity {
         );
     }
 
-    die(collisionX, collisionY) {
+    die() {
         // emit particle when died
         let deathParticle;
         switch (this.type) {
             case "duck":
                 deathParticle = "feather";
+                break;
+            case "boar":
+                deathParticle = "fur";
                 break;
             default:
                 deathParticle = "bloodParticle";

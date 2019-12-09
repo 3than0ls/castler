@@ -32,20 +32,27 @@ const serverState = {
 }
 
 function createResourceTest() {
-    for (let i = 0; i < 12; i ++) {
+    /*for (let i = 0; i < 12; i ++) {
         let resource = new ResourceState(700*Math.sin(i*30*(Math.PI/180)), 700*Math.cos(i*30*(Math.PI/180)), 'tree');
         serverState.resources[resource.resourceID] = resource;
         /*
         let resource2 = new ResourceState(500*Math.sin((i)*(Math.PI/180)), 500*Math.cos((i)*(Math.PI/180)), 'rock');
-        serverState.resources[resource2.resourceID] = resource2;*/
-    }
+        serverState.resources[resource2.resourceID] = resource2;
+    }*/
+    let resource2 = new ResourceState(0, 1000, 'tree');
+    serverState.resources[resource2.resourceID] = resource2;
+    resource2 = new ResourceState(0, 850, 'tree');
+    serverState.resources[resource2.resourceID] = resource2;
 };
 createResourceTest();
 
 
 function createEntityTest() {
-    for (let i = 0; i < 10; i ++) {
-        let entity = new EntityState(0, 0, 'duck', 'passive');
+    for (let i = 0; i < 1; i ++) {
+        let entity = new EntityState(0, 80, 'duck', 'passive');
+        serverState.entities.entityState[entity.entityID] = entity;
+        serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
+        entity = new EntityState(0, 450, 'boar', 'neutral');
         serverState.entities.entityState[entity.entityID] = entity;
         serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
     }
@@ -86,12 +93,12 @@ io.on('connection', socket => {
         // subtract the amount of health that the entity took
         let entityAI = serverState.entities.entityAI[data.entityID]
         let entityState = serverState.entities.entityState[data.entityID]
-        entityAI.attacked(data.damage, data.vx, data.vy);
+        entityAI.attacked(data.damage, data.vx, data.vy, serverState.users[socket.id]);
 
         /* if the entity was killed */
         if (entityState.killed()) {
             // add the amount harvested from kill to client inventory
-            serverState.users[data.id].kill(entityState.type, entityState.lootAmount);
+            serverState.users[data.id].kill(entityState.loot);
             io.emit('killed', {
                 collisionX: data.collisionX,
                 collisionY: data.collisionY,
