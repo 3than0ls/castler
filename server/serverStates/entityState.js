@@ -6,8 +6,7 @@ module.exports = class EntityState {
         this.type = type;
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
-        // this.angle = Math.round((Math.random() - 0.5) * 360);
-        this.angle = 90;
+        this.angle = Math.round((Math.random() - 0.5) * 360);
         this.playerHit = false;
         this.neutrality = neutrality || "passive";
 
@@ -18,7 +17,7 @@ module.exports = class EntityState {
                 this.health = 100;
                 break;
             case 'boar':
-                this.health = 1250;
+                this.health = 250;
                 break;
             default:
                 this.health = 100;

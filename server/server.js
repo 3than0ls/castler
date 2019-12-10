@@ -41,18 +41,18 @@ function createResourceTest() {
     }*/
     let resource2 = new ResourceState(0, 1000, 'tree');
     serverState.resources[resource2.resourceID] = resource2;
-    resource2 = new ResourceState(0, 850, 'tree');
-    serverState.resources[resource2.resourceID] = resource2;
 };
 createResourceTest();
 
 
 function createEntityTest() {
     for (let i = 0; i < 1; i ++) {
-        let entity = new EntityState(0, 80, 'duck', 'passive');
-        serverState.entities.entityState[entity.entityID] = entity;
-        serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
-        entity = new EntityState(0, 450, 'boar', 'neutral');
+        for (let j = 0; j < 10; j ++) {
+            let entity = new EntityState(0, 80, 'duck', 'passive');
+            serverState.entities.entityState[entity.entityID] = entity;
+            serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
+        }
+        let entity = new EntityState(0, 450, 'boar', 'neutral');
         serverState.entities.entityState[entity.entityID] = entity;
         serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
     }
