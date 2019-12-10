@@ -39,7 +39,13 @@ function createResourceTest() {
         let resource2 = new ResourceState(500*Math.sin((i)*(Math.PI/180)), 500*Math.cos((i)*(Math.PI/180)), 'rock');
         serverState.resources[resource2.resourceID] = resource2;
     }*/
-    let resource2 = new ResourceState(0, 1000, 'tree');
+    let resource2 = new ResourceState(0, 500, 'tree');
+    serverState.resources[resource2.resourceID] = resource2;
+    resource2 = new ResourceState(0, -400, 'tree');
+    serverState.resources[resource2.resourceID] = resource2;
+    resource2 = new ResourceState(500, 0, 'tree');
+    serverState.resources[resource2.resourceID] = resource2;
+    resource2 = new ResourceState(-400, 0, 'tree');
     serverState.resources[resource2.resourceID] = resource2;
 };
 createResourceTest();

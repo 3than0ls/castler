@@ -68,25 +68,29 @@ module.exports = class EntityAI {
     
     avoidResources(serverStateResources) {
         let resourceIDs = Object.keys(serverStateResources);
-        for (let i = 0; i < resourceIDs.length; i++) {
-            let a = this.entityState.globalX - serverStateResources[resourceIDs[i]].globalX;
-            let b = this.entityState.globalY  -serverStateResources[resourceIDs[i]].globalY;
+        for (let i = 0; i < resourceIDs.length; i++) { // as the index decreases, it seems like the calculations get rougher
+            const serverStateResource = serverStateResources[resourceIDs[i]]
+            const a = this.entityState.globalX - serverStateResource.globalX;
+            const b = this.entityState.globalY - serverStateResource.globalY;
             let distance = Math.hypot(a, b);
             
-            let avoidResourceDistance = this.hit ? this.avoidResourceDistance + 50 : this.avoidResourceDistance; 
-            if (distance < this.avoidResourceDistance) { // if the entity's distance from a resource is less than the avoidDistance length
+            if (distance < this.avoidResourceDistance) {
                 this.resourceCollision = true;
-                let a = (Math.round((Math.atan2(
+                console.log(i);
+                let angle = (Math.round((Math.atan2(
                     this.entityState.globalY - serverStateResources[resourceIDs[i]].globalY,
                     this.entityState.globalX - serverStateResources[resourceIDs[i]].globalX
                 )) * 180 / Math.PI) - this.entityState.angle + 90);
-                if (a >= 180) {
-                    a -= 360;
-                } else if (a <= -180) {
-                    a += 360;
+                if (angle >= 180) {
+                    angle -= 360;
+                } else if (angle <= -180) {
+                    angle += 360;
                 }
-                if (this.hit) a /= 27; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
-                this.rotate(a, 5);
+                if (this.hit) {
+                    angle /= 25; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
+                }
+                this.rotate(angle, 5);
+                break;
             } else {
                 this.resourceCollision = false;
             }
