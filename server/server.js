@@ -23,13 +23,18 @@ app.use(webpackDevMiddleware(compiler, {
 const io = require('socket.io')(http);
 
 const serverState = {
-    users: {},
+    users: {
+        userData: {},
+        user: {},
+    },
     resources: {}, 
     entities: {
         entityState: {}, // the data we send to the client holding positioning and other info about entities
         entityAI: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
     },
 }
+// TO DO: find a way to send client only the data needed, and not the other unecessary functions
+//        also probably include a clientUpdate which continues to send, rather than functions when an event occurs, which could be problematic
 
 function createResourceTest() {
     /*for (let i = 0; i < 12; i ++) {
@@ -66,23 +71,30 @@ function createEntityTest() {
 createEntityTest();
 
 io.on('connection', socket => {
-    serverState.users[socket.id] = new UserState(socket.id);
+    let newUserState = new UserState(socket);
+    serverState.users.user[socket.id] = newUserState;
+    serverState.users.userData[socket.id] = newUserState.clientDataPackage();
     // on received events, data.id should be equal to socket.id
-    console.log("Client data: " + JSON.stringify(serverState.users[socket.id]));
+    console.log("Client joined: " + serverState.users.user[socket.id].clientID);
 
     socket.emit('playerInit', {
-        inventory: serverState.users[socket.id].inventory
+        inventory: serverState.users.user[socket.id].inventory
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
-        serverState.users[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
+        serverState.users.user[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
+        socket.emit('clientUIUpdate', {
+            inventory: serverState.users.user[data.id].inventory,
+            health: serverState.users.user[data.id].health,
+        })
+        serverState.users.userData[data.id] = serverState.users.user[data.id].clientDataPackage();
     });
 
     socket.on('harvest', data => {
         // subtract the amount harvested from the resource
         serverState.resources[data.resourceID].harvest(data.amount);
         // add the amount harvested to the clients resource pile
-        serverState.users[data.id].harvest(serverState.resources[data.resourceID].type, data.amount);
+        serverState.users.user[data.id].harvest(serverState.resources[data.resourceID].type, data.amount);
         // emit harvest event occuring
         io.emit('harvested', { // harvested only provides a visual effect, and nothing else
             vx: data.vx,
@@ -92,25 +104,25 @@ io.on('connection', socket => {
             resourceID: data.resourceID,
             harvestSpeed: data.harvestSpeed
         });
-        socket.emit('inventoryUpdate', serverState.users[socket.id].inventory) // update the clients inventory
+        socket.emit('inventoryUpdate', serverState.users.userData[socket.id].inventory) // update the clients inventory
     });
 
     socket.on('attack', data => {
         // subtract the amount of health that the entity took
         let entityAI = serverState.entities.entityAI[data.entityID]
         let entityState = serverState.entities.entityState[data.entityID]
-        entityAI.attacked(data.damage, data.vx, data.vy, serverState.users[socket.id]);
+        entityAI.attacked(data.damage, serverState.users.user[socket.id]);
 
         /* if the entity was killed */
         if (entityState.killed()) {
             // add the amount harvested from kill to client inventory
-            serverState.users[data.id].kill(entityState.loot);
+            serverState.users.user[data.id].kill(entityState.loot);
             io.emit('killed', {
                 collisionX: data.collisionX,
                 collisionY: data.collisionY,
                 entityID: data.entityID,
             });
-            socket.emit('inventoryUpdate', serverState.users[socket.id].inventory) // update the clients inventory
+            socket.emit('inventoryUpdate', serverState.users.userData[socket.id].inventory) // update the clients inventory
             delete serverState.entities.entityAI[entityState.entityID];
             delete serverState.entities.entityState[entityState.entityID];
         } else {
@@ -129,13 +141,14 @@ io.on('connection', socket => {
     // when disconnected, remove user from server state
     socket.on('disconnect', () => {
       socket.broadcast.emit('userLeave', socket.id);
-      delete serverState.users[socket.id];
+      delete serverState.users.user[socket.id];
+      delete serverState.users.userData[socket.id];
     });
 })
 
 function update(serverState) {  
     // emit data
-    io.sockets.emit('userStates', serverState.users);
+    io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
     

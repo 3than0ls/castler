@@ -18,24 +18,27 @@ module.exports = class EntityAI {
         this.distance = 0;
         this.stopDistance = 0;
         this.walkFinish = true;
-        // avoid
-        this.avoidResourceDistance = 200;
+        // radius
         switch (entityState.type) {
             case 'duck':
-                this.avoidResourceDistance = (100 + 200)/2; // duck width plus resource width, divided by two
+                this.radius = (100 * 0.798)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
                 break;
             case 'boar':
-                this.avoidResourceDistance = (150 + 200)/2;
+                    this.radius = (150 * 0.827)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
                 break;
             default:
-                this.avoidResourceDistance = 350;
+                this.radius = 100;
                 break;
         }
+        // avoid
+        this.avoidResourceDistance = this.radius + (200/2) // entity radius plus resource radius
         this.resourceCollision = false;
         // neutrality variables
         this.aggroDistance = 500;
         this.hit = false;
         this.target;
+        this.targetSocket;
+        this.attackTargetRadius;
     }
 
     tick() {
@@ -74,9 +77,8 @@ module.exports = class EntityAI {
             const b = this.entityState.globalY - serverStateResource.globalY;
             let distance = Math.hypot(a, b);
             
-            if (distance < this.avoidResourceDistance) {
+            if (distance < this.avoidResourceDistance+15) {
                 this.resourceCollision = true;
-                console.log(i);
                 let angle = (Math.round((Math.atan2(
                     this.entityState.globalY - serverStateResources[resourceIDs[i]].globalY,
                     this.entityState.globalX - serverStateResources[resourceIDs[i]].globalX
@@ -87,10 +89,10 @@ module.exports = class EntityAI {
                     angle += 360;
                 }
                 if (this.hit) {
-                    angle /= 25; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
+                    angle /= 23; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
                 }
                 this.rotate(angle, 5);
-                break;
+                break
             } else {
                 this.resourceCollision = false;
             }
@@ -175,7 +177,7 @@ module.exports = class EntityAI {
         }
     }
 
-    attacked(damage, vx, vy, player) {
+    attacked(damage, player) {
         this.entityState.health -= damage;
         /*this.entityState.globalX += vx;
         this.entityState.globalY += vy;*/
@@ -187,6 +189,7 @@ module.exports = class EntityAI {
     }
 
     flee(distance=this.aggroDistance) {
+        // rotate
         let a = Math.round((Math.atan2(
             this.entityState.globalY - this.target.globalY,
             this.entityState.globalX - this.target.globalX
@@ -199,13 +202,16 @@ module.exports = class EntityAI {
         if (!this.resourceCollision) {
             this.rotate(a);
         }
+        // walk whilst rotating
         this.walk(5);
+        // if target outside of aggro distance, then basically stop caring about it
         if (!this.detectTarget(this.aggroDistance)) {
             this.hit = false;
         }
     }
 
     attack() {
+        // rotate
         let a = Math.round((Math.atan2(
             this.entityState.globalY - this.target.globalY,
             this.entityState.globalX - this.target.globalX
@@ -218,9 +224,17 @@ module.exports = class EntityAI {
         if (!this.resourceCollision) {
             this.rotate(a);
         }
+        // walk towards target, whilst rotating
         this.walk(5);
+        // if target outside of aggro distance, then basically stop caring about it
         if (!this.detectTarget(this.aggroDistance)) {
             this.hit = false;
+        }
+        // if target is within attacking range, then attack
+        this.attackTargetRadius = this.target.radius + this.radius;
+        //console.log(this.attackTargetRadius);
+        if (this.detectTarget(this.attackTargetRadius + 4)) { // 4 is an extra padding space
+            this.target.attacked(0.5);
         }
     }
 

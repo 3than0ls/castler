@@ -124,6 +124,11 @@ class Charm {
     };
   }
 
+  hex(c) { // created so hex values could be added for tint function
+    let hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+
   //The low level `tweenProperty` function is used as the foundation
   //for the the higher level tween methods.
   tweenProperty(
@@ -200,7 +205,17 @@ class Charm {
           }
 
           //Interpolate the sprite's property based on the curve
-          sprite[property] = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
+          if (property !== "tint") {
+            sprite[property] = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
+          } else if (property === "tint") {
+            let value = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
+            let red = parseInt(value);
+            let green, blue;
+            blue = green = parseInt((1/(256**4)) * (red ** 5));
+            let color = '0x' + this.hex(red) + this.hex(green) + this.hex(blue);
+            sprite.tint = color;
+          }
+          
 
           o.frameCounter += 1;
         }
@@ -330,6 +345,14 @@ class Charm {
   pulse(sprite, frames = 60, minAlpha = 0) {
     return this.tweenProperty(
       sprite, "alpha", sprite.alpha, minAlpha, frames, "smoothstep", true
+    );
+  }
+
+  //`tint`
+  //similar to pulse, but instead of alpha it's a tint, colored red, so it seems like player has taken damage
+  redTint(sprite, frames = 60) {
+    return this.tweenProperty(
+      sprite, "tint", 256 * (2/3), 256, frames, "smoothstep"
     );
   }
 

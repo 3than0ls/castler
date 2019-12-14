@@ -1,6 +1,7 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WorkerPlugin = require('worker-plugin');
 
 module.exports = {
     mode: 'development',
@@ -17,16 +18,19 @@ module.exports = {
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             template: 'public/index.html'
+        }),
+        new WorkerPlugin({
+            globalObject: 'self',
         })
     ],
     module: {
       rules: [
-        {
+        /*{
             test: /\.worker\.js$/,
             use: { 
                 loader: 'worker-loader' 
             }
-        },
+        },*/
         {
             test: /\.css$/,
             use: [

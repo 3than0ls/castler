@@ -1,16 +1,28 @@
 module.exports = class UserState {
-    constructor(clientID, globalX, globalY, angle) {
-        this.clientID = clientID;
+    constructor(socket, globalX, globalY, angle) {
+        this.socket = socket;
+        this.clientID = socket.id;
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
         this.angle = angle || 0;
         this.swingAngle = 0;
         this.displayHand = 'hand';
+        this.health = 100;
+        this.radius = (100 * 0.865)/2;
 
         this.inventory = {
             'wood': 10,
             'stone': 0,
             'meat': 0,
+        }
+    }
+    attacked(damage) {
+        this.health -= damage;
+        this.socket.emit('healthUpdate', {
+            damage: damage,
+        });
+        if (this.health <= 0) {
+            this.socket.emit('clientDied');
         }
     }
     harvest(type, amount) {
@@ -36,5 +48,15 @@ module.exports = class UserState {
         this.angle = angle;
         this.swingAngle = swingAngle;
         this.displayHand = displayHand;
+    }
+    clientDataPackage() {
+        return {
+            clientID: this.clientID,
+            globalX: this.globalX,
+            globalY: this.globalY,
+            angle: this.angle,
+            swingAngle: this.swingAngle,
+            displayHand: this.displayHand,
+        }
     }
 }

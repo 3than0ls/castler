@@ -5,6 +5,7 @@ import { ratio, gameWidth } from "./../utils/windowResize.js";
 import { bump } from "../bump/bump.js";
 import { harvest } from "../sockets/resources/harvest.js";
 import { attack } from "../sockets/entities/attack.js";
+import { charm } from "../charm/charm.js";
 
 export class Player {
     constructor(clientID) {
@@ -29,7 +30,7 @@ export class Player {
         this.viewpoint = new PIXI.Container();
 
         // player status
-        this.health = 80;
+        this.health = 100;
 
         // player game stats
         this.maxHealth = 100;
@@ -251,6 +252,29 @@ export class Player {
         this.inventory = inventory;
     }
     
+    healthUpdate(health) {
+        if (health < this.health) {
+            this.health = health;
+            this.attacked();
+        } else if (health > this.health) {
+            console.log('healing');
+        }
+
+        if (this.health <= 0) {
+            this.health = 0;
+        }
+    }
+
+    attacked() {
+        if (this.bodyGraphic.tint === 0xFFFFFF) {
+            let tint = charm.redTint(this.bodyGraphic, 45);
+            tint.onComplete = () => {
+                // reset tint to nothing
+                this.bodyGraphic.tint = 0xFFFFFF
+            }
+        }
+    }
+
     update() {
         // update mouse position variables
         this.mouseX = renderer.plugins.interaction.mouse.global.x/ratio;
@@ -370,8 +394,6 @@ export class Player {
             }
         }
     }
-
-
 
     resizeAdjust(x, y) {
         // re adjusts viewpoint and position of player when the window is resized
