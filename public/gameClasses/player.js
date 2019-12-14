@@ -314,7 +314,7 @@ export class Player {
 
         // test and handle collisions  for resources and entities
         this.collisions();
-
+        
         // emit client info to server
         clientEmit(socket, {
             globalX: this.globalX,
@@ -324,6 +324,8 @@ export class Player {
             displayHand: this.displayHand
         });
     }
+
+    
 
     collisions() {
         const resourceIDs = Object.keys(clientState.resources);

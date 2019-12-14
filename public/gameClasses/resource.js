@@ -1,4 +1,4 @@
-import { socket, player, particleContainer } from "../game";
+import { player, particleContainer } from "../game";
 import { loader } from "../utils/loader";
 import { bump } from "../bump/bump";
 import { ratio, gameWidth } from "../utils/windowResize";
@@ -23,6 +23,7 @@ export class Resource {
         this.amount = amount; // resources contain a certain amount you can harvest from, maybe change variable name
         
         this.alreadyHit = false;
+        this.tween = 0; // determines whether or not to update based on server sent variables or to 
 
         this.globalX = globalX;
         this.globalY = globalY;
@@ -56,7 +57,13 @@ export class Resource {
             [this.globalX+vx, this.globalY+vy],
             [this.globalX, this.globalY]
         ]
-        charm.walkPath(this.resourceGraphic, waypoints, harvestSpeed*8, "smoothstep");
+        this.tweenTick++; // start tween tick so server update doesn't affect charm animation
+        let tween = charm.walkPath(this.resourceGraphic, waypoints, harvestSpeed * 10, "smoothstep");
+
+        if (this.tweenTick > harvestSpeed * 10 * (waypoints.length-1)) {
+            this.tweenTick = 0;
+        }
+
         // emit particle when hit
         dust.create(
             collisionX,
@@ -75,10 +82,14 @@ export class Resource {
     }
     
     animate(globalX, globalY, amount, playerHit) {
-        // update positioning
-        this.globalX = globalX;
-        this.globalY = globalY;
-        this.resourceGraphic.position.set(this.globalX, this.globalY);
+        if (!this.tweenTick === 0) {
+            // update positioning
+            this.globalX = globalX;
+            this.globalY = globalY;
+            this.resourceGraphic.position.set(this.globalX, this.globalY);
+        } else if (this.tweenTick > 0) {
+            this.tweenTick++;
+        }
         // update amount
         this.amount = amount;
 

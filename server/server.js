@@ -83,7 +83,7 @@ io.on('connection', socket => {
 
     socket.on('clientState', data => {
         serverState.users.user[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
-        socket.emit('clientUIUpdate', {
+        socket.emit('clientDataUpdate', {
             inventory: serverState.users.user[data.id].inventory,
             health: serverState.users.user[data.id].health,
         })

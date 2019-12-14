@@ -1,5 +1,6 @@
 import { Enemy } from "../../gameClasses/enemies";
-import { player } from "../../game";
+import { player, animate } from "../../game";
+
 
 export const userUpdate = (socket, clientState) => {
     socket.on('userStates', serverStateUsers => {
