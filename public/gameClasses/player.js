@@ -40,11 +40,7 @@ export class Player {
         this.attackSpeed = 2;
 
         // player inventory and resources
-        this.inventory = {
-            'wood': 0,
-            'stone': 0,
-            'meat': 0,
-        };
+        this.inventory = { wood: 0};
 
         // player statuses and small stuff
         // swing animation variables
@@ -204,7 +200,7 @@ export class Player {
 
     render() {
         // render body graphic
-        this.bodyGraphic = new PIXI.Sprite(loader.resources['playerBody'].texture);
+        this.bodyGraphic = new PIXI.Sprite(loader.resources['player/playerBody'].texture);
         this.bodyGraphic.circular = true; // bump js settings
         // set positions
         this.bodyGraphic.anchor.x = 0.5;
@@ -267,7 +263,7 @@ export class Player {
 
     attacked() {
         if (this.bodyGraphic.tint === 0xFFFFFF) {
-            let tint = charm.redTint(this.bodyGraphic, 45);
+            let tint = charm.redTint(this.bodyGraphic);
             tint.onComplete = () => {
                 // reset tint to nothing
                 this.bodyGraphic.tint = 0xFFFFFF
@@ -442,21 +438,21 @@ export class Player {
                handSprites[displayHand] references the handSprite 'hand', which is then rendered.
         */
         // creates sprites and sets anchor positions and locations for them
-        handSprites['hand'] = new PIXI.Sprite(loader.resources['hand'].texture);
+        handSprites['hand'] = new PIXI.Sprite(loader.resources['player/hand'].texture);
         handSprites['hand'].anchor.x = 0.5;
         handSprites['hand'].anchor.y = 0.5;
         handSprites['hand'].position.set(x, y);
         handSprites['hand'].zIndex = 49;
 
         // axe hand
-        handSprites['axeHand'] = new PIXI.Sprite(loader.resources['axeHand'].texture);
+        handSprites['axeHand'] = new PIXI.Sprite(loader.resources['player/axeHand'].texture);
         handSprites['axeHand'].anchor.x = 0.4; // anchor positions have been pre calculated
         handSprites['axeHand'].anchor.y = 0.55;
         handSprites['axeHand'].position.set(x, y);
         handSprites['axeHand'].zIndex = 49;
 
         // sword hand
-        handSprites['swordHand'] = new PIXI.Sprite(loader.resources['swordHand'].texture);
+        handSprites['swordHand'] = new PIXI.Sprite(loader.resources['player/swordHand'].texture);
         handSprites['swordHand'].anchor.x = 0.256; // anchor positions have been pre calculated
         handSprites['swordHand'].anchor.y = 0.38;
         handSprites['swordHand'].position.set(x, y);

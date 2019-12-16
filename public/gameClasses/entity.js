@@ -17,7 +17,7 @@ export class Entity {
     }
 
     render() {
-        this.entityGraphic = new PIXI.Sprite(loader.resources[this.type].texture);
+        this.entityGraphic = new PIXI.Sprite(loader.resources['entities/'.concat(this.type)].texture);
         this.entityGraphic.circular = true; // bump js settings
         switch (this.type) {
             case "duck":
@@ -51,7 +51,7 @@ export class Entity {
         dust.create(
             collisionX,
             collisionY,
-            () => new PIXI.Sprite(loader.resources['bloodParticle'].texture),
+            () => new PIXI.Sprite(loader.resources['particles/bloodParticle'].texture),
             player.viewpoint,
             25,
             0,
@@ -81,7 +81,7 @@ export class Entity {
         dust.create(
             this.globalX,
             this.globalY,
-            () => new PIXI.Sprite(loader.resources[deathParticle].texture),
+            () => new PIXI.Sprite(loader.resources['particles/'.concat(deathParticle).concat('Particle')].texture),
             player.viewpoint,
             140,
             0,
@@ -96,7 +96,7 @@ export class Entity {
         dust.create(
             this.globalX,
             this.globalY,
-            () => new PIXI.Sprite(loader.resources['bloodParticle'].texture),
+            () => new PIXI.Sprite(loader.resources['particles/bloodParticle'].texture),
             player.viewpoint,
             25,
             0,

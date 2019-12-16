@@ -87,6 +87,8 @@ ReactDOM.render(<App />, document.getElementById('root'));
 export function setup() {
     socketUpdate(socket);
     
+    player.clientID = socket.id;
+    
     player.render();
 
     // resize renderer and game when needed

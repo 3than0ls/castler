@@ -1,6 +1,8 @@
 import { stage, player } from "./../game.js";
 import { loader } from "./../utils/loader.js";
 import { Player } from "./player.js";
+import { charm } from "../charm/charm.js";
+
 
 export class Enemy {
     constructor(clientID, globalX, globalY) {
@@ -17,9 +19,19 @@ export class Enemy {
         this.vy = 0; // maybe used later?
     }
 
+    attackFlash() {
+        if (this.bodyGraphic.tint === 0xFFFFFF) {
+            let tint = charm.redTint(this.bodyGraphic);
+            tint.onComplete = () => {
+                // reset tint to nothing
+                this.bodyGraphic.tint = 0xFFFFFF
+            }
+        }
+    }
+
     render() { // basically what happens for players
         // render body graphic
-        this.bodyGraphic = new PIXI.Sprite(loader.resources['playerBody'].texture);
+        this.bodyGraphic = new PIXI.Sprite(loader.resources['player/playerBody'].texture);
         // set positions
         this.bodyGraphic.anchor.x = 0.5;
         this.bodyGraphic.anchor.y = 0.5;

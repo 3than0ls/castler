@@ -30,7 +30,7 @@ export class Resource {
     }
 
     render() {
-        this.resourceGraphic = new PIXI.Sprite(loader.resources[this.type].texture);
+        this.resourceGraphic = new PIXI.Sprite(loader.resources['resources/'.concat(this.type)].texture);
         this.resourceGraphic.circular = true; // bump js settings
         
         // set positions
@@ -68,7 +68,7 @@ export class Resource {
         dust.create(
             collisionX,
             collisionY,
-            () => new PIXI.Sprite(loader.resources[this.resourceName.concat('Particle')].texture),
+            () => new PIXI.Sprite(loader.resources['particles'.concat(this.resourceName.concat('Particle'))].texture),
             player.viewpoint,
             25,
             0,

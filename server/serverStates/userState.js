@@ -7,17 +7,18 @@ module.exports = class UserState {
         this.angle = angle || 0;
         this.swingAngle = 0;
         this.displayHand = 'hand';
+
         this.health = 100;
+        this.attackFlash = false;
+
         this.radius = (100 * 0.865)/2;
 
-        this.inventory = {
-            'wood': 10,
-            'stone': 0,
-            'meat': 0,
-        }
+        this.inventory = {}
     }
+
     attacked(damage) {
         this.health -= damage;
+        this.attackFlash = true;
         this.socket.emit('healthUpdate', {
             damage: damage,
         });
@@ -25,15 +26,22 @@ module.exports = class UserState {
             this.socket.emit('clientDied');
         }
     }
+
     harvest(type, amount) {
+        let itemInventoryName;
         switch(type) {
             case 'tree':
-                this.inventory['wood'] += amount;
+                itemInventoryName = 'wood';
                 break;
             case 'rock':
-                this.inventory['stone'] += amount;
+                itemInventoryName = 'stone';
                 break;
         }
+
+        if (!this.inventory[itemInventoryName]) {
+            this.inventory[itemInventoryName] = 0;
+        }
+        this.inventory[itemInventoryName] += amount;
     }
     kill(lootDrops) { // later maybe combine kill and harvest
         const lootDropKeys = Object.keys(lootDrops);
@@ -43,6 +51,7 @@ module.exports = class UserState {
         }
     }
     updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {
+        // update variables from client
         this.globalX = globalX;
         this.globalY = globalY;
         this.angle = angle;
@@ -57,6 +66,7 @@ module.exports = class UserState {
             angle: this.angle,
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
+            attackFlash: this.attackFlash,
         }
     }
 }

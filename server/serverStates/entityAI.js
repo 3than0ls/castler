@@ -39,6 +39,9 @@ module.exports = class EntityAI {
         this.target;
         this.targetSocket;
         this.attackTargetRadius;
+        // attack
+        this.attackSpeed = 100;
+        this.attackTick = 100;
     }
 
     tick() {
@@ -226,15 +229,23 @@ module.exports = class EntityAI {
         }
         // walk towards target, whilst rotating
         this.walk(5);
-        // if target outside of aggro distance, then basically stop caring about it
+        // if target outside of aggro distance, then untarget it and reset attack tick to attack speed to ready for next attack
         if (!this.detectTarget(this.aggroDistance)) {
             this.hit = false;
+            this.attackTick = this.attackSpeed;
+        } else {
+            // tick the attack ticker
+            this.attackTick++;
+            this.target.attackFlash = false; // set to true in this.target.attacked
         }
+
         // if target is within attacking range, then attack
         this.attackTargetRadius = this.target.radius + this.radius;
-        //console.log(this.attackTargetRadius);
         if (this.detectTarget(this.attackTargetRadius + 4)) { // 4 is an extra padding space
-            this.target.attacked(0.5);
+            if (this.attackTick >= this.attackSpeed) {
+                this.target.attacked(6);
+                this.attackTick = 0;
+            }
         }
     }
 

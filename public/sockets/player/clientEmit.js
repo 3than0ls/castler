@@ -1,5 +1,4 @@
 export const clientEmit = (socket, data) => {
-    console.log('client')
     socket.emit('clientState', {
         globalX: data.globalX,
         globalY: data.globalY,

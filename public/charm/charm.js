@@ -350,7 +350,7 @@ class Charm {
 
   //`tint`
   //similar to pulse, but instead of alpha it's a tint, colored red, so it seems like player has taken damage
-  redTint(sprite, frames = 60) {
+  redTint(sprite, frames = 30) {
     return this.tweenProperty(
       sprite, "tint", 256 * (2/3), 256, frames, "smoothstep"
     );

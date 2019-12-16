@@ -12,21 +12,23 @@ import './inventory.css';
 import './../styles.css';
 
 // images
-import stone from "./../../assets/stone.png";
-import wood from "./../../assets/wood.png";
 import { player } from '../../game';
+
+function importAll (r) {
+    let images = {};
+    r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
+    return images;
+}
+const images = importAll(require.context('./../../assets/inventory', false,  /\.png$/));
 
 export class Inventory extends React.Component {
     constructor() {
         super();
         this.state = {
+            playerID: player.clientID,
             playerInventory: player.inventory,
-
-            woodImage: wood,
-            stoneImage: stone,
-
-            wood: player.inventory['wood'],
-            stone: player.inventory['stone'],
+            
+            images: images,
         }
     }
     componentDidMount() {
@@ -37,17 +39,18 @@ export class Inventory extends React.Component {
     }
     tick() { 
         this.setState({
-            playerInventory: player.inventory
+            playerInventory: player.inventory,
+            playerID: player.clientID
         });
     }
 
     render() {
         const inventory = [];
-        for (let [item, amount] of Object.entries(this.state.playerInventory)) {
+        for (let [item, amount] of Object.entries(this.state.playerInventory)) { // concat Image because the filename has Image at the end of it
             inventory.push(
                 <div key={item}>
                     <Row className='items' variant="primary">{item}{" x"}{amount}</Row>
-                    <Row variant="primary"><Image className='images' src={this.state[item.concat('Image')]}/></Row>
+                    <Row variant="primary"><Image className='images' src={this.state.images[item.concat('.png')] }/></Row>
                 </div>
             )
         }
@@ -59,10 +62,12 @@ export class Inventory extends React.Component {
         */
         return( // return react fragment
             <> 
-                <h1 className='overlayBox'>hello!</h1>
-                <Col className='overlayBox'>
-                    {inventory}
-                </Col>
+                <div id="name" className='overlayBox'>{this.state.playerID}</div>
+                {inventory.length !== 0 && 
+                    <Col className='overlayBox'>
+                        {inventory}
+                    </Col>
+                }
             </>
         )
     }
