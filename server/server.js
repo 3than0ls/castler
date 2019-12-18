@@ -3,24 +3,30 @@ const path = require('path');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
-const UserState = require('./serverStates/userState.js');
-const ResourceState = require('./serverStates/resourceState.js');
-const EntityState = require('./serverStates/entityState.js');
-const EntityAI = require('./serverStates/entityAI.js');
-
 const app = express();
 const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
-const config = require('../webpack.config.js');
-const compiler = webpack(config);
-
-// app.use(express.static(path.join(__dirname, './src/')));
-app.use(express.static(path.join(__dirname, './public/')));
-app.use(webpackDevMiddleware(compiler, {
-    publicPath: config.output.publicPath
+const configs = require('../webpack.config.js');
+const gameConfig = configs[0];
+const gameCompiler = webpack(gameConfig);
+app.use(webpackDevMiddleware(gameCompiler, {
+    publicPath: gameConfig.output.publicPath
+}));
+const menuConfig = configs[1];
+const menuCompiler = webpack(menuConfig)
+app.use(webpackDevMiddleware(menuCompiler, {
+    publicPath: menuConfig.output.publicPath
 }));
 
-const io = require('socket.io')(http);
+
+// app.use(express.static(path.join(__dirname, './src/')));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, './public/')));
+app.use(express.static(path.join(__dirname, './menu/')));
+
+const UserState = require('./serverStates/userState.js');
+const CreateMap = require('./createMap.js');
 
 const serverState = {
     users: {
@@ -33,42 +39,12 @@ const serverState = {
         entityAI: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
     },
 }
-// TO DO: find a way to send client only the data needed, and not the other unecessary functions
-//        also probably include a clientUpdate which continues to send, rather than functions when an event occurs, which could be problematic
 
-function createResourceTest() {
-    /*for (let i = 0; i < 12; i ++) {
-        let resource = new ResourceState(700*Math.sin(i*30*(Math.PI/180)), 700*Math.cos(i*30*(Math.PI/180)), 'tree');
-        serverState.resources[resource.resourceID] = resource;
-        /*
-        let resource2 = new ResourceState(500*Math.sin((i)*(Math.PI/180)), 500*Math.cos((i)*(Math.PI/180)), 'rock');
-        serverState.resources[resource2.resourceID] = resource2;
-    }*/
-    let resource2 = new ResourceState(0, 500, 'tree');
-    serverState.resources[resource2.resourceID] = resource2;
-    resource2 = new ResourceState(0, -400, 'tree');
-    serverState.resources[resource2.resourceID] = resource2;
-    resource2 = new ResourceState(500, 0, 'tree');
-    serverState.resources[resource2.resourceID] = resource2;
-    resource2 = new ResourceState(-400, 0, 'tree');
-    serverState.resources[resource2.resourceID] = resource2;
-};
-createResourceTest();
+const map = new CreateMap(serverState);
+map.test();
 
 
-function createEntityTest() {
-    for (let i = 0; i < 1; i ++) {
-        for (let j = 0; j < 10; j ++) {
-            let entity = new EntityState(0, 80, 'duck', 'passive');
-            serverState.entities.entityState[entity.entityID] = entity;
-            serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
-        }
-        let entity = new EntityState(0, 450, 'boar', 'neutral');
-        serverState.entities.entityState[entity.entityID] = entity;
-        serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
-    }
-};
-createEntityTest();
+
 
 io.on('connection', socket => {
     let newUserState = new UserState(socket);

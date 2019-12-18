@@ -3,34 +3,12 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WorkerPlugin = require('worker-plugin');
 
-module.exports = {
+
+const commonConfig = {
     mode: 'development',
-    entry: {
-        app: './public/game.js'
-    },
-    output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'
-    },
     devtool: 'inline-source-map',
-    plugins: [
-        new CleanWebpackPlugin(),
-        new HtmlWebpackPlugin({
-            template: 'public/index.html'
-        }),
-        new WorkerPlugin({
-            globalObject: 'self',
-        })
-    ],
     module: {
       rules: [
-        /*{
-            test: /\.worker\.js$/,
-            use: { 
-                loader: 'worker-loader' 
-            }
-        },*/
         {
             test: /\.css$/,
             use: [
@@ -56,4 +34,46 @@ module.exports = {
         }
       ]
     }
-};
+}
+
+const menuConfig = Object.assign({}, commonConfig, {
+    name: "menu",
+    entry: {
+        app: './menu/menu.js'
+    },
+    plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            inject: false,
+            template: 'menu/menu.html'
+        }),
+    ],
+    output: {
+        filename: 'menu.bundle.js',
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: '/'
+    },
+});
+
+const gameConfig = Object.assign({}, commonConfig, {
+    name: "game",
+    entry: {
+        app: './public/game.js'
+    },
+    plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            template: 'public/index.html'
+        }),
+        new WorkerPlugin({
+            globalObject: 'self',
+        })
+    ],
+    output: {
+        filename: 'game.bundle.js',
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: '/game'
+    },
+});
+
+module.exports = [ gameConfig, menuConfig ]

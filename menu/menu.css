@@ -1,0 +1,41 @@
+#menu {
+    text-align: center;
+}
+
+#nameForm {
+    display: inline-block;
+}
+
+button {
+    background: rgb(22, 125, 209);
+    border: none;
+    padding: 50px;
+    margin: 50px;
+}
+
+input {
+    background: rgb(22, 125, 209);
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 50px;
+    margin: 50px;
+    border: solid;
+    border-color: rgb(100, 100, 100);
+    border-width: 3px;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: rgb(0, 0, 0);
+    opacity: 1; /* Firefox */
+    text-align: center;
+  }
+  
+  :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: rgb(0, 0, 0);
+    text-align: center;
+  }
+  
+  ::-ms-input-placeholder { /* Microsoft Edge */
+    color: rgb(0, 0, 0);
+    text-align: center;
+  }

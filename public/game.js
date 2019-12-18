@@ -30,6 +30,8 @@ export const clientState = {
     organize assets folder
 */
 
+document.title = "Game";
+
 // Create renderer
 export const renderer = PIXI.autoDetectRenderer();
 // handle renderer settings
