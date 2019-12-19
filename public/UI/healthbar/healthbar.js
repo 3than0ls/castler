@@ -37,7 +37,7 @@ export class HealthBar extends React.Component {
         return( // return react fragment
             <> 
                 <div className="healthbarWrapper">
-                    <ProgressBar variant="round" className="healthbar" now={this.state.nowHealth}/>  
+                    <ProgressBar variant={"round" + (this.state.nowHealth <= 20 ? 'DarkRed' : 'Red')} className="healthbar" now={this.state.nowHealth}/>  
                 </div>
             </>
         )

@@ -28,6 +28,7 @@ export class Inventory extends React.Component {
             playerID: player.clientID,
             playerInventory: player.inventory,
             
+            nickname: window.localStorage.getItem('nickname'),
             images: images,
         }
     }
@@ -40,7 +41,6 @@ export class Inventory extends React.Component {
     tick() { 
         this.setState({
             playerInventory: player.inventory,
-            playerID: player.clientID
         });
     }
 
@@ -62,7 +62,7 @@ export class Inventory extends React.Component {
         */
         return( // return react fragment
             <> 
-                <div id="name" className='overlayBox'>{this.state.playerID}</div>
+                <div id="name" className='overlayBox'>{this.state.nickname}</div>
                 {inventory.length !== 0 && 
                     <Col className='overlayBox'>
                         {inventory}

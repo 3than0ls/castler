@@ -20,7 +20,6 @@ export const userUpdate = (socket, clientState) => {
                 clientState.enemies[userIDs[i]].animate(
                     data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand
                 );
-                console.log(data.attackFlash);
                 if (data.attackFlash) {
                     clientState.enemies[userIDs[i]].attackFlash();
                 }

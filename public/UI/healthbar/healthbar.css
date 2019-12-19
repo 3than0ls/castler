@@ -30,7 +30,12 @@
     background: rgba(100, 100, 100, 0.5);
 }
 
-.bg-round {
+.bg-roundRed {
     border-radius: 10px;
-    background: rgb(200, 0, 0)
+    background: rgb(200, 0, 0);
+}
+
+.bg-roundDarkRed {
+    border-radius: 10px;
+    background: rgb(104, 11, 11);
 }

@@ -19,7 +19,6 @@ import feather from './../assets/feather.png';
 import fur from './../assets/fur.png';*/
 
 import fur from './../assets/inventory/fur.png';
-console.log(fur);
 
 function importAll(context) {
     let images = {};
@@ -29,7 +28,6 @@ function importAll(context) {
     return images;
 }
 const images = importAll(require.context('./../assets', true,  /\.png$/));
-console.log(JSON.stringify(images));
 
 export const assets = path.relative(__dirname, '/public/assets/'); // remove
 
@@ -38,10 +36,8 @@ export const loader = PIXI.Loader.shared;
 function loadImages(images) {
     for (let keyName in images) {
         let textureName = keyName.replace('.png', '');
-        //console.log(textureName + " " + keyName + " " + images[keyName]);
         loader.add(textureName, images[keyName]);
     }
-    console.log(JSON.stringify(loader.resources));
 }
 loadImages(images);
 
