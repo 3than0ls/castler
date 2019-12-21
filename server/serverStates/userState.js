@@ -7,6 +7,7 @@ module.exports = class UserState {
         this.angle = angle || 0;
         this.swingAngle = 0;
         this.displayHand = 'hand';
+        this.score = 0;
 
         this.health = 100;
         this.attackFlash = false;
@@ -42,13 +43,21 @@ module.exports = class UserState {
             this.inventory[itemInventoryName] = 0;
         }
         this.inventory[itemInventoryName] += amount;
+        
+        // increase player score
+        this.score += amount;
     }
     kill(lootDrops) { // later maybe combine kill and harvest
         const lootDropKeys = Object.keys(lootDrops);
         for (let i = 0; i < lootDropKeys.length; i ++) {
             if (!this.inventory[lootDropKeys[i]]) this.inventory[lootDropKeys[i]] = 0;
             this.inventory[lootDropKeys[i]] += lootDrops[lootDropKeys[i]];
+
+            // increase player score
+            this.score += lootDrops[lootDropKeys[i]];
         }
+        // increase player score for killing the animal
+        this.score += 3;
     }
     updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {
         // update variables from client
@@ -67,6 +76,7 @@ module.exports = class UserState {
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
             attackFlash: this.attackFlash,
+            score: this.score,
         }
     }
 }

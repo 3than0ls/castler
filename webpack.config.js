@@ -76,4 +76,4 @@ const gameConfig = Object.assign({}, commonConfig, {
     },
 });
 
-module.exports = [ gameConfig, menuConfig ]
+module.exports = [ gameConfig, menuConfig ];

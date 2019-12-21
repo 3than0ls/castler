@@ -8,16 +8,12 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
 const configs = require('../webpack.config.js');
-const gameConfig = configs[0];
-const gameCompiler = webpack(gameConfig);
-app.use(webpackDevMiddleware(gameCompiler, {
-    publicPath: gameConfig.output.publicPath
-}));
-const menuConfig = configs[1];
-const menuCompiler = webpack(menuConfig)
-app.use(webpackDevMiddleware(menuCompiler, {
-    publicPath: menuConfig.output.publicPath
-}));
+for (let i = 0; i < configs.length; i++) {
+    let configCompiler = webpack(configs[i]);
+    app.use(webpackDevMiddleware(configCompiler, {
+        publicPath: configs[i].output.publicPath,
+    }));
+}
 
 
 // app.use(express.static(path.join(__dirname, './src/')));
