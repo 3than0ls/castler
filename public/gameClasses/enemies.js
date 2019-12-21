@@ -1,4 +1,4 @@
-import { stage, player } from "./../game.js";
+import { stage, player } from "../app.js";
 import { loader } from "./../utils/loader.js";
 import { Player } from "./player.js";
 import { charm } from "../charm/charm.js";

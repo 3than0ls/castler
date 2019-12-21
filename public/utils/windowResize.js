@@ -1,4 +1,4 @@
-import { renderer, stage, player } from "../game.js";
+import { renderer, stage, player } from "../app.js";
 
 // script to resize window when changed
 

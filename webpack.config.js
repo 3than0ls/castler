@@ -3,6 +3,56 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WorkerPlugin = require('worker-plugin');
 
+const config = {
+    mode: 'development',
+    devtool: 'inline-source-map',
+    entry: {
+        app: './public/app.js',
+        menu: './public/menu/menu.js'
+    },
+    plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            inject: false,
+            template: 'public/index.html'
+        }),
+        new WorkerPlugin({
+            globalObject: 'self',
+        })
+    ],
+    output: {
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: '/'
+    },
+    module: {
+      rules: [
+        {
+            test: /\.css$/,
+            use: [
+              'style-loader',
+              'css-loader'
+            ],
+        },
+        {
+            test: /\.(png|svg|jpg|gif)$/,
+            use: [
+                'file-loader'
+            ]
+        },
+        {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env', '@babel/preset-react'],
+                }
+            }
+        }
+      ]
+    }
+}
 
 const commonConfig = {
     mode: 'development',
@@ -76,4 +126,5 @@ const gameConfig = Object.assign({}, commonConfig, {
     },
 });
 
-module.exports = [ gameConfig, menuConfig ];
+// module.exports = [ gameConfig, menuConfig ];
+module.exports = [ config ];

@@ -1,4 +1,4 @@
-import { player } from "../../game";
+import { player } from "../../app";
 
 export const clientDataUpdate = (socket) => {
     // update the client inventory, specifically made so react will display the amount of resources the player has

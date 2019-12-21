@@ -1,4 +1,4 @@
-import { player } from "../game";
+import { player } from "../app";
 import { loader } from "../utils/loader";
 import { bump } from "../bump/bump";
 import { charm } from "../charm/charm";

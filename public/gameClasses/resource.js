@@ -1,4 +1,4 @@
-import { player, particleContainer } from "../game";
+import { player, particleContainer } from "../app";
 import { loader } from "../utils/loader";
 import { bump } from "../bump/bump";
 import { ratio, gameWidth } from "../utils/windowResize";

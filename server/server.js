@@ -19,7 +19,6 @@ for (let i = 0; i < configs.length; i++) {
 // app.use(express.static(path.join(__dirname, './src/')));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, './public/')));
-app.use(express.static(path.join(__dirname, './menu/')));
 
 const UserState = require('./serverStates/userState.js');
 const CreateMap = require('./createMap.js');

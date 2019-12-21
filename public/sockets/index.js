@@ -1,4 +1,4 @@
-import { clientState, player } from "../game.js";
+import { clientState, player } from "../app.js";
 
 import { userUpdate } from "./player/userUpdate.js";
 import { resourceUpdate } from "./resources/resourceUpdate.js";

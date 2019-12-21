@@ -75,7 +75,7 @@ import Worker from "worker-loader!./webWorker/worker.js";
 const worker = new Worker();*/
 // if using worker-plugin
 
-const worker = new Worker('./worker/worker.js', { type: 'module'});
+const worker = new Worker('./worker/worker.js', { type: 'module' });
 worker.addEventListener('message', function(e) {
     animate();
     // issue: animate function calls are clumped, and are not even, so the socket emits data a lot of times for 1 moment and then stops for a period of time
@@ -84,7 +84,7 @@ worker.addEventListener('message', function(e) {
 
 // import and render react overlay
 import { App } from "./UI/index.js";
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('ui'));
 
 export function setup() {
     socketUpdate(socket);

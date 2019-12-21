@@ -1,4 +1,4 @@
-import { stage, socket, renderer, clientState, particleContainer } from "./../game.js";
+import { stage, socket, renderer, clientState, particleContainer } from "../app.js";
 import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio, gameWidth } from "./../utils/windowResize.js";

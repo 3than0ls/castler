@@ -11,7 +11,7 @@ import './menu.css';
     the server will then update/create UserState username property, which will then be sent to all clients to be seen
 
 */
-class NameForm extends React.Component {
+class StartMenu extends React.Component {
     constructor(props) {
         super(props);
         let nicknameAlreadyExists = window.localStorage.getItem('nickname');
@@ -30,21 +30,20 @@ class NameForm extends React.Component {
     }
     
     handleSubmit(event) {
+        // prevent page from refreshing
+        event.preventDefault();
         // if no value exists, then replace it with Player
         if (!this.state.value) {
             this.setState({value: 'Player'});
         }
         // store player name in local storage
         window.localStorage.setItem('nickname', this.state.value);
-        // replace the entire menu node with the game iFrame
-        let node = document.getElementById('menu');
-        let iFrame = document.createElement('iframe');
-        iFrame.src = '/game';
-        iFrame.style.width = window.innerWidth + 'px';
-        iFrame.style.height = window.innerHeight + 'px';
-        node.parentNode.replaceChild(iFrame, node);
-        // event prevent default
-        event.preventDefault();
+        // delete the entire 
+        let body = document.getElementsByTagName('BODY')[0];
+        let menuWrapper = document.getElementById('menuWrapper');
+        body.removeChild(menuWrapper);
+        let appScript = document.getElementById('gameApp');
+        appScript.src = 'app.bundle.js';
     }
     
     render() {
@@ -69,4 +68,4 @@ class NameForm extends React.Component {
     }
 }
 
-ReactDOM.render(<NameForm />, document.getElementById('menu'));
+ReactDOM.render(<StartMenu />, document.getElementById('menuWrapper'));

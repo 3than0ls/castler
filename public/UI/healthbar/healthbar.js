@@ -9,7 +9,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 import './healthbar.css';
 import './../styles.css';
 
-import { player } from '../../game';
+import { player } from '../../app';
 
 export class HealthBar extends React.Component {
     constructor() {

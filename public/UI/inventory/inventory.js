@@ -12,7 +12,7 @@ import './inventory.css';
 import './../styles.css';
 
 // images
-import { player } from '../../game';
+import { player } from '../../app';
 
 function importAll (r) {
     let images = {};
@@ -62,9 +62,9 @@ export class Inventory extends React.Component {
         */
         return( // return react fragment
             <> 
-                <div id="name" className='overlayBox'>{this.state.nickname}</div>
+                <div id="name" className='overlayContainer'>{this.state.nickname}</div>
                 {inventory.length !== 0 && 
-                    <Col className='overlayBox'>
+                    <Col className='overlayContainer'>
                         {inventory}
                     </Col>
                 }

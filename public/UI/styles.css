@@ -1,4 +1,8 @@
-.overlayBox {
+html, body {
+    background-color: inherit;
+}
+
+.overlayContainer {
     pointer-events: none;
     border-radius: 10px;
     width: 8%;
@@ -8,5 +12,5 @@
     margin: 0.5vh 0.5vw;
     padding: 0.25vh 0.25vw;
     text-align: center;
-    background: rgba(100, 100, 100, 0.5);
+    background-color: rgba(100, 100, 100, 0.5);
 }

@@ -1,6 +1,6 @@
 const path = require('path');
 
-import { setup } from "../game.js";
+import { setup } from "../app.js";
 
 
 /*/ import images

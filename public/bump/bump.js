@@ -1,5 +1,5 @@
 import { gameWidth } from "../utils/windowResize";
-import { player } from "../game";
+import { player } from "../app";
 
 // added an export of an instance of Bump class at the bottom
 
