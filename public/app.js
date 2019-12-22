@@ -28,6 +28,7 @@ export const clientState = {
     particle (dust js) when resource is hit
     more different resources
     organize assets folder
+
 */
 
 document.title = "Game";

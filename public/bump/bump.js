@@ -1,4 +1,4 @@
-import { gameWidth } from "../utils/windowResize";
+import { gameWidth, gameHeight } from "../utils/windowResize";
 import { player } from "../app";
 
 // added an export of an instance of Bump class at the bottom
@@ -373,6 +373,9 @@ class Bump {
       hit = false;
 
     let gameWidthWindowRatio = window.innerWidth/gameWidth; // use this in calculating the combined ratios of the radii
+    let gameHeightWindowRatio = window.innerHeight/gameHeight;
+
+    let gameRatio = Math.max(gameWidthWindowRatio, gameHeightWindowRatio);
 
     //Calculate the vector between the circles’ center points
     if (global) {
@@ -390,7 +393,7 @@ class Bump {
     magnitude = Math.sqrt(vx * vx + vy * vy);
 
     //Add together the circles' combined half-widths
-    combinedRadii = c1.radius*gameWidthWindowRatio + c2.radius*gameWidthWindowRatio; // edited this line
+    combinedRadii = c1.radius*gameRatio + c2.radius*gameRatio; // edited this line
 
     //Figure out if there's a collision
     if (magnitude < combinedRadii) {
