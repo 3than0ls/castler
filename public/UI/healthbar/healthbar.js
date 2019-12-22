@@ -19,8 +19,9 @@ export class HealthBar extends React.Component {
         }
     }
 
+
     componentDidMount() {
-        this.timerID = setInterval(() => this.tick(), 60); // learn more about this
+        this.timerID = setInterval(() => this.tick(), 60);
     }
 
     componentWillUnmount() {

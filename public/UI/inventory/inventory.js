@@ -45,9 +45,9 @@ export class Inventory extends React.Component {
     }
 
     render() {
-        const inventory = [];
+        const inventoryComponents = [];
         for (let [item, amount] of Object.entries(this.state.playerInventory)) { // concat Image because the filename has Image at the end of it
-            inventory.push(
+            inventoryComponents.push(
                 <div key={item}>
                     <Row className='items' variant="primary">{item}{" x"}{amount}</Row>
                     <Row variant="primary"><Image className='images' src={this.state.images[item.concat('.png')] }/></Row>
@@ -63,9 +63,9 @@ export class Inventory extends React.Component {
         return( // return react fragment
             <> 
                 <div id="name" className='overlayContainer'>{this.state.nickname}</div>
-                {inventory.length !== 0 && 
-                    <Col className='overlayContainer'>
-                        {inventory}
+                {inventoryComponents.length !== 0 && 
+                    <Col id='inventoryContainer' className='overlayContainer'>
+                        {inventoryComponents}
                     </Col>
                 }
             </>

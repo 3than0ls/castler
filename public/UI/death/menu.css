@@ -1,23 +1,36 @@
 html, body {
-  background-color: rgb(255, 255, 255);
+  background: rgb(255, 255, 255);
   display: flex;
-  height: 100%;
+  pointer-events: none;
+  height: 100vh;
+  width: 100vw;
+}
+
+#deathMenuWrapper {
+  pointer-events: auto;
+  position: fixed;
+  z-index: 3;
   margin: 0;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
 .overlayBoxContainer {
   margin: 0;
   border: 0;
-  height: 95%;
   margin: 2.5vh 1vw;
+  height: 95%;
   width: 25vw;
   min-width: 200px;
-  display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  background: rgba(0, 0, 0, 0.4);
+  color: rgb(255, 255, 255);
+  background: rgba(0, 0, 0, 0.849);
   border-radius: 2vw;
 }
 
@@ -44,41 +57,7 @@ button {
   font-size:calc(4px + 1vw);
 }
 
-input {
-  background: rgb(255, 255, 255);
-  text-align: center;
-
-  color: rgb(0, 0, 0);
-  border: none;
-  border-radius: 15px;
-  
-  width: 15vw;
-  min-width: 100px;
-  height: 10vh;
-  min-height: 80px;
-
-  font-size:calc(4px + 1vw);
-  /*border: solid;
-  /order-color: rgb(100, 100, 100);
-  border-width: 3px;*/
-}
-
-input:focus, button:focus {
+button:focus {
   outline: none;
-}
-
-::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: rgb(98, 98, 98);
-  opacity: 1; /* Firefox */
-  text-align: center;
-}
-  
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
-  color: rgb(98, 98, 98);
-  text-align: center;
-}
- 
-::-ms-input-placeholder { /* Microsoft Edge */
-  color: rgb(98, 98, 98);
-  text-align: center;
+  border: none;
 }

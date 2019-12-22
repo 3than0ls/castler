@@ -48,17 +48,27 @@ io.on('connection', socket => {
     // on received events, data.id should be equal to socket.id
     console.log("Client joined: " + serverState.users.user[socket.id].clientID);
 
+    // initial variable assignments
+    socket.on('nickname', nickname => {
+        serverState.users.user[socket.id].nickname = nickname;
+    }) // update the server info of the clients nickname when client connects
     socket.emit('playerInit', {
         inventory: serverState.users.user[socket.id].inventory
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
         serverState.users.user[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
-        socket.emit('clientDataUpdate', {
+        let clientUpdateData = {
             inventory: serverState.users.user[data.id].inventory,
             health: serverState.users.user[data.id].health,
-        })
+            score: serverState.users.user[data.id].score,
+        };
         serverState.users.userData[data.id] = serverState.users.user[data.id].clientDataPackage();
+        if (serverState.users.user[data.id].health <= 0) {
+            serverState.users.userData[data.id].dead = true;
+            clientUpdateData.dead = true;
+        }
+        socket.emit('clientDataUpdate', clientUpdateData);
     });
 
     socket.on('harvest', data => {
@@ -122,6 +132,27 @@ function update(serverState) {
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
+
+    // emit leaderboard status (based on player score)
+    const orderedPlayerScores = [];
+    for (let playerID in serverState.users.userData) {
+        let score = serverState.users.userData[playerID].score;
+        orderedPlayerScores.push([playerID, score]);
+    }
+    orderedPlayerScores.sort(function(a, b) {
+        return b[1] - a[1];
+    });
+
+    const leaderboardState = [];
+    orderedPlayerScores.forEach(element => {
+        leaderboardState.push({
+            clientID: element[0],
+            score: element[1],
+            nickname: serverState.users.userData[element[0]].nickname, // element[0] is the player ID
+        })
+    })
+    
+    io.sockets.emit('leaderboardUpdate', leaderboardState);
     
     // updates states and call the entity AIs
     const entityIDs = Object.keys(serverState.entities.entityAI);

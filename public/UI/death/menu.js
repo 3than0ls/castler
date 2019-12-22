@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 
 import './menu.css';
+import { player } from '../../app';
 
 /*
     user types in name in input field, data is passed along to a client connect function, which sends the server data about the client name (and other info)
@@ -21,13 +23,16 @@ class DeathMenu extends React.Component {
     
     handleSubmit(event) {
         // event prevent default
+        location.reload();
         event.preventDefault();
     }
     
     render() {
         return (
             <Form className='overlayBoxContainer' onSubmit={this.handleSubmit} autoComplete="off" spellCheck="false">
-                You Died!
+                {this.state.nickname} died!
+                <br></br>
+                Score: {this.props.score}
             
             <Button variant="primary" type="submit" className="noselect">
               Play Again
@@ -36,5 +41,12 @@ class DeathMenu extends React.Component {
         );
     }
 }
+export function renderDeathMenu() {
+    // add death menu wrapper node
+    let deathMenuWrapper = document.createElement('div');
+    document.body.appendChild(deathMenuWrapper);
+    deathMenuWrapper.id = 'deathMenuWrapper';
+    ReactDOM.render(<DeathMenu score={player.score} />, document.getElementById('deathMenuWrapper'));
+}
 
-ReactDOM.render(<DeathMenu />, document.getElementById('menu'));
+// also have to remove all event detectors, probably freeze the game/no longer update it

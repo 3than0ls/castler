@@ -7,9 +7,12 @@ module.exports = class UserState {
         this.angle = angle || 0;
         this.swingAngle = 0;
         this.displayHand = 'hand';
+
+        this.nickname = 'default'
         this.score = 0;
 
-        this.health = 100;
+        this.health = 10;
+        this.dead = false;
         this.attackFlash = false;
 
         this.radius = (100 * 0.865)/2;
@@ -23,9 +26,6 @@ module.exports = class UserState {
         this.socket.emit('healthUpdate', {
             damage: damage,
         });
-        if (this.health <= 0) {
-            this.socket.emit('clientDied');
-        }
     }
 
     harvest(type, amount) {
@@ -66,6 +66,10 @@ module.exports = class UserState {
         this.angle = angle;
         this.swingAngle = swingAngle;
         this.displayHand = displayHand;
+
+        if (this.health <= 0) {
+            this.dead = true;
+        }
     }
     clientDataPackage() {
         return {
@@ -76,6 +80,8 @@ module.exports = class UserState {
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
             attackFlash: this.attackFlash,
+
+            nickname: this.nickname,
             score: this.score,
         }
     }

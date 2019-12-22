@@ -1,4 +1,4 @@
-import { stage, socket, renderer, clientState, particleContainer } from "../app.js";
+import { stage, socket, renderer, clientState, particleContainer, worker } from "../app.js";
 import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio, gameWidth } from "./../utils/windowResize.js";
@@ -6,6 +6,7 @@ import { bump } from "../bump/bump.js";
 import { harvest } from "../sockets/resources/harvest.js";
 import { attack } from "../sockets/entities/attack.js";
 import { charm } from "../charm/charm.js";
+import { renderDeathMenu } from "../UI/death/menu.js";
 
 export class Player {
     constructor(clientID) {
@@ -30,7 +31,9 @@ export class Player {
         this.viewpoint = new PIXI.Container();
 
         // player status
-        this.health = 100;
+        this.score; // assigned from server
+        this.health = 100; // set at 100, assigned from server
+        this.dead = this.health <= 0;
 
         // player game stats
         this.maxHealth = 100;
@@ -256,7 +259,7 @@ export class Player {
             console.log('healing');
         }
 
-        if (this.health <= 0) {
+        if (health <= 0) {
             this.health = 0;
         }
     }
@@ -269,6 +272,13 @@ export class Player {
                 this.bodyGraphic.tint = 0xFFFFFF
             }
         }
+    }
+
+    died() {
+        console.log('I died...');
+        socket.disconnect();
+        worker.terminate();
+        renderDeathMenu();
     }
 
     update() {
@@ -317,11 +327,9 @@ export class Player {
             globalY: this.globalY,
             angle: this.angle,
             swingAngle: this.swingAngle,
-            displayHand: this.displayHand
+            displayHand: this.displayHand,
         });
     }
-
-    
 
     collisions() {
         const resourceIDs = Object.keys(clientState.resources);

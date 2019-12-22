@@ -180,6 +180,16 @@ module.exports = class EntityAI {
         }
     }
 
+    targetExists() {
+        if (!this.target) {
+            return false;
+        }
+        if (this.target.dead) {
+            return false;
+        }
+        return true;
+    }
+
     attacked(damage, player) {
         this.entityState.health -= damage;
         /*this.entityState.globalX += vx;
@@ -207,9 +217,17 @@ module.exports = class EntityAI {
         }
         // walk whilst rotating
         this.walk(5);
-        // if target outside of aggro distance, then basically stop caring about it
+        // if target outside of aggro distance, then untarget and reset hit
         if (!this.detectTarget(this.aggroDistance)) {
+            this.target = undefined;
             this.hit = false;
+        }
+
+        // if target has died, than untarget and reset hit
+        if (!this.targetExists()) {
+            this.target = undefined;
+            this.hit = false;
+            this.attackTick = this.attackSpeed;
         }
     }
 
@@ -229,23 +247,31 @@ module.exports = class EntityAI {
         }
         // walk towards target, whilst rotating
         this.walk(5);
-        // if target outside of aggro distance, then untarget it and reset attack tick to attack speed to ready for next attack
+        // if target outside of aggro distance and target exists, then untarget it and reset attack tick to attack speed to ready for next attack
         if (!this.detectTarget(this.aggroDistance)) {
+            this.target = undefined;
             this.hit = false;
             this.attackTick = this.attackSpeed;
         } else {
             // tick the attack ticker
             this.attackTick++;
-            this.target.attackFlash = false; // set to true in this.target.attacked
+            this.target.attackFlash = false; // set to true in this.target.attacked, used so that clients can see when other clients are attacked
         }
 
         // if target is within attacking range, then attack
         this.attackTargetRadius = this.target.radius + this.radius;
-        if (this.detectTarget(this.attackTargetRadius + 4)) { // 4 is an extra padding space
+        if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
             if (this.attackTick >= this.attackSpeed) {
                 this.target.attacked(6);
                 this.attackTick = 0;
             }
+        }
+
+        // if target has died, than untarget and reset hit
+        if (!this.targetExists()) {
+            this.target = undefined;
+            this.hit = false;
+            this.attackTick = this.attackSpeed;
         }
     }
 

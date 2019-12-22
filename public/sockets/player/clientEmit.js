@@ -14,6 +14,6 @@ export const clientEmit = (socket, data) => {
     data.globalX,
     data.globalY,
     data.angle,
-    data.swingAngle
-    data.displayHand
+    data.swingAngle,
+    data.displayHand,
 */
