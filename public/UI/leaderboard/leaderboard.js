@@ -13,12 +13,14 @@ import './leaderboard.css';
 
 export const leaderboardState = [];
 
+// move nickname here
 
 export class Leaderboard extends React.Component {
     constructor() {
         super();
         this.state = {
-            leaderboard: leaderboardState
+            leaderboard: leaderboardState,
+            nickname: window.localStorage.getItem('nickname'),
         }
     }
     componentDidMount() {
@@ -50,9 +52,11 @@ export class Leaderboard extends React.Component {
             <> 
                 {leaderboardComponents.length !== 0 && 
                     <Col id='leaderboardContainer' className='overlayContainer'>
+                        Leaderboards:
                         {leaderboardComponents}
                     </Col>
                 }
+                <div id="name" className='overlayContainer'>{this.state.nickname}</div>
             </>
         )
     }

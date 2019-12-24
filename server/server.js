@@ -149,8 +149,8 @@ function update(serverState) {
             clientID: element[0],
             score: element[1],
             nickname: serverState.users.userData[element[0]].nickname, // element[0] is the player ID
-        })
-    })
+        });
+    });
     
     io.sockets.emit('leaderboardUpdate', leaderboardState);
     

@@ -20,14 +20,13 @@ export const clientState = {
     TO DO:
     clean up code
     BIG:
-    Player GUI (improve)
-    health system
-    weapons (poke rather than swing) and animals (entity rather than resource)
+    crafting
+    items
+    armor
+    tiered tools/items
 
     SMALL:
-    particle (dust js) when resource is hit
     more different resources
-    organize assets folder
 
 */
 
