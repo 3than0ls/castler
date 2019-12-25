@@ -258,7 +258,7 @@ export class Player {
             this.health = health;
             this.attacked();
         } else if (health > this.health) {
-            console.log('healing');
+            this.health = health;
         }
 
         if (health <= 0) {

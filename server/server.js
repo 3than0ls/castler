@@ -69,7 +69,7 @@ io.on('connection', socket => {
             serverState.users.userData[data.id].dead = true;
             clientUpdateData.dead = true;
         }
-        serverState.users.user[data.id].hungerTicker(); // tick hunger
+        serverState.users.user[data.id].playerTick(); // tick player
         socket.emit('clientDataUpdate', clientUpdateData);
     });
 

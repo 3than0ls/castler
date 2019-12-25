@@ -12,7 +12,7 @@ module.exports = class UserState {
         this.score = 0;
 
         this.health = 10;
-        this.hunger = 70;
+        this.hunger = 100;
         this.dead = false;
         this.attackFlash = false;
 
@@ -20,17 +20,22 @@ module.exports = class UserState {
 
         this.inventory = {};
 
-        // hunger variables
+        // tick and timer variables
         this.hungerTick = 0;
-        this.hungerSpeed = 100;
+        this.hungerSpeed = 1000;
+        this.healTick = 0;
+        this.healSpeed = 150;
+        this.regenTick = 0;
+        this.regenSpeed = 200;
     }
 
     attacked(damage) {
         this.health -= damage;
         this.attackFlash = true;
-        this.socket.emit('healthUpdate', {
-            damage: damage,
-        });
+    }
+    heal(amount) {
+        this.health += amount;
+        // this.healFlash = true; maybe something similar to attack flash, but for healing
     }
 
     harvest(type, amount) {
@@ -64,7 +69,7 @@ module.exports = class UserState {
         // increase player score for killing the animal
         this.score += 3;
     }
-    hungerTicker() {
+    playerTick() {
         this.hungerTick++;
         if (this.hungerTick >= this.hungerSpeed) {
             if (this.hunger > 0) {
@@ -74,6 +79,25 @@ module.exports = class UserState {
                 // take damage from starving
             }
             this.hungerTick = 0;
+        }
+        if (this.health <= 100) {
+            this.healTick++;
+            if (this.healTick >= this.healSpeed) {
+                if (this.hunger >= 80) { // healing with food
+                    this.hunger -= 5;
+                    this.heal(5);
+                }
+                this.healTick = 0;
+            }
+            this.regenTick++;
+            if (this.regenTick >= this.regenSpeed) {
+                if (this.hunger >= 30) {
+                    this.heal(1); // regeneration
+                    this.regenTick = 0;
+                }
+            }
+        } else {
+            this.health = 100;
         }
     }
     updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {
