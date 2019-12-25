@@ -38,7 +38,8 @@ const serverState = {
 const map = new CreateMap(serverState);
 map.test();
 
-
+const gameItems = require('./items/items.js');
+// gameItems.test.test();
 
 
 io.on('connection', socket => {
@@ -64,6 +65,9 @@ io.on('connection', socket => {
             hunger: serverState.users.user[data.id].hunger,
             score: serverState.users.user[data.id].score,
         };
+
+        // gameItems.test.craft(serverState.users.user[data.id].inventory);
+
         serverState.users.userData[data.id] = serverState.users.user[data.id].clientDataPackage(); // update data packge
         if (serverState.users.user[data.id].health <= 0) { // check if client has died
             serverState.users.userData[data.id].dead = true;
@@ -78,6 +82,7 @@ io.on('connection', socket => {
         serverState.resources[data.resourceID].harvest(data.amount);
         // add the amount harvested to the clients resource pile
         serverState.users.user[data.id].harvest(serverState.resources[data.resourceID].type, data.amount);
+
         // emit harvest event occuring
         io.emit('harvested', { // harvested only provides a visual effect, and nothing else
             vx: data.vx,
