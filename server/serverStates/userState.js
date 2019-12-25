@@ -12,12 +12,17 @@ module.exports = class UserState {
         this.score = 0;
 
         this.health = 10;
+        this.hunger = 70;
         this.dead = false;
         this.attackFlash = false;
 
         this.radius = (100 * 0.865)/2;
 
-        this.inventory = {}
+        this.inventory = {};
+
+        // hunger variables
+        this.hungerTick = 0;
+        this.hungerSpeed = 100;
     }
 
     attacked(damage) {
@@ -58,6 +63,18 @@ module.exports = class UserState {
         }
         // increase player score for killing the animal
         this.score += 3;
+    }
+    hungerTicker() {
+        this.hungerTick++;
+        if (this.hungerTick >= this.hungerSpeed) {
+            if (this.hunger > 0) {
+                this.hunger -= 5;
+            } else if (this.hunger <= 0) {
+                this.attacked(5);
+                // take damage from starving
+            }
+            this.hungerTick = 0;
+        }
     }
     updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {
         // update variables from client

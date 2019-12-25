@@ -92,7 +92,7 @@ module.exports = class EntityAI {
                     angle += 360;
                 }
                 if (this.hit) {
-                    angle /= 20; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
+                    angle /= 15; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
                 }
                 this.rotate(angle, 5);
                 break

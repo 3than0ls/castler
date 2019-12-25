@@ -5,6 +5,7 @@ export const clientDataUpdate = (socket) => {
     socket.on('clientDataUpdate', data => {
         player.inventoryUpdate(data.inventory);
         player.healthUpdate(data.health);
+        player.hungerUpdate(data.hunger);
         player.score = data.score;
         if (data.dead) {
             player.died();

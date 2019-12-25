@@ -25,8 +25,8 @@ const CreateMap = require('./createMap.js');
 
 const serverState = {
     users: {
-        userData: {},
-        user: {},
+        userData: {}, // data we send to clients
+        user: {},   // data that controls and has functions of the user
     },
     resources: {}, 
     entities: {
@@ -61,13 +61,15 @@ io.on('connection', socket => {
         let clientUpdateData = {
             inventory: serverState.users.user[data.id].inventory,
             health: serverState.users.user[data.id].health,
+            hunger: serverState.users.user[data.id].hunger,
             score: serverState.users.user[data.id].score,
         };
-        serverState.users.userData[data.id] = serverState.users.user[data.id].clientDataPackage();
-        if (serverState.users.user[data.id].health <= 0) {
+        serverState.users.userData[data.id] = serverState.users.user[data.id].clientDataPackage(); // update data packge
+        if (serverState.users.user[data.id].health <= 0) { // check if client has died
             serverState.users.userData[data.id].dead = true;
             clientUpdateData.dead = true;
         }
+        serverState.users.user[data.id].hungerTicker(); // tick hunger
         socket.emit('clientDataUpdate', clientUpdateData);
     });
 

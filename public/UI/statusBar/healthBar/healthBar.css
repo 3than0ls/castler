@@ -1,4 +1,4 @@
-.healthbar {
+/*.healthbar {
     pointer-events: none;
     position: fixed;
 
@@ -24,6 +24,13 @@
     min-width: 300px;
     min-height: 30px;
 
+    left: 50%;
+    bottom: 5%;
+    transform: translate(-50%);
+    background: rgba(100, 100, 100, 0.5);
+}*/
+
+#healthBar {
     left: 50%;
     bottom: 5%;
     transform: translate(-50%);

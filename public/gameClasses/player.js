@@ -33,17 +33,19 @@ export class Player {
         // player status
         this.score; // assigned from server
         this.health = 100; // set at 100, assigned from server
+        this.hunger = 100; // set at 100, assigned from server
         this.dead = this.health <= 0;
 
         // player game stats
         this.maxHealth = 100;
         this.speed = 4;
+        this.maxSpeed = 4;
         this.damage = 50;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
 
         // player inventory and resources
-        this.inventory = { wood: 0};
+        this.inventory = {};
 
         // player statuses and small stuff
         // swing animation variables
@@ -261,6 +263,25 @@ export class Player {
 
         if (health <= 0) {
             this.health = 0;
+        }
+    }
+    
+    hungerUpdate(hunger) {
+        if (hunger < this.hunger) {
+            this.hunger = hunger;
+        } else if (hunger > this.hunger) {
+            console.log('eating');
+        }
+
+        if (hunger <= 20) {
+            // hungry, decrease speed
+            this.speed = this.maxSpeed/2;
+        } else {
+            this.speed = this.maxSpeed;
+        }
+
+        if (hunger <= 0) {
+            this.hunger = 0;
         }
     }
 
