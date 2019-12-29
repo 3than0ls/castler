@@ -18,8 +18,6 @@ import bloodParticle from './../assets/bloodParticle.png';
 import feather from './../assets/feather.png';
 import fur from './../assets/fur.png';*/
 
-import fur from './../assets/inventory/fur.png';
-
 function importAll(context) {
     let images = {};
     context.keys().map((item, index) => { 

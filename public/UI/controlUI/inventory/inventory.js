@@ -7,23 +7,20 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-// custom style sheets
-import './inventory.css';
-import './../styles.css';
 
 // images
-import { player } from '../../app';
+import { player } from '../../../app';
 
 function importAll (r) {
     let images = {};
     r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
     return images;
 }
-const images = importAll(require.context('./../../assets/inventory', false,  /\.png$/));
+const images = importAll(require.context('./../../../assets/items', false,  /\.png$/)); // maybe later, add it so images are loaded dynamically, and only when the player has the item
 
 export class Inventory extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             playerID: player.clientID,
             playerInventory: player.inventory,
@@ -49,9 +46,9 @@ export class Inventory extends React.Component {
         // <Row className='items' variant="primary">{item}{" x"}{amount}</Row>
         for (let [item, amount] of Object.entries(this.state.playerInventory)) { // concat Image because the filename has Image at the end of it
             inventoryComponents.push(
-                <div key={item} className="inventoryItem">
-                    <div className='amount'>{item}{" x"}{amount}</div>
-                    <Image className='image' src={this.state.images[item.concat('.png')] }/>
+                <div key={item} className="controlUIItem">
+                    <div className='controlUIItemName'>{item}{" x"}{amount}</div>
+                    <Image className='controlUIImage' src={this.state.images[item.concat('.png')] }/>
                     
                 </div>
             )
@@ -65,8 +62,8 @@ export class Inventory extends React.Component {
         return( // return react fragment
             <> 
                 
-                <div id='inventoryContainerWrapper'>
-                    <div  id='inventoryContainer'>
+                <div>
+                    <div>
                         {inventoryComponents.length !== 0 && 
                             <Col>
                                 {inventoryComponents}

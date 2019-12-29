@@ -74,6 +74,16 @@ io.on('connection', socket => {
             clientUpdateData.dead = true;
         }
         serverState.users.user[data.id].playerTick(); // tick player
+
+        const craftableItems = [];
+        for (item in gameItems) {
+            if (gameItems[item].canCraft(serverState.users.user[data.id].inventory)) {
+                craftableItems.push(gameItems[item].name);
+            }
+        }
+        // console.log(JSON.stringify(craftableItems));
+        socket.emit('craftableItemsUpdate', craftableItems);
+
         socket.emit('clientDataUpdate', clientUpdateData);
     });
 

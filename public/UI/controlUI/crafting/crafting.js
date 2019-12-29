@@ -7,31 +7,30 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-// custom style sheets
-import './crafting.css';
-import './../styles.css';
 
 // images
-import { player } from '../../app';
+import { player } from '../../../app';
 
 function importAll (r) {
     let images = {};
     r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
     return images;
 }
-const images = importAll(require.context('./../../assets/inventory', false,  /\.png$/));
+const images = importAll(require.context('./../../../assets/items', false,  /\.png$/));
 
-export class Crafting extends React.Component {
+export const craftableItemsState = [];
+
+export class CraftingUI extends React.Component {
     constructor() {
         super();
         this.state = {
             playerID: player.clientID,
-            canCraft: {},
+            craftableItems: craftableItemsState,
             
             images: images,
         }
     }
-    /*
+    
     componentDidMount() {
         this.timerID = setInterval(() => this.tick(), 60); // learn more about this
     }
@@ -40,24 +39,30 @@ export class Crafting extends React.Component {
     }
     tick() { 
         this.setState({
-            playerInventory: player.inventory,
+            craftableItems: craftableItemsState,
         });
-    }*/
+    }
 
     render() {
         const craftingComponents = [];
-        // <Row className='items' variant="primary">{item}{" x"}{amount}</Row>
-        for (let [item, amount] of Object.entries(this.state.canCraft)) { // concat Image because the filename has Image at the end of it
+        for (let i = 0; i < this.state.craftableItems.length; i++) {
             craftingComponents.push(
-                <div key={item} className="craftingItem">
-                    <Image className='image' src={this.state.images[item.concat('.png')] }/>
+                <div key={this.state.craftableItems[i]} className="controlUIItem">
+                    <div className='controlUIItemName'>{this.state.craftableItems[i]}</div>
+                    <Image className='controlUIImage' src={this.state.images['stone.png']} />
                 </div>
             )
         }
+        /*
+                <div key={item} className="inventoryItem">
+                    <div className='amount'>{item}{" x"}{amount}</div>
+                    <Image className='image' src={this.state.images[item.concat('.png')] }/>
+                    
+                </div>*/
         return(
             <> 
                 <div id='craftingContainerWrapper'>
-                    <div  id='craftingyContainer'>
+                    <div id='craftingContainer'>
                         {craftingComponents.length !== 0 && 
                             <Col>
                                 {craftingComponents}
