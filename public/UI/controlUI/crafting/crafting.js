@@ -3,13 +3,15 @@ import ReactDOM from 'react-dom';
 
 // react bootstrap components
 import Image from 'react-bootstrap/Image';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import ListGroup from 'react-bootstrap/ListGroup';
+import Button from 'react-bootstrap/Button';
+
+import './crafting.css';
 
 
 // images
-import { player } from '../../../app';
+import { player, socket } from '../../../app';
+import { clientRequestCraft } from '../../../sockets/player/clientRequestCraft';
 
 function importAll (r) {
     let images = {};
@@ -43,14 +45,18 @@ export class CraftingUI extends React.Component {
         });
     }
 
+    itemClick(item) {
+        clientRequestCraft(socket, item);
+    }
+
     render() {
         const craftingComponents = [];
         for (let i = 0; i < this.state.craftableItems.length; i++) {
             craftingComponents.push(
-                <div key={this.state.craftableItems[i]} className="controlUIItem">
+                <Button variant='craftingItem' key={this.state.craftableItems[i]} className="controlUIItem" onClick={() => this.itemClick(this.state.craftableItems[i])}>
                     <div className='controlUIItemName'>{this.state.craftableItems[i]}</div>
                     <Image className='controlUIImage' src={this.state.images['stone.png']} />
-                </div>
+                </Button>
             )
         }
         /*

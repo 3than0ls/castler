@@ -10,7 +10,10 @@ class Item {
         let canCraftRecipe = this.canCraft(inventory); // canCraftRecipe will return the crafting recipe used if true
         if (canCraftRecipe) {
             for (let recipeItem in canCraftRecipe) {
-                inventory[recipeItem.name] -= canCraftRecipe[recipeItem];
+                inventory[recipeItem] -= canCraftRecipe[recipeItem];
+                if (inventory[recipeItem] === 0) {
+                    delete inventory[recipeItem];
+                }
             }
 
             if (!inventory[this.name]) { // if item doesn't exist in inventory, create it
@@ -68,14 +71,14 @@ module.exports = {
 
     test: new Item('test', false, [
         {
-            'stone': 20,
+            'stone': 5,
         },
         {
-            'wood': 20,
+            'wood': 5,
         },
         {
-            'stone': 10,
-            'wood': 10,
+            'stone': 2,
+            'wood': 2,
         },
     ])
 }

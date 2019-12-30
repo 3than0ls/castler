@@ -2,11 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 // react bootstrap components
-import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import ListGroup from 'react-bootstrap/ListGroup';
-import Pagination from 'react-bootstrap/Pagination';
 import Button from 'react-bootstrap/Button';
 
 // custom style sheets

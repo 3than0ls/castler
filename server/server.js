@@ -87,6 +87,12 @@ io.on('connection', socket => {
         socket.emit('clientDataUpdate', clientUpdateData);
     });
 
+    socket.on('clientRequestCraft', data => {
+        if (gameItems[data.item]) { // check if item exists
+            gameItems[data.item].craft(serverState.users.user[socket.id].inventory); // craft already runs a canCraft inside of the function
+        }
+    });
+
     socket.on('harvest', data => {
         // subtract the amount harvested from the resource
         serverState.resources[data.resourceID].harvest(data.amount);

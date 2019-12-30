@@ -1,30 +1,9 @@
-/*#craftingContainerWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    position: absolute;
-    top: 0;
-    left: 10vw;
-
-    height: 100vh;
-    width: 10vw;
-
-    min-width: 100px;
-    max-width: 150px;
+.btn-craftingItem {
+    border: none;
+    box-shadow: none;
 }
 
-#craftingContainer {
-    display: flex;
-    flex-flow: column wrap;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 0 20px 20px 0;
-    height: 100%;
-    width: 100%;
-    padding-top: 5%;
-    padding-bottom: 5%;
-
-    background: rgb(161, 165, 102);
-}*/
+.btn-craftingItem:hover{
+    filter: brightness(1.075);
+    transform: scale(1.05);
+}
