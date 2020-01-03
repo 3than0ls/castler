@@ -3,7 +3,20 @@
     box-shadow: none;
 }
 
-.btn-craftingItem:hover{
+.btn-craftingItem:hover {
     filter: brightness(1.075);
     transform: scale(1.05);
 }
+
+.btn-craftingItem:disabled {
+    pointer-events: none;
+    transform: none;
+    filter: grayscale(60%);
+}
+
+.btn-craftingItem[disabled] {
+    pointer-events: none;
+    transform: none;
+    filter: grayscale(60%);
+}
+

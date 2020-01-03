@@ -6,6 +6,7 @@ import { Leaderboard } from './leaderboard/leaderboard.js';
 import { HungerBar } from './statusBar/hungerBar/hungerBar.js';
 import { CraftingUI } from './controlUI/crafting/crafting.js';
 import { ControlUI } from './controlUI/controlUI.js';
+import { CraftingBar } from './statusBar/craftingBar/craftingBar.js';
 
 
 function importAll (r) {
@@ -24,6 +25,7 @@ export function App() {
                 <ControlUI />
                 <HealthBar />
                 <HungerBar />
+                <CraftingBar />
                 <Leaderboard />
             </div>
         </>

@@ -44,8 +44,12 @@ export class Player {
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
 
-        // player inventory and resources
+        // player inventory and resources, and crafting status
         this.inventory = {};
+        this.craftingState = {
+            crafting: false,
+            craftingComplete: 1,
+        };
 
         // player statuses and small stuff
         // swing animation variables
@@ -232,7 +236,7 @@ export class Player {
         this.viewpoint.sortableChildren = true;
 
         // render viewpoint to stage
-        this.viewpoint.position.set(-this.globalX+this.x, -this.gloalY+this.y); // adjust so its positioned in the middle
+        this.viewpoint.position.set(-this.globalX+this.x, -this.gloalY+this.y); // adjust so viewpoint positioned in the middle
         let viewpoint = this.viewpoint;
         stage.addChild(viewpoint);
     }
@@ -314,7 +318,9 @@ export class Player {
         // update global positioning
         this.globalX += this.vx;
         this.globalY += this.vy;
-        // perhaps a viewpoint window update here
+
+        // update viewpoint
+        this.viewpointUpdate();
 
         // update client needed hand/tool collision points
         this.updateCollisionPoints();
@@ -324,8 +330,8 @@ export class Player {
         this.handSprites[this.displayHand].rotation = this.angle;
         this.bodyGraphic.rotation = this.angle;
 
-        // update viewpoint
-        this.viewpointUpdate();
+        // test and handle collisions  for resources and entities
+        this.collisions();
 
         // detect clicks and respond
         if ((this.mouseHeld || this.swingAngle > 0) && this.displayHand !== "hand") { // if mouse held or effectively the swing has already started 
@@ -338,9 +344,6 @@ export class Player {
         let handGraphic = this.handSprites[this.displayHand];
         let bodyGraphic = this.bodyGraphic;
         stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
-
-        // test and handle collisions  for resources and entities
-        this.collisions();
         
         // emit client info to server
         clientEmit(socket, {
@@ -359,7 +362,7 @@ export class Player {
         }
         const entityIDs = Object.keys(clientState.entities); 
         for (let i = 0; i < entityIDs.length; i++) {
-            clientState.entities[entityIDs[i]].collide(this.bodyGraphic)
+            clientState.entities[entityIDs[i]].collide(this.bodyGraphic);
         }
     }
 

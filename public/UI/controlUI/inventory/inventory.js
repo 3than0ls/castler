@@ -59,17 +59,14 @@ export class Inventory extends React.Component {
             <Row className='items' variant="primary">Stone x{this.state.stone}</Row>
             <Row variant="primary"><Image className='images' src={this.state.stoneImage}/></Row>
         */
-        return( // return react fragment
+        return(
             <> 
-                
                 <div>
-                    <div>
-                        {inventoryComponents.length !== 0 && 
-                            <Col>
-                                {inventoryComponents}
-                            </Col>
-                        }
-                    </div>
+                    {inventoryComponents.length !== 0 && 
+                        <Col>
+                            {inventoryComponents}
+                        </Col>
+                    }
                 </div>
             </>
         )

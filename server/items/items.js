@@ -1,6 +1,7 @@
 class Item {
-    constructor(name, primary, recipes) {
+    constructor(name, primary, craftingTime, recipes) {
         this.name = name;
+        this.craftingTime = craftingTime || 100;
         this.primary = primary; // primary items are acquired, not crafted, and thus don't have a recipe
         if (!this.primary) {
             this.recipes = recipes; // should be a list of recipes that can be used to make this item
@@ -69,16 +70,20 @@ module.exports = {
     feather: new Item('feather', true),
     fur: new Item('fur', true),
 
-    test: new Item('test', false, [
-        {
-            'stone': 5,
-        },
+    test: new Item('test', false, 2000, [
         {
             'wood': 5,
         },
+    ]),
+    test2: new Item('test2', false, 2000, [
         {
-            'stone': 2,
-            'wood': 2,
+            'stone': 5,
+        },
+    ]),
+    test3: new Item('test3', false, 2000, [
+        {
+            'stone': 6,
+            'wood': 6,
         },
     ])
 }

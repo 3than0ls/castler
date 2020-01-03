@@ -6,6 +6,8 @@ export const clientDataUpdate = (socket) => {
         player.inventoryUpdate(data.inventory);
         player.healthUpdate(data.health);
         player.hungerUpdate(data.hunger);
+
+        player.craftingState = data.craftingState;
         player.score = data.score;
         if (data.dead) {
             player.died();

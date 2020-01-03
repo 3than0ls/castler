@@ -427,7 +427,7 @@ class Bump {
       // rather than moving circle 1 out of collision, we add the overlap muliplied by the vector to the player global positions
       player.globalX += (overlap * dx);
       player.globalY += (overlap * dy);
-
+      
       //Bounce
       if (bounce) {
         //Create a collision vector object, `s` to represent the bounce "surface".

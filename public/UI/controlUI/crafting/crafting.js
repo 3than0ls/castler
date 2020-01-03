@@ -28,13 +28,14 @@ export class CraftingUI extends React.Component {
         this.state = {
             playerID: player.clientID,
             craftableItems: craftableItemsState,
-            
+
+            craftingState: player.craftingState,
             images: images,
         }
     }
     
     componentDidMount() {
-        this.timerID = setInterval(() => this.tick(), 60); // learn more about this
+        this.timerID = setInterval(() => this.tick(), 100); // learn more about this
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
@@ -42,6 +43,7 @@ export class CraftingUI extends React.Component {
     tick() { 
         this.setState({
             craftableItems: craftableItemsState,
+            craftingState: player.craftingState,
         });
     }
 
@@ -53,20 +55,15 @@ export class CraftingUI extends React.Component {
         const craftingComponents = [];
         for (let i = 0; i < this.state.craftableItems.length; i++) {
             craftingComponents.push(
-                <Button variant='craftingItem' key={this.state.craftableItems[i]} className="controlUIItem" onClick={() => this.itemClick(this.state.craftableItems[i])}>
+                <Button variant='craftingItem' key={this.state.craftableItems[i]} className="controlUIItem"
+                onClick={() => this.itemClick(this.state.craftableItems[i])} disabled={this.state.craftingState.crafting}>
                     <div className='controlUIItemName'>{this.state.craftableItems[i]}</div>
                     <Image className='controlUIImage' src={this.state.images['stone.png']} />
                 </Button>
             )
         }
-        /*
-                <div key={item} className="inventoryItem">
-                    <div className='amount'>{item}{" x"}{amount}</div>
-                    <Image className='image' src={this.state.images[item.concat('.png')] }/>
-                    
-                </div>*/
-        return(
-            <> 
+
+                /*
                 <div id='craftingContainerWrapper'>
                     <div id='craftingContainer'>
                         {craftingComponents.length !== 0 && 
@@ -75,6 +72,16 @@ export class CraftingUI extends React.Component {
                             </Col>
                         }
                     </div>
+                </div>
+                */
+        return(
+            <> 
+                <div>
+                    {craftingComponents.length !== 0 && 
+                        <Col>
+                            {craftingComponents}
+                        </Col>
+                    }
                 </div>
             </>
         )

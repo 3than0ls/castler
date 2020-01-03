@@ -20,13 +20,18 @@ module.exports = class UserState {
 
         this.inventory = {};
 
-        // tick and timer variables
+        // hunger and regen tick and timer variables
         this.hungerTick = 0;
-        this.hungerSpeed = 1000;
+        this.hungerSpeed = 800;
         this.healTick = 0;
         this.healSpeed = 150;
         this.regenTick = 0;
         this.regenSpeed = 200;
+
+        // crafting variables
+        this.crafting = false;
+        this.craftingTick = 0;
+        this.craftingComplete = 1; // 1 for 100% or complete
     }
 
     attacked(damage) {
@@ -98,6 +103,21 @@ module.exports = class UserState {
             }
         } else {
             this.health = 100;
+        }
+    }
+    craft(item) { // craft an item after a given interval (for crafting cooldown)
+        if (!this.crafting) {
+            let intervalID = setInterval(() => {
+                this.craftingTick++;
+                this.crafting = true;
+                this.craftingComplete = this.craftingTick / item.craftingTime;
+                if (this.craftingTick >= item.craftingTime) {
+                    this.crafting = false;
+                    this.craftingTick = 0;
+                    item.craft(this.inventory);
+                    clearInterval(intervalID);
+                }
+            }, 1);
         }
     }
     updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {

@@ -43,7 +43,7 @@ export class Resource {
     }
 
     collide(playerGraphic) {
-        return bump.circleGameCollision(this.resourceGraphic, playerGraphic, true, true);
+        return bump.circleGameCollision(this.resourceGraphic, playerGraphic, false, true);
     }
 
     handSpriteCollision(collisionPoint) {

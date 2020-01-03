@@ -50,16 +50,16 @@ export class ControlUI extends React.Component {
         });
     }
 
-    render() {
+    render() { // perhaps replace with react bootstrap tabbed components
         return(
             <> 
                 <div id="controlUIWrapper">
                     <div id="controlUIContainer">
                         <Row>
-                            <Button variant='customItem' key={'inventory'} active={this.state.inventoryView} onClick={this.inventoryClick}>
+                            <Button variant='uiItem' key={'inventory'} active={this.state.inventoryView} onClick={this.inventoryClick}>
                                 Inv
                             </Button>
-                            <Button variant='customItem' key={'crafting'} active={!this.state.inventoryView} onClick={this.craftingClick}>
+                            <Button variant='uiItem' key={'crafting'} active={!this.state.inventoryView} onClick={this.craftingClick}>
                                 Cra
                             </Button>
                         </Row>

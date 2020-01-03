@@ -64,6 +64,10 @@ io.on('connection', socket => {
             health: serverState.users.user[data.id].health,
             hunger: serverState.users.user[data.id].hunger,
             score: serverState.users.user[data.id].score,
+            craftingState:  {
+                crafting: serverState.users.user[data.id].crafting,
+                craftingComplete: serverState.users.user[data.id].craftingComplete,
+            }
         };
 
         // gameItems.test.craft(serverState.users.user[data.id].inventory);
@@ -89,7 +93,7 @@ io.on('connection', socket => {
 
     socket.on('clientRequestCraft', data => {
         if (gameItems[data.item]) { // check if item exists
-            gameItems[data.item].craft(serverState.users.user[socket.id].inventory); // craft already runs a canCraft inside of the function
+            serverState.users.user[socket.id].craft(gameItems[data.item]);
         }
     });
 
