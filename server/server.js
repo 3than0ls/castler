@@ -35,8 +35,8 @@ const serverState = {
     },
 }
 
-const map = new CreateMap(serverState);
-map.test();
+const map = new CreateMap(serverState, [ 6000, 6000]);
+map.create();
 
 const gameItems = require('./items/items.js');
 // gameItems.test.test();

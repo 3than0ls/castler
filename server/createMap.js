@@ -9,28 +9,54 @@ function randomInt(min, max) {
 }
 
 module.exports = class CreateMap {
-    constructor(serverState) {
+    constructor(serverState, size) {
         this.resources = serverState.resources;
         this.entities = serverState.entities;
+
+        this.size = size || [1000, 1000]
     }
-    createResources(type, amount, x, y, maxX=0, maxY=0) {
+
+    createResources(type, amount, minX, minY, maxX=0, maxY=0) {
         for(let i = 0; i < amount; i++) {
-            let resource = new ResourceState(randomInt(x, maxX), randomInt(y, maxY), type);
+            let resource = new ResourceState(randomInt(minX, maxX), randomInt(minY, maxY), type);
             this.resources[resource.resourceID] = resource;
         }
     }
-    createEntities(type, amount, x, y, maxX=0, maxY=0) {
+    createEntities(type, amount, minX, minY, maxX=0, maxY=0) {
         for (let i = 0; i < amount; i ++) {
-            let entity = new EntityState(randomInt(x, maxX), randomInt(y, maxY), type);
+            let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type);
             this.entities.entityState[entity.entityID] = entity;
             this.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
         }
     }
-    test() {
-        this.createResources('tree', 4, -800, -800, 800, 800);
-        this.createResources('rock', 4, -800, -800, 800, 800);
 
-        this.createEntities('duck', 25, -900, -900, 900, 900);
-        this.createEntities('boar', 5, -900, -900, 900, 900);
+    create() {
+        // create map boundaries using resource obstacles
+        const size = this.size;
+        const increment = 160;
+        for (let i = 0; i <= size[0]; i += increment) {
+            let topRowResource = new ResourceState((-size[0]/2) + i, -size[1]/2 + randomInt(0, 60), 'tree');
+            this.resources[topRowResource.resourceID] = topRowResource;
+
+            let bottomRowResource = new ResourceState((-size[0]/2) + i, size[1]/2 + randomInt(0, 60), 'tree');
+            this.resources[bottomRowResource.resourceID] = bottomRowResource;
+        }
+        for (let i = 0; i <= size[1]; i += increment) {
+            let leftRowResource = new ResourceState(-size[0]/2 + randomInt(0, 60), (-size[1]/2) + i, 'tree');
+            this.resources[leftRowResource.resourceID] = leftRowResource;
+
+            let rightRowResource = new ResourceState(size[0]/2 + randomInt(0, 60), (-size[1]/2) + i, 'tree');
+            this.resources[rightRowResource.resourceID] = rightRowResource;
+        }
+
+        this.test();
+    }
+    test() {
+        const size = this.size;
+        this.createResources('tree', size[0]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        this.createResources('rock', size[1]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+
+        this.createEntities('duck', size[0]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        this.createEntities('boar', size[1]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
     }
 }
