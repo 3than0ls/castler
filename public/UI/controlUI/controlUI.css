@@ -87,9 +87,9 @@
     height: auto;
 }
 
+/* styles for ui item (the top tab choices) */
 .btn-uiItem {
     padding: 0;
-
     width: 3vw;
     height: 3vw;
     color: rgb(117, 117, 117);
@@ -116,8 +116,33 @@
 
 .btn-uiItem.disabled {
     filter: grayscale(60%);
+    cursor: default;
 }
 
 .btn-uiItem.disabled.btn-uiItem.active {
     transform: none;
 }
+
+/* styles for click item */
+.btn-clickItem {
+    border: none;
+    box-shadow: none;
+}
+
+.btn-clickItem:hover {
+    filter: brightness(1.075);
+    transform: scale(1.05);
+}
+
+.btn-clickItem:disabled {
+    pointer-events: none;
+    transform: none;
+    filter: grayscale(60%);
+}
+
+.btn-clickItem[disabled] {
+    pointer-events: none;
+    transform: none;
+    filter: grayscale(60%);
+}
+

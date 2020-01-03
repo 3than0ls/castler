@@ -6,9 +6,6 @@ import Image from 'react-bootstrap/Image';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 
-import './crafting.css';
-
-
 // images
 import { player, socket } from '../../../app';
 import { clientRequestCraft } from '../../../sockets/player/clientRequestCraft';
@@ -55,7 +52,7 @@ export class CraftingUI extends React.Component {
         const craftingComponents = [];
         for (let i = 0; i < this.state.craftableItems.length; i++) {
             craftingComponents.push(
-                <Button variant='craftingItem' key={this.state.craftableItems[i]} className="controlUIItem"
+                <Button variant='clickItem' key={this.state.craftableItems[i]} className="controlUIItem"
                 onClick={() => this.itemClick(this.state.craftableItems[i])} disabled={this.state.craftingState.crafting}>
                     <div className='controlUIItemName'>{this.state.craftableItems[i]}</div>
                     <Image className='controlUIImage' src={this.state.images['stone.png']} />

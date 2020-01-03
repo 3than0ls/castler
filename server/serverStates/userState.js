@@ -1,3 +1,5 @@
+const gameItems = require('./../items/items.js');
+
 module.exports = class UserState {
     constructor(socket, globalX, globalY, angle) {
         this.socket = socket;
@@ -18,15 +20,18 @@ module.exports = class UserState {
 
         this.radius = (100 * 0.865)/2;
 
-        this.inventory = {};
+        this.inventory = {
+            food:{
+                consumable: true,
+                amount: 100,
+            }
+        };
 
         // hunger and regen tick and timer variables
         this.hungerTick = 0;
         this.hungerSpeed = 800;
         this.healTick = 0;
-        this.healSpeed = 150;
-        this.regenTick = 0;
-        this.regenSpeed = 200;
+        this.healSpeed = 100;
 
         // crafting variables
         this.crafting = false;
@@ -44,20 +49,23 @@ module.exports = class UserState {
     }
 
     harvest(type, amount) {
-        let itemInventoryName;
+        let gameItemName;
         switch(type) {
             case 'tree':
-                itemInventoryName = 'wood';
+                gameItemName = gameItems['wood'].name;
                 break;
             case 'rock':
-                itemInventoryName = 'stone';
+                gameItemName = gameItems['stone'].name
                 break;
         }
 
-        if (!this.inventory[itemInventoryName]) {
-            this.inventory[itemInventoryName] = 0;
+        if (!this.inventory[gameItemName]) {
+            this.inventory[gameItemName] = {
+                consumable: gameItems[gameItemName].consumable,
+                amount: 0,
+            };
         }
-        this.inventory[itemInventoryName] += amount;
+        this.inventory[gameItemName].amount += amount;
         
         // increase player score
         this.score += amount;
@@ -65,11 +73,13 @@ module.exports = class UserState {
     kill(lootDrops) { // later maybe combine kill and harvest
         const lootDropKeys = Object.keys(lootDrops);
         for (let i = 0; i < lootDropKeys.length; i ++) {
-            if (!this.inventory[lootDropKeys[i]]) this.inventory[lootDropKeys[i]] = 0;
-            this.inventory[lootDropKeys[i]] += lootDrops[lootDropKeys[i]];
-
-            // increase player score
-            this.score += lootDrops[lootDropKeys[i]];
+            if (!this.inventory[lootDropKeys[i]]) {
+                this.inventory[lootDropKeys[i]] = {
+                    consumable: gameItems[lootDropKeys[i]].consumable,
+                    amount: 0,
+                };
+            }
+            this.inventory[lootDropKeys[i]].amount += lootDrops[lootDropKeys[i]];
         }
         // increase player score for killing the animal
         this.score += 3;
@@ -85,24 +95,21 @@ module.exports = class UserState {
             }
             this.hungerTick = 0;
         }
-        if (this.health <= 100) {
+        if (this.hunger >= 100) {
+            this.hunger = 100; // cap hunger at 100 in case it goes over
+        }
+
+        if (this.health < 100) {
             this.healTick++;
             if (this.healTick >= this.healSpeed) {
-                if (this.hunger >= 80) { // healing with food
+                if (this.hunger >= 40) { // healing with food
                     this.hunger -= 5;
                     this.heal(5);
                 }
                 this.healTick = 0;
             }
-            this.regenTick++;
-            if (this.regenTick >= this.regenSpeed) {
-                if (this.hunger >= 30) {
-                    this.heal(1); // regeneration
-                    this.regenTick = 0;
-                }
-            }
         } else {
-            this.health = 100;
+            this.health = 100; // cap health at 100 in case it goes over
         }
     }
     craft(item) { // craft an item after a given interval (for crafting cooldown)

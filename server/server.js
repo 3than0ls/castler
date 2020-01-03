@@ -70,8 +70,6 @@ io.on('connection', socket => {
             }
         };
 
-        // gameItems.test.craft(serverState.users.user[data.id].inventory);
-
         serverState.users.userData[data.id] = serverState.users.user[data.id].clientDataPackage(); // update data packge
         if (serverState.users.user[data.id].health <= 0) { // check if client has died
             serverState.users.userData[data.id].dead = true;
@@ -94,6 +92,12 @@ io.on('connection', socket => {
     socket.on('clientRequestCraft', data => {
         if (gameItems[data.item]) { // check if item exists
             serverState.users.user[socket.id].craft(gameItems[data.item]);
+        }
+    });
+
+    socket.on('clientRequestConsume', data => {
+        if (serverState.users.user[socket.id].inventory[data.item].amount > 0) {
+            gameItems[data.item].consumeFunction(serverState.users.user[socket.id]);
         }
     });
 

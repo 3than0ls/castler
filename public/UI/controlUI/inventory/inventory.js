@@ -3,13 +3,13 @@ import ReactDOM from 'react-dom';
 
 // react bootstrap components
 import Image from 'react-bootstrap/Image';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import ListGroup from 'react-bootstrap/ListGroup';
+import Button from 'react-bootstrap/Button';
 
 
 // images
-import { player } from '../../../app';
+import { player, socket } from '../../../app';
+import { clientRequestConsume } from '../../../sockets/player/clientRequestConsume';
 
 function importAll (r) {
     let images = {};
@@ -41,17 +41,37 @@ export class Inventory extends React.Component {
         });
     }
 
+    itemClick(item) {
+        clientRequestConsume(socket, item);
+    }
+
     render() {
         const inventoryComponents = [];
         // <Row className='items' variant="primary">{item}{" x"}{amount}</Row>
-        for (let [item, amount] of Object.entries(this.state.playerInventory)) { // concat Image because the filename has Image at the end of it
-            inventoryComponents.push(
-                <div key={item} className="controlUIItem">
-                    <div className='controlUIItemName'>{item}{" x"}{amount}</div>
-                    <Image className='controlUIImage' src={this.state.images[item.concat('.png')] }/>
-                    
-                </div>
-            )
+        for (let [item, itemData] of Object.entries(this.state.playerInventory)) { // concat Image because the filename has Image at the end of it
+
+            let componentItem;
+            if (!itemData.consumable) {
+                componentItem = 
+                    <div key={item} className="controlUIItem">
+                        <div className='controlUIItemName'>{item}{" x"}{itemData.amount}</div>
+                        <Image className='controlUIImage' src={this.state.images[item.concat('.png')] }/>
+                    </div>
+            } else {
+                componentItem = 
+                    <Button variant="clickItem" key={item} className="controlUIItem" onClick={() => this.itemClick(item)}>
+                        <div className='controlUIItemName'>{item}{" x"}{itemData.amount}</div>
+                        <Image className='controlUIImage' src={this.state.images[item.concat('.png')] }/>
+                    </Button>
+
+            }
+            inventoryComponents.push(componentItem);
+            /*
+            if (itemData.consumable) {
+                console.log(item + ' is consumable');
+            } else {
+                console.log(item + ' is not consumable');
+            }*/
         }
         /* 
             <Row className='items' variant="primary">Wood x{this.state.wood}</Row>

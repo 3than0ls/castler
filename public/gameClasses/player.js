@@ -268,13 +268,18 @@ export class Player {
         if (health <= 0) {
             this.health = 0;
         }
+        if (this.health >= 100) {
+            this.health = 100;
+        }
     }
     
     hungerUpdate(hunger) {
         if (hunger < this.hunger) {
             this.hunger = hunger;
+            // hunger flash?
         } else if (hunger > this.hunger) {
-            console.log('eating');
+            this.hunger = hunger;
+
         }
 
         if (hunger <= 20) {
@@ -300,7 +305,6 @@ export class Player {
     }
 
     died() {
-        console.log('I died...');
         socket.disconnect();
         worker.terminate();
         renderDeathMenu();

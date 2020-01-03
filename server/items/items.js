@@ -1,7 +1,9 @@
 class Item {
-    constructor(name, primary, craftingTime, recipes) {
+    constructor(name, primary, consumable, consumeFunction, craftingTime, recipes) {
         this.name = name;
-        this.craftingTime = craftingTime || 100;
+        this.consumable = consumable || false;
+        this.consumeFunction = consumeFunction || function(user) {};
+        this.craftingTime = craftingTime || 1000;
         this.primary = primary; // primary items are acquired, not crafted, and thus don't have a recipe
         if (!this.primary) {
             this.recipes = recipes; // should be a list of recipes that can be used to make this item
@@ -11,16 +13,19 @@ class Item {
         let canCraftRecipe = this.canCraft(inventory); // canCraftRecipe will return the crafting recipe used if true
         if (canCraftRecipe) {
             for (let recipeItem in canCraftRecipe) {
-                inventory[recipeItem] -= canCraftRecipe[recipeItem];
-                if (inventory[recipeItem] === 0) {
+                inventory[recipeItem].amount -= canCraftRecipe[recipeItem];
+                if (inventory[recipeItem].amount === 0) {
                     delete inventory[recipeItem];
                 }
             }
 
             if (!inventory[this.name]) { // if item doesn't exist in inventory, create it
-                inventory[this.name] = 0;
+                inventory[this.name] = {
+                    consumable: this.consumable,
+                    amount: 0,
+                };
             }
-            inventory[this.name] += 1;
+            inventory[this.name].amount += 1;
         }
     }
     canCraft(inventory) {
@@ -34,7 +39,7 @@ class Item {
                         // console.log(`Item needed: ${recipeItem}. Continuing to next recipe`)
                         continue recipeNumber; // a recipe item is missing, skip to next possible recipe (if there are none left, exits loop)
                     } else {
-                        if (inventory[recipeItem] >= this.recipes[i][recipeItem]) { // if the inventory has more than or equal to the amount required
+                        if (inventory[recipeItem].amount >= this.recipes[i][recipeItem]) { // if the inventory has more than or equal to the amount required
                             // console.log(`The inventory has enough ${recipeItem} (${inventory[recipeItem]}) to make ${this.name} (amount needed: ${this.recipes[i][recipeItem]})`);
                             hasItems.push(true);
                         } else {
@@ -63,27 +68,44 @@ class Item {
     }
 }
 
+function consumed(user, itemName) {
+    user.inventory[itemName].amount -= 1;
+    if (user.inventory[itemName].amount <= 0) {
+        delete user.inventory[itemName];
+    }
+};
+
 module.exports = {
     stone: new Item('stone', true),
-    wood: new Item('stone', true),
+    wood: new Item('wood', true),
     meat: new Item('meat', true),
     feather: new Item('feather', true),
     fur: new Item('fur', true),
 
-    test: new Item('test', false, 2000, [
+    clientID: new Item('clientID', false, true, (user) => {
+        console.log(user.clientID);
+        consumed(user, 'clientID');
+    }, 2000, [
         {
             'wood': 5,
         },
     ]),
-    test2: new Item('test2', false, 2000, [
+    nickname: new Item('nickname', false, true, (user) => {
+        console.log(user.nickname);
+        consumed(user, 'nickname');
+    }, 2000, [
         {
             'stone': 5,
         },
     ]),
-    test3: new Item('test3', false, 2000, [
+    food: new Item('food', false, true, (user) => {
+        if (user.hunger < 100) {
+            consumed(user, 'food');
+            user.hunger += 25;
+        }
+    }, 2000, [
         {
-            'stone': 6,
-            'wood': 6,
-        },
+            meat: 2,
+        }
     ])
 }
