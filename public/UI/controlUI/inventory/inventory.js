@@ -46,6 +46,19 @@ export class Inventory extends React.Component {
     }
 
     render() {
+        function displayRename(itemName) {
+            let name = '';
+            for (let i = 0; i < itemName.length; i++) {
+                let char = itemName.charAt(i);
+                if (char == char.toUpperCase()) {
+                    name += ` ${char.toLowerCase()}`;
+                } else {
+                    name += char;
+                }
+            }
+            return name;
+        }
+
         const inventoryComponents = [];
         // <Row className='items' variant="primary">{item}{" x"}{amount}</Row>
         for (let [item, itemData] of Object.entries(this.state.playerInventory)) { // concat Image because the filename has Image at the end of it
@@ -54,14 +67,14 @@ export class Inventory extends React.Component {
             if (!itemData.consumable) {
                 componentItem = 
                     <div key={item} className="controlUIItem">
-                        <div className='controlUIItemName'>{item}{" x"}{itemData.amount}</div>
+                        <div className='controlUIItemName'>{displayRename(item)}{" x"}{itemData.amount}</div>
                         <Image className='controlUIImage' src={this.state.images[item.concat('.png')] }/>
                     </div>
             } else {
                 componentItem = 
-                    <Button variant="clickItem" key={item} className="controlUIItem" onClick={() => this.itemClick(item)}>
-                        <div className='controlUIItemName'>{item}{" x"}{itemData.amount}</div>
-                        <Image className='controlUIImage' src={this.state.images[item.concat('.png')] }/>
+                    <Button variant="clickItem" key={item} className="controlUIItem disableSelect" onClick={() => this.itemClick(item)}>
+                        <div className='controlUIItemName'>{displayRename(item)}{" x"}{itemData.amount}</div>
+                        <Image className='controlUIImage' src={this.state.images[item.concat('.png')]}/>
                     </Button>
 
             }

@@ -21,9 +21,9 @@ module.exports = class UserState {
         this.radius = (100 * 0.865)/2;
 
         this.inventory = {
-            food:{
+            cookedMeat: {
                 consumable: true,
-                amount: 100,
+                amount: 2,
             }
         };
 
@@ -112,6 +112,22 @@ module.exports = class UserState {
             this.health = 100; // cap health at 100 in case it goes over
         }
     }
+
+    boundaryContain(boundarySize) {
+        if (this.globalX <= -boundarySize[0]/2) {
+            this.globalX = -boundarySize[0]/2;
+        }
+        if (this.globalX >= boundarySize[0]/2) {
+            this.globalX = boundarySize[0]/2;
+        }
+        if (this.globalY <= -boundarySize[1]/2) {
+            this.globalY = -boundarySize[1]/2;
+        }
+        if (this.globalY >= boundarySize[1]/2) {
+            this.globalY = boundarySize[1]/2;
+        }
+    }
+
     craft(item) { // craft an item after a given interval (for crafting cooldown)
         if (!this.crafting) {
             let intervalID = setInterval(() => {

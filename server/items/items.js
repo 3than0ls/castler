@@ -78,34 +78,25 @@ function consumed(user, itemName) {
 module.exports = {
     stone: new Item('stone', true),
     wood: new Item('wood', true),
-    meat: new Item('meat', true),
+    rawMeat: new Item('rawMeat', true),
     feather: new Item('feather', true),
     fur: new Item('fur', true),
 
-    clientID: new Item('clientID', false, true, (user) => {
-        console.log(user.clientID);
-        consumed(user, 'clientID');
-    }, 2000, [
-        {
-            'wood': 5,
-        },
-    ]),
-    nickname: new Item('nickname', false, true, (user) => {
-        console.log(user.nickname);
-        consumed(user, 'nickname');
-    }, 2000, [
-        {
-            'stone': 5,
-        },
-    ]),
-    food: new Item('food', false, true, (user) => {
+    cookedMeat: new Item('cookedMeat', false, true, (user) => {
         if (user.hunger < 100) {
-            consumed(user, 'food');
+            consumed(user, 'cookedMeat');0000000000000000000000000000000000
             user.hunger += 25;
         }
     }, 2000, [
         {
-            meat: 2,
+            rawMeat: 1,
         }
-    ])
+    ]),
+
+    foodRation: new Item('foodRation', true, true, (user) => {
+        if (user.hunger < 100) {
+            consumed(user, 'foodRation');
+            user.hunger += 25;
+        }
+    })
 }

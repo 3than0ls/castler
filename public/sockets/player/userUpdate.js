@@ -23,9 +23,6 @@ export const userUpdate = (socket, clientState) => {
                 if (data.attackFlash) {
                     clientState.enemies[userIDs[i]].attackFlash();
                 }
-                if (data.dead) {
-                    console.log('user died');
-                }
             }
         }
         // delete disconnected players

@@ -49,13 +49,26 @@ export class CraftingUI extends React.Component {
     }
 
     render() {
+        function displayRename(itemName) {
+            let name = '';
+            for (let i = 0; i < itemName.length; i++) {
+                let char = itemName.charAt(i);
+                if (char == char.toUpperCase() || char == '_') {
+                    name += ` ${char.toLowerCase()}`;
+                } else {
+                    name += char;
+                }
+            }
+            return name;
+        }
+
         const craftingComponents = [];
         for (let i = 0; i < this.state.craftableItems.length; i++) {
             craftingComponents.push(
-                <Button variant='clickItem' key={this.state.craftableItems[i]} className="controlUIItem"
+                <Button variant='clickItem' key={this.state.craftableItems[i]} className="controlUIItem disableSelect"
                 onClick={() => this.itemClick(this.state.craftableItems[i])} disabled={this.state.craftingState.crafting}>
-                    <div className='controlUIItemName'>{this.state.craftableItems[i]}</div>
-                    <Image className='controlUIImage' src={this.state.images['stone.png']} />
+                    <div className='controlUIItemName'>{displayRename(this.state.craftableItems[i])}</div>
+                    <Image className='controlUIImage' src={this.state.images[this.state.craftableItems[i].concat('.png')]} />
                 </Button>
             )
         }

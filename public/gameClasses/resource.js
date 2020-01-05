@@ -38,6 +38,9 @@ export class Resource {
         this.resourceGraphic.anchor.y = 0.5;
         this.resourceGraphic.position.set(this.globalX, this.globalY);
 
+        // set zIndex (the parent container, player.viewpoint, enables sortable children)
+        this.resourceGraphic.zIndex = 25;
+
         let resourceGraphic = this.resourceGraphic;
         player.viewpoint.addChild(resourceGraphic); // hands drawn below body
     }

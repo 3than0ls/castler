@@ -29,7 +29,7 @@ export class CraftingBar extends React.Component { // used to monitor progress o
     tick() { 
         this.setState({
             crafting: player.craftingState.crafting,
-            craftingComplete: Math.round(player.craftingState.craftingComplete * 150)
+            craftingComplete: Math.round(player.craftingState.craftingComplete * 125)
         });
     } // check bump js collision hand detection, may be inaccurate
 

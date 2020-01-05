@@ -35,7 +35,7 @@ const serverState = {
     },
 }
 
-const map = new CreateMap(serverState, [ 6000, 6000]);
+const map = new CreateMap(serverState, [1000, 1000]);
 map.create();
 
 const gameItems = require('./items/items.js');
@@ -46,7 +46,7 @@ io.on('connection', socket => {
     let newUserState = new UserState(socket);
     serverState.users.user[socket.id] = newUserState;
     serverState.users.userData[socket.id] = newUserState.clientDataPackage();
-    // on received events, data.id should be equal to socket.id
+    // on received events, socket.id should be equal to socket.id
     console.log("Client joined: " + serverState.users.user[socket.id].clientID);
 
     // initial variable assignments
@@ -54,32 +54,38 @@ io.on('connection', socket => {
         serverState.users.user[socket.id].nickname = nickname;
     }) // update the server info of the clients nickname when client connects
     socket.emit('playerInit', {
+        mapSize: map.size,
         inventory: serverState.users.user[socket.id].inventory
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
-        serverState.users.user[data.id].updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
+        let user = serverState.users.user[data.id];
+        user.updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
+        user.boundaryContain(map.size);
+
         let clientUpdateData = {
-            inventory: serverState.users.user[data.id].inventory,
-            health: serverState.users.user[data.id].health,
-            hunger: serverState.users.user[data.id].hunger,
-            score: serverState.users.user[data.id].score,
+            globalX: user.globalX,
+            globalY: user.globalY,
+            inventory: user.inventory,
+            health: user.health,
+            hunger: user.hunger,
+            score: user.score,
             craftingState:  {
-                crafting: serverState.users.user[data.id].crafting,
-                craftingComplete: serverState.users.user[data.id].craftingComplete,
+                crafting: user.crafting,
+                craftingComplete: user.craftingComplete,
             }
         };
 
-        serverState.users.userData[data.id] = serverState.users.user[data.id].clientDataPackage(); // update data packge
-        if (serverState.users.user[data.id].health <= 0) { // check if client has died
+        serverState.users.userData[data.id] = user.clientDataPackage(); // update data packge
+        if (user.health <= 0) { // check if client has died
             serverState.users.userData[data.id].dead = true;
             clientUpdateData.dead = true;
         }
-        serverState.users.user[data.id].playerTick(); // tick player
+        user.playerTick(); // tick player
 
         const craftableItems = [];
         for (item in gameItems) {
-            if (gameItems[item].canCraft(serverState.users.user[data.id].inventory)) {
+            if (gameItems[item].canCraft(user.inventory)) {
                 craftableItems.push(gameItems[item].name);
             }
         }
@@ -105,7 +111,7 @@ io.on('connection', socket => {
         // subtract the amount harvested from the resource
         serverState.resources[data.resourceID].harvest(data.amount);
         // add the amount harvested to the clients resource pile
-        serverState.users.user[data.id].harvest(serverState.resources[data.resourceID].type, data.amount);
+        serverState.users.user[socket.id].harvest(serverState.resources[data.resourceID].type, data.amount);
 
         // emit harvest event occuring
         io.emit('harvested', { // harvested only provides a visual effect, and nothing else
@@ -123,12 +129,12 @@ io.on('connection', socket => {
         // subtract the amount of health that the entity took
         let entityAI = serverState.entities.entityAI[data.entityID]
         let entityState = serverState.entities.entityState[data.entityID]
-        entityAI.attacked(data.damage, serverState.users.user[socket.id]);
+        entityAI.attacked(data.damage, serverState.users.user[data.id]);
 
         /* if the entity was killed */
         if (entityState.killed()) {
             // add the amount harvested from kill to client inventory
-            serverState.users.user[data.id].kill(entityState.loot);
+            serverState.users.user[socket.id].kill(entityState.loot);
             io.emit('killed', {
                 collisionX: data.collisionX,
                 collisionY: data.collisionY,
@@ -158,7 +164,8 @@ io.on('connection', socket => {
     });
 })
 
-function update(serverState) {  
+function update(serverState) {
+    
     // emit data
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
@@ -194,6 +201,13 @@ function update(serverState) {
   
 
 http.listen(3000, () => {
-    setInterval(() => {update(serverState)}, 1000/60);
+
+    setInterval(() => {
+        // console.time('update');
+        update(serverState)
+        // console.timeEnd('update');
+    }, 1000/60);
+    
+
     console.log('listening on localhost:3000');
 });

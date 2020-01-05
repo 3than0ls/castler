@@ -256,14 +256,14 @@ module.exports = class EntityAI {
             // tick the attack ticker
             this.attackTick++;
             this.target.attackFlash = false; // set to true in this.target.attacked, used so that clients can see when other clients are attacked
-        }
 
-        // if target is within attacking range, then attack
-        this.attackTargetRadius = this.target.radius + this.radius;
-        if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
-            if (this.attackTick >= this.attackSpeed) {
-                this.target.attacked(6);
-                this.attackTick = 0;
+            // if target is within attacking range, then attack
+            this.attackTargetRadius = this.target.radius + this.radius;
+            if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
+                if (this.attackTick >= this.attackSpeed) {
+                    this.target.attacked(6);
+                    this.attackTick = 0;
+                }
             }
         }
 

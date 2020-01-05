@@ -20,8 +20,6 @@ export const clientState = {
     TO DO:
     clean up code
     BIG:
-    crafting
-    items
     armor
     tiered tools/items
 
@@ -38,7 +36,7 @@ export const renderer = PIXI.autoDetectRenderer();
 renderer.view.style.position = "absolute";
 renderer.view.style.display = "block";
 renderer.autoDensity = true;
-renderer.backgroundColor = 0x0077AA;
+renderer.backgroundColor = 0x3d7d00;
 renderer.antialias = true;
 renderer.resize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.view); // add renderer to html document
@@ -51,6 +49,10 @@ renderer.render(stage); // add stage to renderer
 // create player
 export const player = new Player(socket.io.engine.id);
 
+// create boundary variable that will be assigned later once client init data is received
+import { Boundary } from './gameClasses/boundary.js';
+export const boundary = new Boundary();
+
 import { socketUpdate, clientInit } from './sockets/index.js'; // imports socket update, but also calls playerInit in this file
 clientInit(socket); 
 
@@ -58,6 +60,7 @@ export function update() {
     charm.update();
     dust.update();
 
+    boundary.updateBoundary();
     player.update();
 }
 

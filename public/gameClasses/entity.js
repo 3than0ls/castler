@@ -33,6 +33,9 @@ export class Entity {
         this.entityGraphic.anchor.y = 0.5;
         this.entityGraphic.position.set(this.globalX, this.globalY);
 
+        // set zIndex (the parent container, player.viewpoint, enables sortable children)
+        this.entityGraphic.zIndex = 15;
+
         let entityGraphic = this.entityGraphic;
         player.viewpoint.addChild(entityGraphic); // hands drawn below body
     }

@@ -32,6 +32,7 @@ module.exports = class CreateMap {
 
     create() {
         // create map boundaries using resource obstacles
+        /*
         const size = this.size;
         const increment = 160;
         for (let i = 0; i <= size[0]; i += increment) {
@@ -47,7 +48,7 @@ module.exports = class CreateMap {
 
             let rightRowResource = new ResourceState(size[0]/2 + randomInt(0, 60), (-size[1]/2) + i, 'tree');
             this.resources[rightRowResource.resourceID] = rightRowResource;
-        }
+        }*/
 
         this.test();
     }

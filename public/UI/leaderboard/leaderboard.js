@@ -52,7 +52,7 @@ export class Leaderboard extends React.Component {
             <> 
                 {leaderboardComponents.length !== 0 && 
                     <Col id='leaderboardContainer' className='overlayContainer'>
-                        Leaderboards:
+                        Leaderboard:
                         {leaderboardComponents}
                     </Col>
                 }

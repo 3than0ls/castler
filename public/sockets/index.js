@@ -1,4 +1,4 @@
-import { clientState, player } from "../app.js";
+import { clientState, player, boundary } from "../app.js";
 import { leaderboardState } from "../UI/leaderboard/leaderboard.js";
 import { craftableItemsState } from "../UI/controlUI/crafting/crafting.js";
 
@@ -13,6 +13,10 @@ export function clientInit(socket) {
     socket.emit('nickname', window.localStorage.getItem('nickname'));
     socket.on('playerInit', initData => {
         player.inventoryUpdate(initData.inventory);
+
+        // create boundary borders
+        boundary.resize(initData.mapSize);
+        boundary.renderBoundary();
         // when other init data is created, add here
     });
 }

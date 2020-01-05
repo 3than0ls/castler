@@ -276,10 +276,11 @@ export class Player {
     hungerUpdate(hunger) {
         if (hunger < this.hunger) {
             this.hunger = hunger;
+            this.movementKeys();
             // hunger flash?
         } else if (hunger > this.hunger) {
             this.hunger = hunger;
-
+            this.movementKeys();
         }
 
         if (hunger <= 20) {
@@ -478,21 +479,18 @@ export class Player {
         handSprites['hand'].anchor.x = 0.5;
         handSprites['hand'].anchor.y = 0.5;
         handSprites['hand'].position.set(x, y);
-        handSprites['hand'].zIndex = 49;
 
         // axe hand
         handSprites['axeHand'] = new PIXI.Sprite(loader.resources['player/axeHand'].texture);
         handSprites['axeHand'].anchor.x = 0.4; // anchor positions have been pre calculated
         handSprites['axeHand'].anchor.y = 0.55;
         handSprites['axeHand'].position.set(x, y);
-        handSprites['axeHand'].zIndex = 49;
 
         // sword hand
         handSprites['swordHand'] = new PIXI.Sprite(loader.resources['player/swordHand'].texture);
         handSprites['swordHand'].anchor.x = 0.256; // anchor positions have been pre calculated
         handSprites['swordHand'].anchor.y = 0.38;
         handSprites['swordHand'].position.set(x, y);
-        handSprites['swordHand'].zIndex = 49;
 
 
         // etc.
