@@ -43,6 +43,7 @@ module.exports = class UserState {
         this.health -= damage;
         this.attackFlash = true;
     }
+
     heal(amount) {
         this.health += amount;
         // this.healFlash = true; maybe something similar to attack flash, but for healing
@@ -85,6 +86,7 @@ module.exports = class UserState {
         this.score += 3;
     }
     playerTick() {
+        this.attackFlash = false;
         this.hungerTick++;
         if (this.hungerTick >= this.hungerSpeed) {
             if (this.hunger > 0) {
@@ -125,6 +127,15 @@ module.exports = class UserState {
         }
         if (this.globalY >= boundarySize[1]/2) {
             this.globalY = boundarySize[1]/2;
+        }
+
+        // if the player has somehow gotten to a place way beyond the boundary, reset its position
+        if (this.globalX <= -boundarySize[0]/2 - boundarySize[0]/3 || this.globalX >= boundarySize[0]/2 + boundarySize[0]/3 ||
+            this.globalY <= -boundarySize[1]/2 - boundarySize[1]/3 || this.globalY >= boundarySize[1]/2 + boundarySize[1]/3) {
+            this.globalX = 0;
+            this.globalY = 0;
+
+            this.attacked(10); // and damage them for exploiting, just for good measures
         }
     }
 

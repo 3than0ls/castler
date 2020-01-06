@@ -27,6 +27,8 @@ export class Player {
 
         this.vx = 0;
         this.vy = 0;
+        this.collisionvx = 0;
+        this.collisionvy = 0;
 
         this.viewpoint = new PIXI.Container();
 
@@ -71,7 +73,6 @@ export class Player {
         this.one = keyboard(49);
         this.two = keyboard(50);
         this.three = keyboard(51);
-
 
         // Left
         this.a.press = () => {
@@ -173,7 +174,7 @@ export class Player {
         }
 
         if (this.swingAngle < this.stopRotation) {
-            // harvest: if collided with resource during swing and before stop rotation, call resource function
+            // harvest: if collided with resource during swing and before sto2p rotation, call resource function
             if (this.displayHand === "axeHand") {
                 this.resourceHarvest();
             } else if (this.displayHand === "swordHand") {
@@ -320,10 +321,6 @@ export class Player {
         this.bodyGraphic.position.set(this.x, this.y);
         this.handSprites[this.displayHand].position.set(this.x, this.y);
 
-        // update global positioning
-        this.globalX += this.vx;
-        this.globalY += this.vy;
-
         // update viewpoint
         this.viewpointUpdate();
 
@@ -352,8 +349,8 @@ export class Player {
         
         // emit client info to server
         clientEmit(socket, {
-            globalX: this.globalX,
-            globalY: this.globalY,
+            globalX: this.globalX + this.vx,
+            globalY: this.globalY + this.vy,
             angle: this.angle,
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,

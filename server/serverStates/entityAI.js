@@ -201,7 +201,7 @@ module.exports = class EntityAI {
         this.hit = true;
     }
 
-    flee(distance=this.aggroDistance) {
+    flee() {
         // rotate
         let a = Math.round((Math.atan2(
             this.entityState.globalY - this.target.globalY,
@@ -282,7 +282,32 @@ module.exports = class EntityAI {
         }
     }
 
-    update(serverState) {
+    boundaryContain(boundarySize) {
+        // rotate
+        let a = Math.round((Math.atan2(
+            this.entityState.globalY,
+            this.entityState.globalX,
+        )) * 180 / Math.PI) - this.entityState.angle - 90;
+        if (a >= 180) {
+            a -= 360;
+        } else if (a <= -180) {
+            a += 360;
+        }
+
+        if (this.entityState.globalX <= -boundarySize[0]/2 || this.entityState.globalX >= boundarySize[0]/2 ||
+            this.entityState.globalY <= -boundarySize[1]/2 || this.entityState.globalY >= boundarySize[1]/2) {
+            this.rotate(a, 15);
+        }
+
+        // if the entity has somehow gotten to a place way beyond the boundary, reset its position
+        if (this.entityState.globalX <= -boundarySize[0]/2 - boundarySize[0]/3 || this.entityState.globalX >= boundarySize[0]/2 + boundarySize[0]/3 ||
+            this.entityState.globalY <= -boundarySize[1]/2 - boundarySize[1]/3 || this.entityState.globalY >= boundarySize[1]/2 + boundarySize[1]/3) {
+            this.entityState.globalX = 0;
+            this.entityState.globalY = 0;
+        }
+    }
+
+    update(serverState, map) {
         this.tick();
         
             
@@ -306,6 +331,8 @@ module.exports = class EntityAI {
         }
         
         this.avoidResources(serverState.resources);
+        this.boundaryContain(map.size);
+
         
         this.walk('updateCall');
         this.rotate('updateCall');

@@ -35,7 +35,7 @@ const serverState = {
     },
 }
 
-const map = new CreateMap(serverState, [1000, 1000]);
+const map = new CreateMap(serverState, [2500, 2500]);
 map.create();
 
 const gameItems = require('./items/items.js');
@@ -195,7 +195,7 @@ function update(serverState) {
     // updates states and call the entity AIs
     const entityIDs = Object.keys(serverState.entities.entityAI);
     for(let i = 0; i < entityIDs.length; i++) {
-        serverState.entities.entityAI[entityIDs[i]].update(serverState);
+        serverState.entities.entityAI[entityIDs[i]].update(serverState, map);
     }
 }
   
