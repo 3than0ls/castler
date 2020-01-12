@@ -10,7 +10,6 @@ export class Boundary {
     }
 
     renderBoundary() {
-        console.log(JSON.stringify(this.size));
         this.boundaryRect = new PIXI.Graphics();
 
         // draw thin transparent black line edges for boundary boxes

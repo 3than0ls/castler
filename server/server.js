@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, './public/')));
 
 const UserState = require('./serverStates/userState.js');
+const StructureState = require('./serverStates/structureState.js');
 const CreateMap = require('./createMap.js');
 
 const serverState = {
@@ -33,10 +34,27 @@ const serverState = {
         entityState: {}, // the data we send to the client holding positioning and other info about entities
         entityAI: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
     },
+    structures: {},
 }
 
-const map = new CreateMap(serverState, [2500, 2500]);
+const map = new CreateMap(serverState, [4000, 4000]);
 map.create();
+
+const mine = new StructureState({
+    type: 'mine',
+    globalX: 0,
+    globalY: 0,
+    size: [1000, 1000],
+    primaryColor: 0x888888,
+    entities: [
+        {type: 'boar', amount: 5}
+    ],
+    resources: [
+        //{type: 'rock', amount: 1}
+    ]
+});
+serverState.structures[mine.structureID] = mine;
+mine.create(serverState);
 
 const gameItems = require('./items/items.js');
 // gameItems.test.test();
@@ -165,11 +183,11 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
-    
-    // emit data
+    // emit data (perhaps combine all into one later)
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
+    io.sockets.emit('structureStates', serverState.structures)
 
     // emit leaderboard status (based on player score)
     const orderedPlayerScores = [];

@@ -1,11 +1,12 @@
 const lootDrops = require('./lootDrops.js');
 
 module.exports = class EntityState {
-    constructor(globalX, globalY, type, entityID) {
+    constructor(globalX, globalY, type, homeStructureID, entityID) {
         this.entityID = entityID || 'e' + Math.random().toString(36).substr(2, 9);
         this.type = type;
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
+        this.homeStructureID = homeStructureID || 'map';
         this.angle = Math.round((Math.random() - 0.5) * 360);
         this.playerHit = false;
 

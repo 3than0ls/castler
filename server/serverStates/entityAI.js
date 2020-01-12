@@ -21,10 +21,10 @@ module.exports = class EntityAI {
         // radius
         switch (entityState.type) {
             case 'duck':
-                this.radius = (100 * 0.798)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
+                this.radius = (100 * 0.8)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
                 break;
             case 'boar':
-                    this.radius = (150 * 0.827)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
+                    this.radius = (150 * 0.83)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
                 break;
             default:
                 this.radius = 100;
@@ -71,6 +71,40 @@ module.exports = class EntityAI {
             return false;
         }
     }
+
+    avoidStructure(serverStateStructures) {
+        for (let [structureID, structure] of Object.entries(serverStateStructures)) {
+            let entityInsideStructure = structure.objectInsideStructure(this.entityState); // keep out external entities
+            // if the entity is inside the structure, the structure is not the entities home structure, and the entity has not been hit, then turn it away from structure
+            if (entityInsideStructure && this.entityState.homeStructureID !== structureID && !this.hit) {
+                let angle = (Math.round((Math.atan2(
+                    this.entityState.globalY - structure.globalY,
+                    this.entityState.globalX - structure.globalX
+                )) * 180 / Math.PI) - this.entityState.angle + 90);
+                if (angle >= 180) {
+                    angle -= 360;
+                } else if (angle <= -180) {
+                    angle += 360;
+                }
+                this.rotate(angle, 3);
+                break;
+            } else if (!entityInsideStructure && this.entityState.homeStructureID === structureID && !this.hit) {
+                // if the entity is outsude the structure and the structure is the entities home structure, and the entity has not been hit, then turn it owards the structure
+                // perhaps create hard limit on how far an entity can leave its structure even if it has been hit
+                let angle = (Math.round((Math.atan2(
+                    this.entityState.globalY - structure.globalY,
+                    this.entityState.globalX - structure.globalX
+                )) * 180 / Math.PI) - this.entityState.angle - 90);
+                if (angle >= 180) {
+                    angle -= 360;
+                } else if (angle <= -180) {
+                    angle += 360;
+                }
+                this.rotate(angle, 3);
+                break;
+            }
+        }
+    }
     
     avoidResources(serverStateResources) {
         let resourceIDs = Object.keys(serverStateResources);
@@ -92,9 +126,9 @@ module.exports = class EntityAI {
                     angle += 360;
                 }
                 if (this.hit) {
-                    angle /= 15; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
+                    angle /= 1; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
                 }
-                this.rotate(angle, 5);
+                this.rotate(angle, 1);
                 break
             } else {
                 this.resourceCollision = false;
@@ -331,6 +365,7 @@ module.exports = class EntityAI {
         }
         
         this.avoidResources(serverState.resources);
+        this.avoidStructure(serverState.structures);
         this.boundaryContain(map.size);
 
         

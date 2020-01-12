@@ -16,17 +16,17 @@ module.exports = class CreateMap {
         this.size = size || [1000, 1000]
     }
 
-    createResources(type, amount, minX, minY, maxX=0, maxY=0) {
+    static createResources(resources, type, amount, minX, minY, maxX=0, maxY=0) {
         for(let i = 0; i < amount; i++) {
             let resource = new ResourceState(randomInt(minX, maxX), randomInt(minY, maxY), type);
-            this.resources[resource.resourceID] = resource;
+            resources[resource.resourceID] = resource;
         }
     }
-    createEntities(type, amount, minX, minY, maxX=0, maxY=0) {
+    static createEntities(entities, type, amount, minX, minY, maxX=0, maxY=0, homeStructureID) {
         for (let i = 0; i < amount; i ++) {
-            let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type);
-            this.entities.entityState[entity.entityID] = entity;
-            this.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
+            let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type, homeStructureID);
+            entities.entityState[entity.entityID] = entity;
+            entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
         }
     }
 
@@ -53,11 +53,12 @@ module.exports = class CreateMap {
         this.test();
     }
     test() {
+        /*
         const size = this.size;
-        this.createResources('tree', size[0]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        this.createResources('rock', size[1]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createResources(this.resources, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createResources(this.resources, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
-        this.createEntities('duck', size[0]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        this.createEntities('boar', size[1]/100, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createEntities(this.entities, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createEntities(this.entities, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);*/
     }
 }

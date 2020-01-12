@@ -14,6 +14,7 @@ export const clientState = {
     enemies: {},
     resources: {},
     entities: {},
+    structures: {},
 }
 
 /*

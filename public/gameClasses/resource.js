@@ -84,7 +84,7 @@ export class Resource {
         );
     }
     
-    animate(globalX, globalY, amount, playerHit) {
+    animate(globalX, globalY, amount) {
         if (!this.tweenTick === 0) {
             // update positioning
             this.globalX = globalX;

@@ -5,6 +5,7 @@ import { craftableItemsState } from "../UI/controlUI/crafting/crafting.js";
 import { userUpdate } from "./player/userUpdate.js";
 import { resourceUpdate } from "./resources/resourceUpdate.js";
 import { entityUpdate } from "./entities/entityUpdate.js";
+import { structureUpdate } from "./structures/structureUpdate.js";
 import { clientDataUpdate } from "./player/clientDataUpdate.js";
 import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
 import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
@@ -29,6 +30,8 @@ export function socketUpdate(socket) {
     // update resource and entity data
     resourceUpdate(socket, clientState);
     entityUpdate(socket, clientState);
+    // update structures (may remove)
+    structureUpdate(socket, clientState);
     // update UI data
     // update leaderboard data
     leaderboardUpdate(socket, leaderboardState);

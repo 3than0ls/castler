@@ -366,6 +366,12 @@ export class Player {
         for (let i = 0; i < entityIDs.length; i++) {
             clientState.entities[entityIDs[i]].collide(this.bodyGraphic);
         }
+        /* wip, doesn't work
+        const structureIDs = Object.keys(clientState.structures);
+        for (let i = 0; i < structureIDs.length; i++) {
+            clientState.structures[structureIDs[i]].wallCollide(this.bodyGraphic);
+        }*/
+        
     }
 
     resourceHarvest() {
