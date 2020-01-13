@@ -53,12 +53,12 @@ module.exports = class CreateMap {
         this.test();
     }
     test() {
-        /*
+        
         const size = this.size;
         CreateMap.createResources(this.resources, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createResources(this.resources, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
         CreateMap.createEntities(this.entities, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createEntities(this.entities, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);*/
+        CreateMap.createEntities(this.entities, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
     }
 }

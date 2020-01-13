@@ -26,6 +26,9 @@ export class Entity {
             case "boar": 
                 this.entityGraphic.radius = (this.entityGraphic.width * 0.827)/2; // 0.798 is pre calculated
                 break;
+            case "beetle":
+                this.entityGraphic.radius = (this.entityGraphic.width * 0.883)/2;
+                break;
         }
         
         // set positions
@@ -78,7 +81,7 @@ export class Entity {
                 deathParticle = "fur";
                 break;
             default:
-                deathParticle = "bloodParticle";
+                deathParticle = "blood";
                 break;
         }
         dust.create(

@@ -78,6 +78,7 @@ function consumed(user, itemName) {
 module.exports = {
     stone: new Item('stone', true),
     wood: new Item('wood', true),
+    ironChunk: new Item('ironChunk', true),
     rawMeat: new Item('rawMeat', true),
     feather: new Item('feather', true),
     fur: new Item('fur', true),

@@ -1,3 +1,5 @@
+const imageSize = require('image-size');
+
 module.exports = class EntityAI {
     constructor(entityID, entityState) {
         this.entityID = entityID;
@@ -21,10 +23,13 @@ module.exports = class EntityAI {
         // radius
         switch (entityState.type) {
             case 'duck':
-                this.radius = (100 * 0.8)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
+                this.radius = (imageSize('./public/assets/entities/duck.png').width * 0.798)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
                 break;
             case 'boar':
-                    this.radius = (150 * 0.83)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
+                this.radius = (imageSize('./public/assets/entities/boar.png').width * 0.827)/2;
+                break;
+            case 'beetle':
+                this.radius = (imageSize('./public/assets/entities/beetle.png').width * 0.883)/2;
                 break;
             default:
                 this.radius = 100;

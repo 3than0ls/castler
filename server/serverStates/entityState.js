@@ -21,6 +21,10 @@ module.exports = class EntityState {
                 this.health = 250;
                 this.neutrality = "neutral";
                 break;
+            case 'beetle':
+                this.health = 125;
+                this.neutrality = "neutral";
+                break;
             default:
                 this.health = 100;
                 this.neutrality = "passive";

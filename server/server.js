@@ -47,11 +47,14 @@ const mine = new StructureState({
     size: [1000, 1000],
     primaryColor: 0x888888,
     entities: [
-        {type: 'boar', amount: 5}
+        {type: 'beetle', amount: 2},
+        {type: 'boar', amount: 2},
     ],
     resources: [
-        //{type: 'rock', amount: 1}
-    ]
+        {type: 'iron', amount: 4},
+        {type: 'rock', amount: 4}
+    ],
+    entityLimit: 4,
 });
 serverState.structures[mine.structureID] = mine;
 mine.create(serverState);
@@ -145,8 +148,8 @@ io.on('connection', socket => {
 
     socket.on('attack', data => {
         // subtract the amount of health that the entity took
-        let entityAI = serverState.entities.entityAI[data.entityID]
-        let entityState = serverState.entities.entityState[data.entityID]
+        let entityAI = serverState.entities.entityAI[data.entityID];
+        let entityState = serverState.entities.entityState[data.entityID];
         entityAI.attacked(data.damage, serverState.users.user[data.id]);
 
         /* if the entity was killed */
@@ -158,6 +161,11 @@ io.on('connection', socket => {
                 collisionY: data.collisionY,
                 entityID: data.entityID,
             });
+
+            if (entityState.homeStructureID) { // if entity had a home structure, decrease structures entity amount
+                serverState.structures[entityState.homeStructureID].entityCount--;
+            }
+
             socket.emit('inventoryUpdate', serverState.users.userData[socket.id].inventory) // update the clients inventory
             delete serverState.entities.entityAI[entityState.entityID];
             delete serverState.entities.entityState[entityState.entityID];
@@ -187,7 +195,9 @@ function update(serverState) {
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
-    io.sockets.emit('structureStates', serverState.structures)
+    io.sockets.emit('structureStates', serverState.structures);
+
+    mine.respawnTick(serverState);
 
     // emit leaderboard status (based on player score)
     const orderedPlayerScores = [];
@@ -219,13 +229,11 @@ function update(serverState) {
   
 
 http.listen(3000, () => {
-
     setInterval(() => {
         // console.time('update');
         update(serverState)
         // console.timeEnd('update');
-    }, 1000/60);
-    
+    }, 1000/60);    
 
     console.log('listening on localhost:3000');
 });

@@ -63,8 +63,5 @@ export class Structure {
 
     animate() {
         player.viewpoint.addChild(this.structureGraphic);
-        for (let i = 0; i < this.wallGraphics.length; i++) {
-            player.viewpoint.addChild(this.wallGraphics[i]);
-        }
     }
 }

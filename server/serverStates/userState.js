@@ -56,8 +56,13 @@ module.exports = class UserState {
                 gameItemName = gameItems['wood'].name;
                 break;
             case 'rock':
-                gameItemName = gameItems['stone'].name
+                gameItemName = gameItems['stone'].name;
                 break;
+            case 'iron':
+                gameItemName = gameItems['ironChunk'].name;
+                break;
+            default:
+                gameItemName = gameItems['stone'].name;
         }
 
         if (!this.inventory[gameItemName]) {

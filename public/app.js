@@ -23,6 +23,7 @@ export const clientState = {
     BIG:
     armor
     tiered tools/items
+    spcified crafting areas (furnace, workbench, anvil)
 
     SMALL:
     more different resources
