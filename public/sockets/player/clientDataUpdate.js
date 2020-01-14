@@ -11,6 +11,9 @@ export const clientDataUpdate = (socket) => {
         player.toolUpdate(data.toolTier);
         Player.createHandSprites(player.handSprites, player.x, player.y, data.toolTier);
 
+        player.attackSpeed = data.attackSpeed;
+        player.harvestSpeed = data.harvestSpeed;
+
         player.globalX = data.globalX;
         player.globalY = data.globalY;
         

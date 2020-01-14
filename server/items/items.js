@@ -92,6 +92,8 @@ module.exports = {
     stoneTools: new Item('stoneTools', false, true, (user) => {
         user.toolTier = 'stone';
         user.damage = 50;
+        user.attackSpeed = 3;
+        user.harvestSpeed = 3;
     }, 2500, [
         {
             stone: 1,

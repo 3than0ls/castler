@@ -23,10 +23,14 @@ export const clientState = {
     BIG:
     armor
 
-    move all player stat variables that are sent to server but used in player class not for display (speed, velocity, harvest speed, damage)
+    move all player stat variables that are sent to server but used in player class not for display (harvest speed)
     perhaps move most of swing function to server side
 
-    spcified crafting areas (furnace, workbench, anvil)
+    pvp
+
+    buildings
+
+    specified crafting areas (furnace, workbench, anvil)
 
     SMALL:
     more different resources 

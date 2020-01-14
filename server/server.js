@@ -82,7 +82,7 @@ io.on('connection', socket => {
 
     socket.on('clientState', data => {
         let user = serverState.users.user[data.id];
-        user.updateClientInfo(data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand);
+        user.updateClientInfo(data.vx, data.vy, data.collisionvx, data.collisionvy, data.angle, data.swingAngle, data.displayHand);
         user.boundaryContain(map.size);
 
         let clientUpdateData = {
@@ -96,7 +96,10 @@ io.on('connection', socket => {
                 crafting: user.crafting,
                 craftingComplete: user.craftingComplete,
             },
+
             toolTier: user.toolTier,
+            harvestSpeed: user.harvestSpeed,
+            attackSpeed: user.attackSpeed,
         };
 
         serverState.users.userData[data.id] = user.clientDataPackage(); // update data packge
@@ -164,7 +167,7 @@ io.on('connection', socket => {
                 entityID: data.entityID,
             });
 
-            if (entityState.homeStructureID) { // if entity had a home structure, decrease structures entity amount
+            if (entityState.homeStructureID && entityState.homeStructureID !== 'map') { // if entity had a home structure and it isn't the map, decrease structures entity amount
                 serverState.structures[entityState.homeStructureID].entityCount--;
             }
 

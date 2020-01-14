@@ -16,9 +16,6 @@ export class Enemy {
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
         this.handSprites = {};
         this.toolTier = toolTier;
-
-        this.vx = 0;
-        this.vy = 0; // maybe used later?
     }
 
     attackFlash() {
@@ -44,10 +41,10 @@ export class Enemy {
 
         // give it a high zIndex to render it over other objects
         this.bodyGraphic.zIndex = 50;
-        this.handSprites[this.displayHand].zIndex = 49;
+        this.handSprites[this.handSpriteKey].zIndex = 49;
 
         // finally, render each to the viewpoint of player, different from rendering to stage
-        let handGraphic = this.handSprites[this.displayHand];
+        let handGraphic = this.handSprites[this.handSpriteKey];
         let bodyGraphic = this.bodyGraphic;
         player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }

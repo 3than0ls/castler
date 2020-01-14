@@ -16,7 +16,7 @@ export class Resource {
                 this.resourceName = 'stone';
                 break;
             default:
-                this.resourceName = 'unidentified'
+                this.resourceName = 'stone'
                 break;
         }
         this.resourceID = resourceID;
@@ -61,7 +61,7 @@ export class Resource {
             [this.globalX, this.globalY]
         ]
         this.tweenTick++; // start tween tick so server update doesn't affect charm animation
-        let tween = charm.walkPath(this.resourceGraphic, waypoints, harvestSpeed * 10, "smoothstep");
+        charm.walkPath(this.resourceGraphic, waypoints, harvestSpeed * 10, "smoothstep");
 
         if (this.tweenTick > harvestSpeed * 10 * (waypoints.length-1)) {
             this.tweenTick = 0;
@@ -71,7 +71,7 @@ export class Resource {
         dust.create(
             collisionX,
             collisionY,
-            () => new PIXI.Sprite(loader.resources['particles/'.concat(this.resourceName.concat('Particle'))].texture),
+            () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.resourceName : 'stone').concat('Particle'))].texture),
             player.viewpoint,
             25,
             0,

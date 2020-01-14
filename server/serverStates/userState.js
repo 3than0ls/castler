@@ -20,6 +20,8 @@ module.exports = class UserState {
 
         // player stats
         this.damage = 25;
+        this.speed = 4;
+        this.maxSpeed = 4
 
         this.radius = (100 * 0.865)/2;
 
@@ -30,6 +32,8 @@ module.exports = class UserState {
             }
         };
         this.toolTier = 'wood';
+        this.harvestSpeed = 2;
+        this.attackSpeed = 2;
 
         // hunger and regen tick and timer variables
         this.hungerTick = 0;
@@ -97,6 +101,14 @@ module.exports = class UserState {
     playerTick() {
         this.attackFlash = false;
         this.hungerTick++;
+
+        if (this.hunger <= 20) {
+            // hungry, decrease speed
+            this.speed = this.maxSpeed/2;
+        } else {
+            this.speed = this.maxSpeed;
+        }
+
         if (this.hungerTick >= this.hungerSpeed) {
             if (this.hunger > 0) {
                 this.hunger -= 5;
@@ -163,10 +175,19 @@ module.exports = class UserState {
             }, 1);
         }
     }
-    updateClientInfo(globalX, globalY, angle, swingAngle, displayHand) {
+    updateClientInfo(vx, vy, collisionvx, collisionvy, angle, swingAngle, displayHand) {
         // update variables from client
-        this.globalX = globalX;
-        this.globalY = globalY;
+        // vx and vy are directions, telling to go left/up if negative or right/down if positive
+        if (vx !== 0 && vy !== 0) {
+            this.globalX += vx * this.speed * Math.sin(45) + collisionvx;
+            this.globalY += vy * this.speed * Math.sin(45) + collisionvy;
+        } else {
+            this.globalX += vx * this.speed + collisionvx;
+            this.globalY += vy * this.speed + collisionvy;
+        }
+
+
+
         this.angle = angle;
         this.swingAngle = swingAngle;
         this.displayHand = displayHand;

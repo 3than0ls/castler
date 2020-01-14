@@ -27,6 +27,8 @@ export class Player {
 
         this.vx = 0;
         this.vy = 0;
+        this.collisionvx = 0;
+        this.collisionvy = 0;
 
         this.viewpoint = new PIXI.Container();
 
@@ -37,10 +39,8 @@ export class Player {
         this.dead = this.health <= 0;
 
         // player game stats
-        this.speed = 4;
-        this.maxSpeed = 4;
-        this.harvestSpeed = 2;
-        this.attackSpeed = 2;
+        this.harvestSpeed = 2; // set at 2, assigned from server
+        this.attackSpeed = 2; // set at 2, assigned from server
 
         // player inventory and resources, and crafting status
         this.inventory = {};
@@ -72,11 +72,7 @@ export class Player {
 
         // Left
         this.a.press = () => {
-            if (this.w.isDown || this.s.isDown) {
-                this.vx = -this.speed * Math.sin(45);
-            } else {
-                this.vx = -this.speed;
-            }
+            this.vx = -1;
         };
         this.a.release = () => {
             if (!this.d.isDown) {
@@ -86,11 +82,7 @@ export class Player {
     
         // Up
         this.w.press = () => {
-            if (this.a.isDown || this.d.isDown) {
-                this.vy = -this.speed * Math.sin(45);
-            } else {
-                this.vy = -this.speed;
-            }
+            this.vy = -1;
         };
         this.w.release = () => {
             if (!this.s.isDown) {
@@ -100,11 +92,7 @@ export class Player {
     
         // Right
         this.d.press = () => {
-            if (this.w.isDown || this.s.isDown) {
-                this.vx = this.speed * Math.sin(45);
-            } else {
-                this.vx = this.speed;
-            }
+            this.vx = 1;
         };
         this.d.release = () => {
             if (!this.a.isDown) {
@@ -114,11 +102,7 @@ export class Player {
     
         // Down
         this.s.press = () => {
-            if (this.a.isDown || this.d.isDown) {
-                this.vy = this.speed * Math.sin(45);
-            } else {
-                this.vy = this.speed;
-            }
+            this.vy = 1;
         };
         this.s.release = () => {
             if (!this.w.isDown) {
@@ -128,8 +112,6 @@ export class Player {
         
         this.one.release = () => {
             if (this.displayHand !== 'hand') {
-                // determine hand sprite key
-                this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
 
                 stage.removeChild(this.handSprites[this.handSpriteKey]);
                 this.swingAngle = 0;
@@ -139,8 +121,6 @@ export class Player {
         }
         this.two.release = () => {
             if (this.displayHand !== 'AxeHand') {
-                // determine hand sprite key
-                this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
 
                 stage.removeChild(this.handSprites[this.handSpriteKey]);
                 this.swingAngle = 0;
@@ -150,8 +130,6 @@ export class Player {
         }
         this.three.release = () => {
             if (this.displayHand !== 'SwordHand') {
-                // determine hand sprite key
-                this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
 
                 stage.removeChild(this.handSprites[this.handSpriteKey]);
                 this.swingAngle = 0;
@@ -296,13 +274,6 @@ export class Player {
             this.movementKeys();
         }
 
-        if (hunger <= 20) {
-            // hungry, decrease speed
-            this.speed = this.maxSpeed/2;
-        } else {
-            this.speed = this.maxSpeed;
-        }
-
         if (hunger <= 0) {
             this.hunger = 0;
         }
@@ -335,6 +306,9 @@ export class Player {
         // update mouse position variables
         this.mouseX = renderer.plugins.interaction.mouse.global.x/ratio;
         this.mouseY = renderer.plugins.interaction.mouse.global.y/ratio;
+
+        this.collisionvx = 0;
+        this.collisionvy = 0;
 
         // determine hand sprite key
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
@@ -370,8 +344,10 @@ export class Player {
         
         // emit client info to server
         clientEmit(socket, {
-            globalX: this.globalX + this.vx,
-            globalY: this.globalY + this.vy,
+            vx: this.vx,
+            vy: this.vy,
+            collisionvx: this.collisionvx,
+            collisionvy: this.collisionvy,
             angle: this.angle,
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
