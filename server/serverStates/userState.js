@@ -18,6 +18,9 @@ module.exports = class UserState {
         this.dead = false;
         this.attackFlash = false;
 
+        // player stats
+        this.damage = 25;
+
         this.radius = (100 * 0.865)/2;
 
         this.inventory = {
@@ -26,6 +29,7 @@ module.exports = class UserState {
                 amount: 2,
             }
         };
+        this.toolTier = 'wood';
 
         // hunger and regen tick and timer variables
         this.hungerTick = 0;
@@ -153,7 +157,7 @@ module.exports = class UserState {
                 if (this.craftingTick >= item.craftingTime) {
                     this.crafting = false;
                     this.craftingTick = 0;
-                    item.craft(this.inventory);
+                    item.craft(this);
                     clearInterval(intervalID);
                 }
             }, 1);
@@ -180,6 +184,8 @@ module.exports = class UserState {
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
             attackFlash: this.attackFlash,
+
+            toolTier: this.toolTier,
 
             nickname: this.nickname,
             score: this.score,

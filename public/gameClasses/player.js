@@ -27,8 +27,6 @@ export class Player {
 
         this.vx = 0;
         this.vy = 0;
-        this.collisionvx = 0;
-        this.collisionvy = 0;
 
         this.viewpoint = new PIXI.Container();
 
@@ -39,10 +37,8 @@ export class Player {
         this.dead = this.health <= 0;
 
         // player game stats
-        this.maxHealth = 100;
         this.speed = 4;
         this.maxSpeed = 4;
-        this.damage = 50;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
 
@@ -129,28 +125,38 @@ export class Player {
                 this.vy = 0;
             }
         };
+        
         this.one.release = () => {
             if (this.displayHand !== 'hand') {
-                stage.removeChild(this.handSprites[this.displayHand]);
+                // determine hand sprite key
+                this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
+
+                stage.removeChild(this.handSprites[this.handSpriteKey]);
                 this.swingAngle = 0;
                 this.swingAvailable = true;
                 this.displayHand = 'hand';
             }
         }
         this.two.release = () => {
-            if (this.displayHand !== 'axeHand') {
-                stage.removeChild(this.handSprites[this.displayHand]);
+            if (this.displayHand !== 'AxeHand') {
+                // determine hand sprite key
+                this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
+
+                stage.removeChild(this.handSprites[this.handSpriteKey]);
                 this.swingAngle = 0;
                 this.swingAvailable = true;
-                this.displayHand = 'axeHand';
+                this.displayHand = 'AxeHand';
             }
         }
         this.three.release = () => {
-            if (this.displayHand !== 'swordHand') {
-                stage.removeChild(this.handSprites[this.displayHand]);
+            if (this.displayHand !== 'SwordHand') {
+                // determine hand sprite key
+                this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
+
+                stage.removeChild(this.handSprites[this.handSpriteKey]);
                 this.swingAngle = 0;
                 this.swingAvailable = true;
-                this.displayHand = 'swordHand';
+                this.displayHand = 'SwordHand';
             }
         }
     }
@@ -166,18 +172,18 @@ export class Player {
         
         
         if (!this.swingBack) {
-            if (this.displayHand === "axeHand") this.swingAngle += this.harvestSpeed;
-            else if (this.displayHand === "swordHand") this.swingAngle += this.attackSpeed;
+            if (this.displayHand === "AxeHand") this.swingAngle += this.harvestSpeed;
+            else if (this.displayHand === "SwordHand") this.swingAngle += this.attackSpeed;
         } else {
-            if (this.displayHand === "axeHand") this.swingAngle -= this.harvestSpeed;
-            else if (this.displayHand === "swordHand") this.swingAngle -= this.attackSpeed;
+            if (this.displayHand === "AxeHand") this.swingAngle -= this.harvestSpeed;
+            else if (this.displayHand === "SwordHand") this.swingAngle -= this.attackSpeed;
         }
 
         if (this.swingAngle < this.stopRotation) {
             // harvest: if collided with resource during swing and before sto2p rotation, call resource function
-            if (this.displayHand === "axeHand") {
+            if (this.displayHand === "AxeHand") {
                 this.resourceHarvest();
-            } else if (this.displayHand === "swordHand") {
+            } else if (this.displayHand === "SwordHand") {
                 this.entityAttack();
             }
         } else if (this.swingAngle >= this.stopRotation) {
@@ -196,7 +202,10 @@ export class Player {
             this.swingAvailable = true;
             this.swingAngle = 0;
         }
-        this.handSprites[this.displayHand].angle += this.swingAngle;
+        // determine hand sprite key
+        this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
+
+        this.handSprites[this.handSpriteKey].angle += this.swingAngle;
     }
 
     mouse() {
@@ -218,7 +227,7 @@ export class Player {
         this.bodyGraphic.position.set(this.x, this.y);
 
         // render and create hands
-        Player.createHandSprites(this.handSprites, this.x, this.y);
+        Player.createHandSprites(this.handSprites, this.x, this.y, this.toolTier);
 
         // create client needed hand/tool collision points
         this.updateCollisionPoints();
@@ -228,8 +237,11 @@ export class Player {
         // mouse event detection
         this.mouse();
 
+        // determine hand sprite key
+        this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
+
         // finally, render each to the stage
-        let handGraphic = this.handSprites[this.displayHand];
+        let handGraphic = this.handSprites[this.handSpriteKey];
         let bodyGraphic = this.bodyGraphic;
         stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
 
@@ -296,6 +308,13 @@ export class Player {
         }
     }
 
+    toolUpdate(toolTier) {
+        if (toolTier !== this.toolTier) {
+            this.toolTier = toolTier;
+            stage.removeChild(this.handSprites[this.handSpriteKey]);
+        }
+    }
+
     attacked() {
         if (this.bodyGraphic.tint === 0xFFFFFF) {
             let tint = charm.redTint(this.bodyGraphic);
@@ -317,9 +336,11 @@ export class Player {
         this.mouseX = renderer.plugins.interaction.mouse.global.x/ratio;
         this.mouseY = renderer.plugins.interaction.mouse.global.y/ratio;
 
+        // determine hand sprite key
+        this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
         // update positioning to x and y display (not global). x and y will only ever change in screen resizes
         this.bodyGraphic.position.set(this.x, this.y);
-        this.handSprites[this.displayHand].position.set(this.x, this.y);
+        this.handSprites[this.handSpriteKey].position.set(this.x, this.y);
 
         // update viewpoint
         this.viewpointUpdate();
@@ -329,7 +350,7 @@ export class Player {
 
         // update angle 
         this.angle = -Math.atan2(this.mouseX - this.x, this.mouseY - this.y);
-        this.handSprites[this.displayHand].rotation = this.angle;
+        this.handSprites[this.handSpriteKey].rotation = this.angle;
         this.bodyGraphic.rotation = this.angle;
 
         // test and handle collisions  for resources and entities
@@ -343,7 +364,7 @@ export class Player {
         }
 
         // add graphics to stage
-        let handGraphic = this.handSprites[this.displayHand];
+        let handGraphic = this.handSprites[this.handSpriteKey];
         let bodyGraphic = this.bodyGraphic;
         stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
         
@@ -419,7 +440,6 @@ export class Player {
                 // then emit harvest
                 attack(socket, {
                     entityID: entity.entityID,
-                    damage: this.damage,
                     vx: vx,
                     vy: vy,
                     collisionX: this.collisionPoints[this.displayHand].x,
@@ -440,22 +460,23 @@ export class Player {
     }
 
     updateCollisionPoints() { // the math is a bit off, can check later
-        this.collisionPoints['axeHand'] = {
+        // we will use the current tool tiered as the sample to base all calculations off of, but all tools, no matter tier, are the same
+        this.collisionPoints['AxeHand'] = {
             x: this.globalX - 
-            (this.handSprites['axeHand'].width+this.bodyGraphic.width-50)/2
+            (this.handSprites[this.toolTier.concat('AxeHand')].width+this.bodyGraphic.width-50)/2
             *-Math.sin(-this.angle - (-0.95 + this.swingAngle * (Math.PI/180))), // update based on angle
 
             y: this.globalY - 
-            (this.handSprites['axeHand'].height+this.bodyGraphic.height-50)/2
+            (this.handSprites[this.toolTier.concat('AxeHand')].height+this.bodyGraphic.height-50)/2
             *-Math.cos(-this.angle - (-0.95 + this.swingAngle * (Math.PI/180)))
         }
-        this.collisionPoints['swordHand'] = {
+        this.collisionPoints['SwordHand'] = {
             x: this.globalX - 
-            (this.handSprites['swordHand'].width+this.bodyGraphic.width-20)/2
+            (this.handSprites[this.toolTier.concat('SwordHand')].width+this.bodyGraphic.width-20)/2
             *-Math.sin(-this.angle - (-1.2 + this.swingAngle * (Math.PI/180))), // update based on angle
 
             y: this.globalY - 
-            (this.handSprites['swordHand'].height+this.bodyGraphic.height-20)/2
+            (this.handSprites[this.toolTier.concat('SwordHand')].height+this.bodyGraphic.height-20)/2
             *-Math.cos(-this.angle - (-1.2 + this.swingAngle * (Math.PI/180)))
         }
         /* point test, to see where the collision point for tested is
@@ -470,30 +491,37 @@ export class Player {
         stage.addChild(this.pointTest)*/
     }
 
-    static createHandSprites(handSprites, x, y) {
+    static createHandSprites(handSprites, x, y, tier) {
         /* this creates all hand sprites and puts them into the dictionary handSprites.
            handSprites are given a key (that describes what kind) which is connected to their corresponding sprite
            enemy and player classes have a displayHand string which is used as a key to pick which handSprite is currently being displayed.
            ex: displayHand = 'hand';
                handSprites[displayHand] references the handSprite 'hand', which is then rendered.
+            if hand sprite already exists, then don't re add it
         */
         // creates sprites and sets anchor positions and locations for them
-        handSprites['hand'] = new PIXI.Sprite(loader.resources['player/hand'].texture);
-        handSprites['hand'].anchor.x = 0.5;
-        handSprites['hand'].anchor.y = 0.5;
-        handSprites['hand'].position.set(x, y);
+        if (!handSprites['hand']) {
+            handSprites['hand'] = new PIXI.Sprite(loader.resources['player/hand'].texture);
+            handSprites['hand'].anchor.x = 0.5;
+            handSprites['hand'].anchor.y = 0.5;
+            handSprites['hand'].position.set(x, y);
+        }
 
-        // axe hand
-        handSprites['axeHand'] = new PIXI.Sprite(loader.resources['player/axeHand'].texture);
-        handSprites['axeHand'].anchor.x = 0.4; // anchor positions have been pre calculated
-        handSprites['axeHand'].anchor.y = 0.55;
-        handSprites['axeHand'].position.set(x, y);
+        if (tier && !handSprites[tier.concat('AxeHand')]) {
+            // axe hand
+            handSprites[tier.concat('AxeHand')] = new PIXI.Sprite(loader.resources[`player/${tier}AxeHand`].texture);
+            handSprites[tier.concat('AxeHand')].anchor.x = 0.4; // anchor positions have been pre calculated
+            handSprites[tier.concat('AxeHand')].anchor.y = 0.55;
+            handSprites[tier.concat('AxeHand')].position.set(x, y);
+        }
 
-        // sword hand
-        handSprites['swordHand'] = new PIXI.Sprite(loader.resources['player/swordHand'].texture);
-        handSprites['swordHand'].anchor.x = 0.256; // anchor positions have been pre calculated
-        handSprites['swordHand'].anchor.y = 0.38;
-        handSprites['swordHand'].position.set(x, y);
+        if (tier && !handSprites[tier.concat('SwordHand')]) {
+            // sword hand
+            handSprites[tier.concat('SwordHand')] = new PIXI.Sprite(loader.resources[`player/${tier}SwordHand`].texture);
+            handSprites[tier.concat('SwordHand')].anchor.x = 0.256; // anchor positions have been pre calculated
+            handSprites[tier.concat('SwordHand')].anchor.y = 0.38;
+            handSprites[tier.concat('SwordHand')].position.set(x, y);
+        }
 
 
         // etc.

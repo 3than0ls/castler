@@ -1,7 +1,6 @@
 export const attack = (socket, data) => {
     socket.emit('attack', {
         entityID: data.entityID,
-        damage: data.damage,
         vx: data.vx,
         vy: data.vy,
         collisionX: data.collisionX,
@@ -14,7 +13,6 @@ export const attack = (socket, data) => {
 /* 
     data supplied should include these variables: 
     data.resourceID
-    data.amount
     data.vx
     data.vy
     data.collisionX

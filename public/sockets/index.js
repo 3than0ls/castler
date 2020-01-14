@@ -14,6 +14,7 @@ export function clientInit(socket) {
     socket.emit('nickname', window.localStorage.getItem('nickname'));
     socket.on('playerInit', initData => {
         player.inventoryUpdate(initData.inventory);
+        player.toolTier = initData.toolTier;
 
         // create boundary borders
         boundary.resize(initData.mapSize);

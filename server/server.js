@@ -76,7 +76,8 @@ io.on('connection', socket => {
     }) // update the server info of the clients nickname when client connects
     socket.emit('playerInit', {
         mapSize: map.size,
-        inventory: serverState.users.user[socket.id].inventory
+        inventory: serverState.users.user[socket.id].inventory,
+        toolTier: serverState.users.user[socket.id].toolTier
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
@@ -94,7 +95,8 @@ io.on('connection', socket => {
             craftingState:  {
                 crafting: user.crafting,
                 craftingComplete: user.craftingComplete,
-            }
+            },
+            toolTier: user.toolTier,
         };
 
         serverState.users.userData[data.id] = user.clientDataPackage(); // update data packge
@@ -118,7 +120,7 @@ io.on('connection', socket => {
 
     socket.on('clientRequestCraft', data => {
         if (gameItems[data.item]) { // check if item exists
-            serverState.users.user[socket.id].craft(gameItems[data.item]);
+            serverState.users.user[socket.id].craft(gameItems[data.item], serverState.users.user[socket.id]);
         }
     });
 
@@ -150,7 +152,7 @@ io.on('connection', socket => {
         // subtract the amount of health that the entity took
         let entityAI = serverState.entities.entityAI[data.entityID];
         let entityState = serverState.entities.entityState[data.entityID];
-        entityAI.attacked(data.damage, serverState.users.user[data.id]);
+        entityAI.attacked(serverState.users.user[data.id].damage, serverState.users.user[data.id]);
 
         /* if the entity was killed */
         if (entityState.killed()) {

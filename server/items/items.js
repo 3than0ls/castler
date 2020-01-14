@@ -1,31 +1,37 @@
 class Item {
-    constructor(name, primary, consumable, consumeFunction, craftingTime, recipes) {
+    constructor(name, primary, consumable, consumeFunction, craftingTime, recipes, consumedOnCraft) {
         this.name = name;
         this.consumable = consumable || false;
         this.consumeFunction = consumeFunction || function(user) {};
         this.craftingTime = craftingTime || 1000;
+        this.consumedOnCraft = consumedOnCraft || false;
         this.primary = primary; // primary items are acquired, not crafted, and thus don't have a recipe
         if (!this.primary) {
             this.recipes = recipes; // should be a list of recipes that can be used to make this item
         }
     }
-    craft(inventory) {
-        let canCraftRecipe = this.canCraft(inventory); // canCraftRecipe will return the crafting recipe used if true
+    craft(player) {
+        let canCraftRecipe = this.canCraft(player.inventory); // canCraftRecipe will return the crafting recipe used if true
         if (canCraftRecipe) {
             for (let recipeItem in canCraftRecipe) {
-                inventory[recipeItem].amount -= canCraftRecipe[recipeItem];
-                if (inventory[recipeItem].amount === 0) {
-                    delete inventory[recipeItem];
+                player.inventory[recipeItem].amount -= canCraftRecipe[recipeItem];
+                if (player.inventory[recipeItem].amount === 0) {
+                    delete player.inventory[recipeItem];
                 }
             }
 
-            if (!inventory[this.name]) { // if item doesn't exist in inventory, create it
-                inventory[this.name] = {
-                    consumable: this.consumable,
-                    amount: 0,
-                };
+            if (!this.consumedOnCraft) {
+                if (!player.inventory[this.name]) { // if item doesn't exist in inventory, create it
+                    player.inventory[this.name] = {
+                        consumable: this.consumable,
+                        amount: 0,
+                    };
+                }
+                player.inventory[this.name].amount += 1;
+            } else {
+                // if consumed on craft is true, automatically consume item
+                this.consumeFunction(player);
             }
-            inventory[this.name].amount += 1;
         }
     }
     canCraft(inventory) {
@@ -83,9 +89,18 @@ module.exports = {
     feather: new Item('feather', true),
     fur: new Item('fur', true),
 
+    stoneTools: new Item('stoneTools', false, true, (user) => {
+        user.toolTier = 'stone';
+        user.damage = 50;
+    }, 2500, [
+        {
+            stone: 1,
+        }
+    ], true),
+
     cookedMeat: new Item('cookedMeat', false, true, (user) => {
         if (user.hunger < 100) {
-            consumed(user, 'cookedMeat');0000000000000000000000000000000000
+            consumed(user, 'cookedMeat');
             user.hunger += 25;
         }
     }, 2000, [

@@ -22,12 +22,16 @@ export const clientState = {
     clean up code
     BIG:
     armor
-    tiered tools/items
+
+    move all player stat variables that are sent to server but used in player class not for display (speed, velocity, harvest speed, damage)
+    perhaps move most of swing function to server side
+
     spcified crafting areas (furnace, workbench, anvil)
 
     SMALL:
-    more different resources
-
+    more different resources 
+    add item image for iron
+    add more tiered tool (iron)
 */
 
 document.title = "Game";
