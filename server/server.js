@@ -62,18 +62,21 @@ mine.create(serverState);
 const gameItems = require('./items/items.js');
 // gameItems.test.test();
 
+function createUser(socketID) {
+    let newUserState = new UserState(socketID);
+    serverState.users.user[socketID] = newUserState;
+    serverState.users.userData[socketID] = newUserState.clientDataPackage();
+    console.log("Client joined: " + serverState.users.user[socketID].clientID);
+}
 
 io.on('connection', socket => {
-    let newUserState = new UserState(socket);
-    serverState.users.user[socket.id] = newUserState;
-    serverState.users.userData[socket.id] = newUserState.clientDataPackage();
-    // on received events, socket.id should be equal to socket.id
-    console.log("Client joined: " + serverState.users.user[socket.id].clientID);
+    createUser(socket.id);
 
     // initial variable assignments
     socket.on('nickname', nickname => {
         serverState.users.user[socket.id].nickname = nickname;
-    }) // update the server info of the clients nickname when client connects
+    }); // update the server info of the clients nickname when client connects
+
     socket.emit('playerInit', {
         mapSize: map.size,
         inventory: serverState.users.user[socket.id].inventory,
@@ -81,6 +84,10 @@ io.on('connection', socket => {
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
+        /*
+        if (!serverState.users.user[data.id]) {
+            createUser(data.id);
+        }*/
         let user = serverState.users.user[data.id];
         user.updateClientInfo(data.vx, data.vy, data.collisionvx, data.collisionvy, data.angle, data.swingAngle, data.displayHand);
         user.boundaryContain(map.size);
@@ -111,6 +118,17 @@ io.on('connection', socket => {
 
         const craftableItems = [];
         for (item in gameItems) {
+            // determine next craftable tier
+            if (user.toolTier === 'wood' && gameItems[item].name === 'ironTools') {
+                continue;
+            }
+            if (user.toolTier === 'stone' && gameItems[item].name === 'stoneTools') {
+                continue;
+            }
+            if (user.toolTier === 'iron' && gameItems[item].name === 'ironTools' || gameItems[item].name === 'stoneTools') {
+                continue;
+            }
+
             if (gameItems[item].canCraft(user.inventory)) {
                 craftableItems.push(gameItems[item].name);
             }

@@ -5,30 +5,27 @@ export const resourceUpdate = (socket, clientState) => {
         clientState.resources[data.resourceID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
     });
     socket.on('resourceStates', serverStateResources => {
-        const resourceIDs = Object.keys(serverStateResources);
-        for(let i = 0; i < resourceIDs.length; i++) {
+        for (let [resourceID, resource] of Object.entries(serverStateResources)) {
             // if new resource found, add it
-            if (!clientState.resources[resourceIDs[i]]) {
+            if (!clientState.resources[resourceID]) {
                 // if new id and info found, create new resource and add it to client state
-                let data = serverStateResources[resourceIDs[i]];
-                const newResource = new Resource(data.resourceID, data.type, data.amount, data.globalX, data.globalY);
+                const newResource = new Resource(resource.resourceID, resource.type, resource.globalX, resource.globalY);
                 newResource.render(); // render resource
-                clientState.resources[resourceIDs[i]] = newResource;
+                clientState.resources[resourceID] = newResource;
             }
-            
-            let data = serverStateResources[resourceIDs[i]];
-            clientState.resources[resourceIDs[i]].animate(
-                data.globalX, data.globalY, data.amount
-            );
+            // update resources
+            clientState.resources[resourceID].animate(resource.globalX, resource.globalY);
         }
-        /*
-        // delete disconnected players
-        const enemyIDs = Object.keys(clientState.enemies);
-        // filters server ids from client ids, and if theres a difference remove it
-        let userDifference = enemyIDs.filter(function(i) {return userIDs.indexOf(i) < 0; }); 
-        for(let i = 0; i < userDifference.length; i++) {
-            clientState.enemies[userDifference[i]].delete();
-            delete clientState.enemies[userDifference[i]];
-        }*/
+        // delete un needed resources
+        const entityIDs = Object.keys(clientState.resources);
+        // filters client enemies using server sent data
+        let resourceDifference = entityIDs.filter(function(entityID) {
+            return !serverStateResources[entityID]; // check if client has any entities that the server doesn't, and if so, filter it to a waste difference array
+        }); 
+        // delete entities in waste difference array
+        for (let i = 0; i < resourceDifference.length; i++) {
+            clientState.resources[resourceDifference[i]].delete();
+            delete clientState.resources[resourceDifference[i]];
+        }
     });
 };

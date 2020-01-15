@@ -48,10 +48,8 @@ module.exports = class StructureState {
         // entity count will be decreased when an entity dies, which will be called in entityAI
         if (this.entityCount < this.entityLimit) {
             this.entityRespawnTick++;
-            console.log(this.entityRespawnTick);
             if (this.entityRespawnTick >= this.entityRespawnTime) {
                 this.entityRespawnTick = 0;
-                console.log('respawning');
 
                 let type;
                 if (this.config.entities.length === 1) {
@@ -115,6 +113,6 @@ module.exports = class StructureState {
             this.createdObjects++;
         }
         // console.log(`Cleared ${this.clearedObjects} objects when constructing a '${this.type}' structure`);
-        console.log(`Created ${this.createdObjects} object TYPES when constructing a '${this.type}' structure`);
+        // console.log(`Created ${this.createdObjects} object TYPES when constructing a '${this.type}' structure`);
     }
 }

@@ -112,18 +112,16 @@ module.exports = class EntityAI {
     }
     
     avoidResources(serverStateResources) {
-        let resourceIDs = Object.keys(serverStateResources);
-        for (let i = 0; i < resourceIDs.length; i++) { // as the index decreases, it seems like the calculations get rougher
-            const serverStateResource = serverStateResources[resourceIDs[i]]
-            const a = this.entityState.globalX - serverStateResource.globalX;
-            const b = this.entityState.globalY - serverStateResource.globalY;
+        for (let resource of Object.values(serverStateResources)) { // as the index decreases, it seems like the calculations get rougher
+            const a = this.entityState.globalX - resource.globalX;
+            const b = this.entityState.globalY - resource.globalY;
             let distance = Math.hypot(a, b);
             
             if (distance < this.avoidResourceDistance+15) {
                 this.resourceCollision = true;
                 let angle = (Math.round((Math.atan2(
-                    this.entityState.globalY - serverStateResources[resourceIDs[i]].globalY,
-                    this.entityState.globalX - serverStateResources[resourceIDs[i]].globalX
+                    this.entityState.globalY - resource.globalY,
+                    this.entityState.globalX - resource.globalX
                 )) * 180 / Math.PI) - this.entityState.angle + 90);
                 if (angle >= 180) {
                     angle -= 360;

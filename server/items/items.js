@@ -81,6 +81,8 @@ function consumed(user, itemName) {
     }
 };
 
+// make the only parameter for Item a config
+
 module.exports = {
     stone: new Item('stone', true),
     wood: new Item('wood', true),
@@ -92,13 +94,30 @@ module.exports = {
     stoneTools: new Item('stoneTools', false, true, (user) => {
         user.toolTier = 'stone';
         user.damage = 50;
-        user.attackSpeed = 3;
-        user.harvestSpeed = 3;
+        user.attackSpeed = 2.5;
+        user.harvestSpeed = 2.5;
     }, 2500, [
         {
             stone: 1,
         }
     ], true),
+
+    ironTools: new Item('ironTools', false, true, (user) => {
+        user.toolTier = 'iron';
+        user.damage = 70;
+        user.attackSpeed = 3;
+        user.harvestSpeed = 3;
+    }, 2500, [
+        {
+            ironPiece: 1,
+        }
+    ], true),
+
+    ironPiece: new Item('ironPiece', false, false, false, 2000, [
+        {
+            ironChunk: 5,
+        }
+    ]),
 
     cookedMeat: new Item('cookedMeat', false, true, (user) => {
         if (user.hunger < 100) {

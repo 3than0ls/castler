@@ -6,7 +6,7 @@ import { charm } from "../charm/charm.js";
 import { dust } from "../dust/dust.js";
 
 export class Resource {
-    constructor(resourceID, type, amount, globalX, globalY) {
+    constructor(resourceID, type, globalX, globalY) {
         this.type = type;
         switch(type) {
             case 'tree':
@@ -20,7 +20,6 @@ export class Resource {
                 break;
         }
         this.resourceID = resourceID;
-        this.amount = amount; // resources contain a certain amount you can harvest from, maybe change variable name
         
         this.alreadyHit = false;
         this.tween = 0; // determines whether or not to update based on server sent variables or to 
@@ -84,7 +83,7 @@ export class Resource {
         );
     }
     
-    animate(globalX, globalY, amount) {
+    animate(globalX, globalY) {
         if (!this.tweenTick === 0) {
             // update positioning
             this.globalX = globalX;
@@ -93,8 +92,6 @@ export class Resource {
         } else if (this.tweenTick > 0) {
             this.tweenTick++;
         }
-        // update amount
-        this.amount = amount;
 
         // add graphics to stage
         let resourceGraphic = this.resourceGraphic;       

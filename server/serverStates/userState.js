@@ -1,9 +1,8 @@
 const gameItems = require('./../items/items.js');
 
 module.exports = class UserState {
-    constructor(socket, globalX, globalY, angle) {
-        this.socket = socket;
-        this.clientID = socket.id;
+    constructor(socketID, globalX, globalY, angle) {
+        this.clientID = socketID;
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
         this.angle = angle || 0;

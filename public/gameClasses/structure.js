@@ -13,32 +13,6 @@ export class Structure {
         this.size = config.size;
 
         this.primaryColor = config.primaryColor;
-
-        /*
-        this.wallGraphics = config.walls.map((item) => {
-            let wallGraphic = new PIXI.Graphics();
-
-            wallGraphic.pivot.x = -this.globalX+this.size[0]/2;
-            wallGraphic.pivot.y = -this.globalY+this.size[1]/2;
-            wallGraphic.zIndex = 0;
-            
-            wallGraphic.lineStyle(4, 0x000000);
-            wallGraphic.beginFill(item.primaryColor);
-            wallGraphic.drawRect(item.globalX, item.globalY, item.size[0], item.size[1]);
-            wallGraphic.endFill();
-
-            return wallGraphic;
-        });*/
-    }
-
-    wallCollide(playerGraphic) { // wip, does not work
-        // elements of wall graphic are pixi sprites that have had their positions set
-        const returned = [];
-        for (let i = 0; i < this.wallGraphics.length; i++) {
-            let hit = bump.circleRectangleGameCollision(this.wallGraphics[i], playerGraphic, false, true);
-            returned.push(hit);
-        }
-        return returned;
     }
 
     render() {

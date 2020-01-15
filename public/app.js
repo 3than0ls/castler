@@ -28,7 +28,7 @@ export const clientState = {
 
     pvp
 
-    buildings
+    player placable buildings
 
     specified crafting areas (furnace, workbench, anvil)
 

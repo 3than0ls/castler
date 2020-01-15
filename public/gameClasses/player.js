@@ -355,26 +355,17 @@ export class Player {
     }
 
     collisions() {
-        const resourceIDs = Object.keys(clientState.resources);
-        for (let i = 0; i < resourceIDs.length; i++) {
-            clientState.resources[resourceIDs[i]].collide(this.bodyGraphic);
+        for (let resource of Object.values(clientState.resources)) {
+            resource.collide(this.bodyGraphic);
         }
-        const entityIDs = Object.keys(clientState.entities); 
-        for (let i = 0; i < entityIDs.length; i++) {
-            clientState.entities[entityIDs[i]].collide(this.bodyGraphic);
+        for (let entity of Object.values(clientState.entities)) {
+            entity.collide(this.bodyGraphic);
         }
-        /* wip, doesn't work
-        const structureIDs = Object.keys(clientState.structures);
-        for (let i = 0; i < structureIDs.length; i++) {
-            clientState.structures[structureIDs[i]].wallCollide(this.bodyGraphic);
-        }*/
         
     }
 
     resourceHarvest() {
-        const resourceIDs = Object.keys(clientState.resources);
-        for (let i = 0; i < resourceIDs.length; i++) {
-            let resource = clientState.resources[resourceIDs[i]];
+        for (let resource of Object.values(clientState.resources)) {
             if (resource.handSpriteCollision(this.collisionPoints[this.displayHand]) && !resource.alreadyHit) {
                 resource.alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
                 // create velocity and direction in which a resource bumps towards
@@ -401,9 +392,7 @@ export class Player {
     }
 
     entityAttack() {
-        const entityIDs = Object.keys(clientState.entities);
-        for (let i = 0; i < entityIDs.length; i++) {
-            let entity = clientState.entities[entityIDs[i]];
+        for (let entity of Object.values(clientState.entities)) {
             if (entity.handSpriteCollision(this.collisionPoints[this.displayHand]) && !entity.alreadyHit) {
                 entity.alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
 

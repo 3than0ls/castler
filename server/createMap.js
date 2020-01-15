@@ -17,7 +17,7 @@ module.exports = class CreateMap {
     }
 
     static createResources(resources, type, amount, minX, minY, maxX=0, maxY=0) {
-        for(let i = 0; i < amount; i++) {
+        for (let i = 0; i < amount; i++) {
             let resource = new ResourceState(randomInt(minX, maxX), randomInt(minY, maxY), type);
             resources[resource.resourceID] = resource;
         }

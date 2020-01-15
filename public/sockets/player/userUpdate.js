@@ -5,36 +5,36 @@ import { Player } from "../../gameClasses/player";
 
 export const userUpdate = (socket, clientState) => {
     socket.on('userStates', serverStateUsers => {
-        const userIDs = Object.keys(serverStateUsers);
-        for(let i = 0; i < userIDs.length; i++) {
+        for (let [userID, serverStateUser] of Object.entries(serverStateUsers)) {
             // if new player found, add it
-            if (!clientState.enemies[userIDs[i]] && userIDs[i] !== socket.id) { // if not user isnt already found and isn't the client
+            if (!clientState.enemies[userID] && userID !== socket.id) { // if not user isnt already found and isn't the client
                 // if new id and info found, create new enemy and add it to client state
-                let data = serverStateUsers[userIDs[i]];
-                const newEnemy = new Enemy(data.clientID, -data.globalX, -data.globalY, data.toolTier);
+                const newEnemy = new Enemy(serverStateUser.clientID, -serverStateUser.globalX, -serverStateUser.globalY, serverStateUser.toolTier);
                 newEnemy.render(); // render enemy
-                clientState.enemies[userIDs[i]] = newEnemy;
+                clientState.enemies[userID] = newEnemy;
             }
             
-            if (userIDs[i] !== socket.id) { // if the server sent player id isn't the client id
-                let data = serverStateUsers[userIDs[i]];
-                let enemy = clientState.enemies[userIDs[i]];
+            if (userID !== socket.id) { // if the server sent player id isn't the client id
+                let enemy = clientState.enemies[userID];
                 enemy.animate(
-                    data.globalX, data.globalY, data.angle, data.swingAngle, data.displayHand
+                    serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand
                 );
-                if (enemy.toolTier !== data.toolTier) {
-                    Player.createHandSprites(enemy.handSprites, data.globalX, data.globalY, data.toolTier);
+                if (enemy.toolTier !== serverStateUser.toolTier) {
+                    Player.createHandSprites(enemy.handSprites, serverStateUser.globalX, serverStateUser.globalY, serverStateUser.toolTier);
                 }
-                if (data.attackFlash) {
-                    clientState.enemies[userIDs[i]].attackFlash();
+                if (serverStateUser.attackFlash) {
+                    clientState.enemies[userID].attackFlash();
                 }
             }
         }
         // delete disconnected players
         const enemyIDs = Object.keys(clientState.enemies);
-        // filters server ids from client ids, and if theres a difference remove it
-        let userDifference = enemyIDs.filter(function(i) {return userIDs.indexOf(i) < 0; }); 
-        for(let i = 0; i < userDifference.length; i++) {
+        // filters client enemies using server sent data
+        let userDifference = enemyIDs.filter(function(enemyID) {
+            return !serverStateUsers[enemyID]; // check if client has any enemies that the server doesn't, and if so, filter it to a waste difference array
+        }); 
+        // delete entities in waste difference array
+        for (let i = 0; i < userDifference.length; i++) {
             clientState.enemies[userDifference[i]].delete();
             delete clientState.enemies[userDifference[i]];
         }

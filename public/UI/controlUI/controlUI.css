@@ -64,11 +64,12 @@
     height: 100%;
 
     min-width: 0;
+    min-height: 0;
 
     background-color: rgba(100, 100, 100, 0.5);
     border-radius: 10px;
 
-    padding: 0;
+    padding: 0.2vh 0.6vw;
     
     border: 1%;
 
@@ -81,18 +82,17 @@
 }
 
 .controlUIItemName {
-    margin: 0.25vw;
-    font-size: calc(10.25px + 0.25vw);
+    margin: 0.25vh;
+    font-size: calc(4px + (1.7vh+1.7vw)/2);
 }
 
 .controlUIImage {
-
     object-fit: contain;
 
-    margin: 5%;
+    height: calc((20vh+20vw)/2);
+    width: auto;
 
-    width: 80%;
-    height: auto;
+    margin: 5%;
 }
 
 /* styles for ui item (the top tab choices) */
@@ -137,8 +137,9 @@
 .btn-clickItem {
     border: none;
     box-shadow: none;
-
+    padding: 0.2vh 0.6vh;
     min-width: 0;
+
 }
 
 .btn-clickItem:hover {

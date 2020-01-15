@@ -9,27 +9,25 @@ export const entityUpdate = (socket, clientState) => {
         delete clientState.entities[data.entityID];
     })
     socket.on('entityStates', serverStateEntities => {
-        const entityIDs = Object.keys(serverStateEntities);
-        for(let i = 0; i < entityIDs.length; i++) {
+        for (let [entityID, entity] of Object.entries(serverStateEntities)) {
             // if new entity found, add it
-            if (!clientState.entities[entityIDs[i]]) {
+            if (!clientState.entities[entityID]) {
                 // if new id and info found, create new entity and add it to client state
-                let data = serverStateEntities[entityIDs[i]];
-                const newEntity = new Entity(data.entityID, data.type, data.nuetrality, data.amount, data.globalX, data.globalY);
+                const newEntity = new Entity(entity.entityID, entity.type, entity.nuetrality, entity.amount, entity.globalX, entity.globalY);
                 newEntity.render(); // render entity
-                clientState.entities[entityIDs[i]] = newEntity;
+                clientState.entities[entityID] = newEntity;
             }
             
-            let data = serverStateEntities[entityIDs[i]];
-            clientState.entities[entityIDs[i]].animate(
-                data.globalX, data.globalY, data.angle, data.nuetrality
-            );
+            clientState.entities[entityID].animate(entity.globalX, entity.globalY, entity.angle, entity.nuetrality);
         }
         // delete dead entities
-        const clientEntityIDs = Object.keys(clientState.entities);
-        // filters server ids from client ids, and if theres a difference remove it
-        let entityDifference = entityIDs.filter(function(i) {return clientEntityIDs.indexOf(i) < 0; }); 
-        for(let i = 0; i < entityDifference.length; i++) {
+        const entityIDs = Object.keys(clientState.entities);
+        // filters client enemies using server sent data
+        let entityDifference = entityIDs.filter(function(entityID) {
+            return !serverStateEntities[entityID]; // check if client has any entities that the server doesn't, and if so, filter it to a waste difference array
+        }); 
+        // delete entities in waste difference array
+        for (let i = 0; i < entityDifference.length; i++) {
             clientState.entities[entityDifference[i]].delete();
             delete clientState.entities[entityDifference[i]];
         }

@@ -65,6 +65,8 @@ export class Enemy {
         // determine hand sprite key
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
 
+        this.handSprites[this.handSpriteKey].zIndex = 49;
+
         // update rendered position
         this.handSprites[this.handSpriteKey].position.set(globalX, globalY);  // <- remove the this in displayhand later
         this.bodyGraphic.position.set(globalX, globalY);
