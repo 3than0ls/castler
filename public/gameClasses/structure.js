@@ -3,32 +3,25 @@ import { loader } from "../utils/loader";
 import { bump } from "../bump/bump";
 
 export class Structure {
-    constructor(structureID, config) {
-        this.structureID = structureID;
+    constructor(areaID, globalX, globalY, type) {
+        this.areaID = areaID;
 
-        this.globalX = config.globalX;
-        this.globalY = config.globalY;
+        this.globalX = globalX;
+        this.globalY = globalY;
 
-        this.type = config.type;
-        this.size = config.size;
+        this.type = type;
+    }
 
-        this.primaryColor = config.primaryColor;
+    collide(playerGraphic) {
+        return bump.circleGameCollision(this.structureGraphic, playerGraphic, false, true);
     }
 
     render() {
-        /*/ this.structureGraphic = new PIXI.Graphics();
-
-        // this.structureGraphic.pivot.x = this.size[0]/2;
-        // this.structureGraphic.pivot.y = this.size[1]/2;
-
-        this.structureGraphic.beginFill(this.primaryColor);
-        this.structureGraphic.drawRect(this.globalX, this.globalY, this.size[0], this.size[1]);
-        this.structureGraphic.endFill();*/
-
-        this.structureGraphic = new PIXI.Sprite(loader.resources['structures/mine'].texture);
+        this.structureGraphic = new PIXI.Sprite(loader.resources[`structures/${this.type}`].texture);
         this.structureGraphic.anchor.x = 0.5;
         this.structureGraphic.anchor.y = 0.5;
         this.structureGraphic.position.set(this.globalX, this.globalY);
+        this.structureGraphic.circular = true; // bump js settings
 
         this.structureGraphic.zIndex = -1;
 

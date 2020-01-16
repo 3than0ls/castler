@@ -22,9 +22,9 @@ module.exports = class CreateMap {
             resources[resource.resourceID] = resource;
         }
     }
-    static createEntities(entities, type, amount, minX, minY, maxX=0, maxY=0, homeStructureID) {
+    static createEntities(entities, type, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
         for (let i = 0; i < amount; i ++) {
-            let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type, homeStructureID);
+            let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type, homeAreaID);
             entities.entityState[entity.entityID] = entity;
             entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
         }

@@ -361,7 +361,9 @@ export class Player {
         for (let entity of Object.values(clientState.entities)) {
             entity.collide(this.bodyGraphic);
         }
-        
+        for (let structure of Object.values(clientState.structures)) {
+            structure.collide(this.bodyGraphic);
+        }
     }
 
     resourceHarvest() {

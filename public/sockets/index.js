@@ -5,10 +5,11 @@ import { craftableItemsState } from "../UI/controlUI/crafting/crafting.js";
 import { userUpdate } from "./player/userUpdate.js";
 import { resourceUpdate } from "./resources/resourceUpdate.js";
 import { entityUpdate } from "./entities/entityUpdate.js";
-import { structureUpdate } from "./structures/structureUpdate.js";
+import { areaUpdate } from "./areas/areaUpdate.js";
 import { clientDataUpdate } from "./player/clientDataUpdate.js";
 import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
 import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
+import { structureUpdate } from "./structures/structureUpdate.js";
 
 export function clientInit(socket) {
     socket.emit('nickname', window.localStorage.getItem('nickname'));
@@ -31,7 +32,8 @@ export function socketUpdate(socket) {
     // update resource and entity data
     resourceUpdate(socket, clientState);
     entityUpdate(socket, clientState);
-    // update structures (may remove)
+    // update areas (may remove) and structures
+    areaUpdate(socket, clientState);
     structureUpdate(socket, clientState);
     // update UI data
     // update leaderboard data

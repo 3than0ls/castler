@@ -1,13 +1,14 @@
 class Item {
-    constructor(name, primary, consumable, consumeFunction, craftingTime, recipes, consumedOnCraft) {
+    constructor(name, config) {
         this.name = name;
-        this.consumable = consumable || false;
-        this.consumeFunction = consumeFunction || function(user) {};
-        this.craftingTime = craftingTime || 1000;
-        this.consumedOnCraft = consumedOnCraft || false;
-        this.primary = primary; // primary items are acquired, not crafted, and thus don't have a recipe
+        this.primary = config.primary; // primary items are acquired, not crafted, and thus don't have a recipe
+        this.consumable = config.consumable || false;
+        this.consumeFunction = config.consumeFunction || function(user) {};
+        this.craftingTime = config.craftingTime || 1000;
+        this.consumedOnCraft = config.consumedOnCraft || false;
+        this.craftingStructure = config.craftingStructure || undefined;
         if (!this.primary) {
-            this.recipes = recipes; // should be a list of recipes that can be used to make this item
+            this.recipes = config.recipes; // should be a list of recipes that can be used to make this item
         }
     }
     craft(player) {
@@ -84,56 +85,76 @@ function consumed(user, itemName) {
 // make the only parameter for Item a config
 
 module.exports = {
-    stone: new Item('stone', true),
-    wood: new Item('wood', true),
-    ironChunk: new Item('ironChunk', true),
-    rawMeat: new Item('rawMeat', true),
-    feather: new Item('feather', true),
-    fur: new Item('fur', true),
+    stone: new Item('stone', {primary: true}),
+    wood: new Item('wood', {primary: true}),
+    ironChunk: new Item('ironChunk', {primary: true}),
+    rawMeat: new Item('rawMeat', {primary: true}),
+    feather: new Item('feather', {primary: true}),
+    fur: new Item('fur', {primary: true}),
 
-    stoneTools: new Item('stoneTools', false, true, (user) => {
-        user.toolTier = 'stone';
-        user.damage = 50;
-        user.attackSpeed = 2.5;
-        user.harvestSpeed = 2.5;
-    }, 2500, [
-        {
-            stone: 1,
-        }
-    ], true),
+    stoneTools: new Item('stoneTools', {
+        primary: false,
+        consumable: true,
+        consumedOnCraft: true,
+        consumeFunction: (user) => {
+            user.toolTier = 'stone';
+            user.damage = 50;
+            user.attackSpeed = 2.5;
+            user.harvestSpeed = 2.5;
+        },
+        craftingTime: 2500,
+        recipes: [
+            {
+                stone: 5,
+            }
+        ],
+        craftingStructure: 'workbench',
+    }),
 
-    ironTools: new Item('ironTools', false, true, (user) => {
-        user.toolTier = 'iron';
-        user.damage = 70;
-        user.attackSpeed = 3;
-        user.harvestSpeed = 3;
-    }, 2500, [
-        {
-            ironPiece: 1,
-        }
-    ], true),
+    ironTools: new Item('ironTools', {
+        primary: false,
+        consumable: true,
+        consumedOnCraft: true,
+        consumeFunction: (user) => {
+            user.toolTier = 'iron';
+            user.damage = 70;
+            user.attackSpeed = 3;
+            user.harvestSpeed = 3;
+        },
+        craftingTime: 3500,
+        recipes: [
+            {
+                ironPiece: 2,
+            }
+        ],
+        craftingStructure: 'workbench',
+    }),
 
-    ironPiece: new Item('ironPiece', false, false, false, 2000, [
-        {
-            ironChunk: 5,
-        }
-    ]),
+    ironBars: new Item('ironBars', {
+        primary: false,
+        consumable: false,
+        craftingTime: 2000,
+        recipes: [
+            {
+                ironChunk: 5,
+            }
+        ]
+    }),
 
-    cookedMeat: new Item('cookedMeat', false, true, (user) => {
-        if (user.hunger < 100) {
-            consumed(user, 'cookedMeat');
-            user.hunger += 25;
-        }
-    }, 2000, [
-        {
-            rawMeat: 1,
-        }
-    ]),
-
-    foodRation: new Item('foodRation', true, true, (user) => {
-        if (user.hunger < 100) {
-            consumed(user, 'foodRation');
-            user.hunger += 25;
-        }
+    cookedMeat: new Item('cookedMeat', {
+        primary: false,
+        consumable: false,
+        craftingTime: 2000,
+        consumeFunction: (user) => {
+            if (user.hunger < 100) {
+                consumed(user, 'cookedMeat');
+                user.hunger += 25;
+            }
+        },
+        recipes: [
+            {
+                rawMeat: 1,
+            }
+        ],
     })
 }

@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, './public/')));
 
 const UserState = require('./serverStates/userState.js');
+const AreaState = require('./serverStates/areaState.js');
 const StructureState = require('./serverStates/structureState.js');
 const CreateMap = require('./createMap.js');
 
@@ -34,17 +35,17 @@ const serverState = {
         entityState: {}, // the data we send to the client holding positioning and other info about entities
         entityAI: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
     },
+    areas: {},
     structures: {},
 }
 
 const map = new CreateMap(serverState, [4000, 4000]);
 map.create();
 
-const mine = new StructureState({
+const mine = new AreaState({
     type: 'mine',
-    globalX: 0,
-    globalY: 0,
-    size: [1000, 1000],
+    globalX: -1000,
+    globalY: -1000,
     primaryColor: 0x888888,
     entities: [
         {type: 'beetle', amount: 2},
@@ -56,8 +57,16 @@ const mine = new StructureState({
     ],
     entityLimit: 4,
 });
-serverState.structures[mine.structureID] = mine;
+serverState.areas[mine.areaID] = mine;
 mine.create(serverState);
+
+const workbench = new StructureState({
+    type: 'workbench',
+    globalX: -100,
+    globalY: 0,
+});
+serverState.structures[workbench.structureID] = workbench;
+workbench.create(serverState);
 
 const gameItems = require('./items/items.js');
 // gameItems.test.test();
@@ -116,25 +125,34 @@ io.on('connection', socket => {
         }
         user.playerTick(); // tick player
 
+
+        // craftable items sorting algorithm
         const craftableItems = [];
         for (item in gameItems) {
-            // determine next craftable tier
-            if (user.toolTier === 'wood' && gameItems[item].name === 'ironTools') {
-                continue;
-            }
+            // determine next craftable tier, and if they already have that tier or higher, don't display
             if (user.toolTier === 'stone' && gameItems[item].name === 'stoneTools') {
                 continue;
             }
-            if (user.toolTier === 'iron' && gameItems[item].name === 'ironTools' || gameItems[item].name === 'stoneTools') {
+            if (user.toolTier === 'iron' && (gameItems[item].name === 'ironTools' || gameItems[item].name === 'stoneTools')) {
                 continue;
             }
 
             if (gameItems[item].canCraft(user.inventory)) {
-                craftableItems.push(gameItems[item].name);
+                craftableItems.push(gameItems[item]);
             }
         }
-        // console.log(JSON.stringify(craftableItems));
-        socket.emit('craftableItemsUpdate', craftableItems);
+        const items = [];
+        for (let i = 0; i < craftableItems.length; i++) {
+            let craftingStructure = craftableItems[i].craftingStructure;
+            let correctCraftingStructure = Object.values(serverState.structures)
+                .filter(structure => craftingStructure === structure.type);
+            for (let i = 0; i < correctCraftingStructure.length; i++) {
+                if (correctCraftingStructure[i].objectWithinRange(user)) {
+                    items.push(craftableItems[i].name)
+                }
+            }
+        }
+        socket.emit('craftableItemsUpdate', items);
 
         socket.emit('clientDataUpdate', clientUpdateData);
     });
@@ -185,8 +203,8 @@ io.on('connection', socket => {
                 entityID: data.entityID,
             });
 
-            if (entityState.homeStructureID && entityState.homeStructureID !== 'map') { // if entity had a home structure and it isn't the map, decrease structures entity amount
-                serverState.structures[entityState.homeStructureID].entityCount--;
+            if (entityState.homeAreaID && entityState.homeAreaID !== 'map') { // if entity had a home area and it isn't the map, decrease areas entity amount
+                serverState.areas[entityState.homeAreaID].entityCount--;
             }
 
             socket.emit('inventoryUpdate', serverState.users.userData[socket.id].inventory) // update the clients inventory
@@ -218,6 +236,7 @@ function update(serverState) {
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
+    io.sockets.emit('areaStates', serverState.areas);
     io.sockets.emit('structureStates', serverState.structures);
 
     mine.respawnTick(serverState);
@@ -244,9 +263,8 @@ function update(serverState) {
     io.sockets.emit('leaderboardUpdate', leaderboardState);
     
     // updates states and call the entity AIs
-    const entityIDs = Object.keys(serverState.entities.entityAI);
-    for(let i = 0; i < entityIDs.length; i++) {
-        serverState.entities.entityAI[entityIDs[i]].update(serverState, map);
+    for (let entity of Object.values(serverState.entities.entityAI)) {
+        entity.update(serverState, map);
     }
 }
   
