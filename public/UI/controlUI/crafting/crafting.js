@@ -62,15 +62,21 @@ export class CraftingUI extends React.Component {
             return name;
         }
 
+        const componentKeys = [];
         const craftingComponents = [];
         for (let i = 0; i < this.state.craftableItems.length; i++) {
-            craftingComponents.push(
-                <Button variant='clickItem' key={this.state.craftableItems[i]} className="controlUIItem disableSelect"
-                onClick={() => this.itemClick(this.state.craftableItems[i])} disabled={this.state.craftingState.crafting}>
-                    <div className='controlUIItemName'>{displayRename(this.state.craftableItems[i])}</div>
-                    <Image className='controlUIImage' src={this.state.images[this.state.craftableItems[i].concat('.png')]} />
-                </Button>
-            )
+            let key = this.state.craftableItems[i]; // we can tell if a crafting item is displayed twice if the key already exists when a same one is being added
+            if (componentKeys.this.state.craftableItems[i].includes(key)) continue; // if the crafting item is already displayed, don't display it twice
+            else {
+                componentKeys.push(key);
+                craftingComponents.push(
+                    <Button variant='clickItem' key={key} className="controlUIItem disableSelect"
+                    onClick={() => this.itemClick(this.state.craftableItems[i])} disabled={this.state.craftingState.crafting}>
+                        <div className='controlUIItemName'>{displayRename(this.state.craftableItems[i])}</div>
+                        <Image className='controlUIImage' src={this.state.images[this.state.craftableItems[i].concat('.png')]} />
+                    </Button>
+                )
+            }
         }
 
                 /*

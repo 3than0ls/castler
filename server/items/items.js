@@ -138,12 +138,13 @@ module.exports = {
             {
                 ironChunk: 5,
             }
-        ]
+        ],
+        craftingStructure: 'furnace',
     }),
 
     cookedMeat: new Item('cookedMeat', {
         primary: false,
-        consumable: false,
+        consumable: true,
         craftingTime: 2000,
         consumeFunction: (user) => {
             if (user.hunger < 100) {
@@ -156,5 +157,6 @@ module.exports = {
                 rawMeat: 1,
             }
         ],
+        craftingStructure: 'furnace',
     })
 }

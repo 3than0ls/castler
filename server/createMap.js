@@ -1,6 +1,9 @@
 const ResourceState = require('./serverStates/resourceState.js');
 const EntityState = require('./serverStates/entityState.js');
 const EntityAI = require('./serverStates/entityAI.js');
+/*
+const AreaState = require('./serverStates/areaState.js');
+const StructureState = require('./serverStates/structureState.js');*/
 
 function randomInt(min, max) {
     min = Math.ceil(min);
@@ -12,6 +15,8 @@ module.exports = class CreateMap {
     constructor(serverState, size) {
         this.resources = serverState.resources;
         this.entities = serverState.entities;
+        this.areas = serverState.areas;
+        this.structures = serverState.structures;
 
         this.size = size || [1000, 1000]
     }
@@ -29,10 +34,28 @@ module.exports = class CreateMap {
             entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
         }
     }
+    /*
+    static createAreas(areas, amount, minX, minY, maxX, maxY, areaConfig) {
+        for (let i = 0; i < amount; i ++) {
+            let config = areaConfig;
+            if (!config.globalX) config.globalX = randomInt(minX, maxX);
+            if (!config.globalY) config.globalY = randomInt(minY, maxY);
+            let area = new AreaState(config);
+            areas[area.areaID] = area;
+        }
+    }
 
-    create() {
-        // create map boundaries using resource obstacles
-        /*
+    static createStructures(structures, amount, minX, minY, maxX, maxY, structureConfig) {
+        for (let i = 0; i < amount; i ++) {
+            let config = structureConfig;
+            if (!config.globalX) config.globalX = randomInt(minX, maxX);
+            if (!config.globalY) config.globalY = randomInt(minY, maxY);
+            let structure = new StructureState(config);
+            structures[structure.structureID] = structure;
+        }
+    }
+    */
+    boundaryResource() {
         const size = this.size;
         const increment = 160;
         for (let i = 0; i <= size[0]; i += increment) {
@@ -48,17 +71,37 @@ module.exports = class CreateMap {
 
             let rightRowResource = new ResourceState(size[0]/2 + randomInt(0, 60), (-size[1]/2) + i, 'tree');
             this.resources[rightRowResource.resourceID] = rightRowResource;
-        }*/
+        }
+    }
+
+    create() {
 
         this.test();
     }
     test() {
-        
         const size = this.size;
         CreateMap.createResources(this.resources, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createResources(this.resources, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
         CreateMap.createEntities(this.entities, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createEntities(this.entities, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+
+        /*
+        CreateMap.createAreas(this.areas, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2, {
+            type: 'mine',
+            primaryColor: 0x888888,
+            entities: [
+                {type: 'beetle', amount: 2},
+                {type: 'boar', amount: 2},
+            ],
+            resources: [
+                {type: 'iron', amount: 4},
+                {type: 'rock', amount: 4}
+            ],
+            entityLimit: 4,
+        });
+
+        CreateMap.createStructures(this.structures, 2, -1000, -1000, 1000, 1000, { type: 'workbench' });
+        CreateMap.createStructures(this.structures, 2, -1000, -1000, 1000, 1000, { type: 'furnace' });*/
     }
 }

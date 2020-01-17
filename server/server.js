@@ -44,8 +44,8 @@ map.create();
 
 const mine = new AreaState({
     type: 'mine',
-    globalX: -1000,
-    globalY: -1000,
+    globalX: 0,
+    globalY: -700,
     primaryColor: 0x888888,
     entities: [
         {type: 'beetle', amount: 2},
@@ -62,11 +62,18 @@ mine.create(serverState);
 
 const workbench = new StructureState({
     type: 'workbench',
-    globalX: -100,
-    globalY: 0,
+    globalX: -400,
+    globalY: 700,
 });
 serverState.structures[workbench.structureID] = workbench;
 workbench.create(serverState);
+const furnace = new StructureState({
+    type: 'furnace',
+    globalX: 400,
+    globalY: 700,
+});
+serverState.structures[furnace.structureID] = furnace;
+furnace.create(serverState);
 
 const gameItems = require('./items/items.js');
 // gameItems.test.test();
@@ -239,7 +246,9 @@ function update(serverState) {
     io.sockets.emit('areaStates', serverState.areas);
     io.sockets.emit('structureStates', serverState.structures);
 
-    mine.respawnTick(serverState);
+    for (let area of Object.values(serverState.areas)) {
+        area.respawnTick(serverState);
+    }
 
     // emit leaderboard status (based on player score)
     const orderedPlayerScores = [];

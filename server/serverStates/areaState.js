@@ -40,7 +40,7 @@ module.exports = class AreaState {
         }
     }
 
-    respawnTick(serverState) {
+    respawnTick() {
         // entity count will be decreased when an entity dies, which will be called in entityAI
         if (this.entityCount < this.entityLimit) {
             this.entityRespawnTick++;
@@ -60,12 +60,13 @@ module.exports = class AreaState {
                     }
                 }
 
+                /*
                 CreateMap.createEntities(
                     serverState.entities, type, 1, 
                     this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                     this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
                     this.areaID
-                );
+                );*/
                 this.entityCount++;
             }
         }

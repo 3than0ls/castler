@@ -1,4 +1,3 @@
-const CreateMap = require('../createMap.js');
 const imageSize = require('image-size');
 
 function randomInt(min, max) {
@@ -19,16 +18,6 @@ module.exports = class StructureState {
         this.structureID = 's' + Math.random().toString(36).substr(2, 9);
     }
 
-    objectInsideStructure(object, invert=false) {
-        if (object.globalX >= -this.size[0] + this.globalX && object.globalX <= this.size[0] + this.globalX &&
-            object.globalY >= -this.size[1] + this.globalY && object.globalY <= this.size[1] + this.globalY) {
-            if (invert) {
-                return false;
-            }
-            return true;
-        }
-    }
-
     objectWithinRange(object) {
         if (object.globalX >= -this.size[0] + this.globalX && object.globalX <= this.size[0] + this.globalX &&
             object.globalY >= -this.size[1] + this.globalY && object.globalY <= this.size[1] + this.globalY) {
@@ -39,12 +28,12 @@ module.exports = class StructureState {
     create(serverState) {
         // clear area of previous resources and entities that exist inside structure
         for (let [resourceID, resource] of Object.entries(serverState.resources)) {
-            if (this.objectInsideStructure(resource)) {
+            if (this.objectWithinRange(resource)) {
                 delete serverState.resources[resourceID];
             }
         }
         for (let [entityID, entity] of Object.entries(serverState.entities.entityState)) {
-            if (this.objectInsideStructure(entity)) {
+            if (this.objectWithinRange(entity)) {
                 delete serverState.entities.entityState[entityID];
                 delete serverState.entities.entityAI[entityID];
             }

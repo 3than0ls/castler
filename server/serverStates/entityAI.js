@@ -36,7 +36,7 @@ module.exports = class EntityAI {
                 break;
         }
         // avoid
-        this.avoidPaddingDistance = this.radius + (200/2) // entity radius plus resource radius
+        this.avoidPaddingDistance = 15; // used as a padding so entities hopefully avoid direct collision
         this.resourceCollision = false;
         // neutrality variables
         this.aggroDistance = 500;
@@ -116,8 +116,10 @@ module.exports = class EntityAI {
             const a = this.entityState.globalX - resource.globalX;
             const b = this.entityState.globalY - resource.globalY;
             let distance = Math.hypot(a, b);
+
+            let collisionDistance = this.radius + this.avoidPaddingDistance + (resource.size[0]/2+resource.size[1]/2)/2;
             
-            if (distance < this.avoidPaddingDistance+15) {
+            if (distance < collisionDistance) {
                 this.resourceCollision = true;
                 let angle = (Math.round((Math.atan2(
                     this.entityState.globalY - resource.globalY,
@@ -144,8 +146,10 @@ module.exports = class EntityAI {
             const a = this.entityState.globalX - structure.globalX;
             const b = this.entityState.globalY - structure.globalY;
             let distance = Math.hypot(a, b);
+
+            let collisionDistance = this.radius + this.avoidPaddingDistance + (structure.size[0]/2+structure.size[1]/2)/2;
             
-            if (distance < this.avoidPaddingDistance+15) {
+            if (distance < collisionDistance) {
                 this.resourceCollision = true; // since entities are supposed to react similarly to structures as they do to resources, we can use this interchangeably
                 let angle = (Math.round((Math.atan2(
                     this.entityState.globalY - structure.globalY,
