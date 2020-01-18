@@ -20,10 +20,10 @@ for (let i = 0; i < configs.length; i++) {
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, './public/')));
 
-const UserState = require('./serverStates/userState.js');
+const UserState = require('./serverStates/userState.js');;
+const CreateMap = require('./createMap.js');
 const AreaState = require('./serverStates/areaState.js');
 const StructureState = require('./serverStates/structureState.js');
-const CreateMap = require('./createMap.js');
 
 const serverState = {
     users: {
@@ -42,11 +42,11 @@ const serverState = {
 const map = new CreateMap(serverState, [4000, 4000]);
 map.create();
 
+/*
 const mine = new AreaState({
     type: 'mine',
     globalX: 0,
     globalY: -700,
-    primaryColor: 0x888888,
     entities: [
         {type: 'beetle', amount: 2},
         {type: 'boar', amount: 2},
@@ -73,7 +73,7 @@ const furnace = new StructureState({
     globalY: 700,
 });
 serverState.structures[furnace.structureID] = furnace;
-furnace.create(serverState);
+furnace.create(serverState);*/
 
 const gameItems = require('./items/items.js');
 // gameItems.test.test();
@@ -134,6 +134,7 @@ io.on('connection', socket => {
 
 
         // craftable items sorting algorithm
+        // determines what items are craftable with the current inventory
         const craftableItems = [];
         for (item in gameItems) {
             // determine next craftable tier, and if they already have that tier or higher, don't display
@@ -148,14 +149,19 @@ io.on('connection', socket => {
                 craftableItems.push(gameItems[item]);
             }
         }
+        // checks each craftableItem's crafting structure availability, and if one is not available, remove it from end craftable items (items)
         const items = [];
         for (let i = 0; i < craftableItems.length; i++) {
             let craftingStructure = craftableItems[i].craftingStructure;
-            let correctCraftingStructure = Object.values(serverState.structures)
-                .filter(structure => craftingStructure === structure.type);
-            for (let i = 0; i < correctCraftingStructure.length; i++) {
-                if (correctCraftingStructure[i].objectWithinRange(user)) {
-                    items.push(craftableItems[i].name)
+            let correctCraftingStructure = Object.values(serverState.structures).filter(structure => craftingStructure === structure.type);
+            /*
+                idea: rather than iterating through every correct crafting structures and testing if object is within range
+                iterate through all correct crafting structures and test object is within range of the closest one
+            */
+            for (let j = 0; j < correctCraftingStructure.length; j++) {
+                if (correctCraftingStructure[j].objectWithinRange(user) && craftableItems[i]) {
+                    items.push(craftableItems[i].name);
+                    break;
                 }
             }
         }

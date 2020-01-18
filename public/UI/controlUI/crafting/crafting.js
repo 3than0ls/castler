@@ -66,7 +66,7 @@ export class CraftingUI extends React.Component {
         const craftingComponents = [];
         for (let i = 0; i < this.state.craftableItems.length; i++) {
             let key = this.state.craftableItems[i]; // we can tell if a crafting item is displayed twice if the key already exists when a same one is being added
-            if (componentKeys.this.state.craftableItems[i].includes(key)) continue; // if the crafting item is already displayed, don't display it twice
+            if (componentKeys.includes(key)) continue; // if the crafting item is already displayed, don't display it twice
             else {
                 componentKeys.push(key);
                 craftingComponents.push(
@@ -78,18 +78,6 @@ export class CraftingUI extends React.Component {
                 )
             }
         }
-
-                /*
-                <div id='craftingContainerWrapper'>
-                    <div id='craftingContainer'>
-                        {craftingComponents.length !== 0 && 
-                            <Col>
-                                {craftingComponents}
-                            </Col>
-                        }
-                    </div>
-                </div>
-                */
         return(
             <> 
                 <div>

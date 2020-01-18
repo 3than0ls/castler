@@ -1,4 +1,3 @@
-const CreateMap = require('../createMap.js');
 const imageSize = require('image-size')
 
 function randomInt(min, max) {
@@ -11,8 +10,6 @@ module.exports = class AreaState {
     constructor(config) {
         this.globalX = config.globalX;
         this.globalY = config.globalY;
-
-        this.primaryColor = config.primaryColor;
 
         this.type = config.type;
         this.size = [imageSize(`./public/assets/areas/${config.type}.png`).width, imageSize(`./public/assets/areas/${config.type}.png`).height];
@@ -72,7 +69,7 @@ module.exports = class AreaState {
         }
     }
 
-    create(serverState) {
+    create(serverState, CreateMap) {
         // clear area of previous resources, then insert in new ones
         // clear resources and entities
         this.clearedObjects = 0;

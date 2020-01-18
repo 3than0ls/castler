@@ -21,6 +21,7 @@ export class Structure {
         this.structureGraphic.anchor.x = 0.5;
         this.structureGraphic.anchor.y = 0.5;
         this.structureGraphic.position.set(this.globalX, this.globalY);
+        this.structureGraphic.zIndex = 26;
         this.structureGraphic.circular = true; // bump js settings
 
         this.structureGraphic.zIndex = -1;

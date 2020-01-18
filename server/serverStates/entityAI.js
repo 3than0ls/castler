@@ -131,10 +131,12 @@ module.exports = class EntityAI {
                     angle += 360;
                 }
                 if (this.hit) {
-                    angle /= 1; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
+                    angle /= 5; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
+                } else {
+                    this.stopDistance = 0;
                 }
                 this.rotate(angle, 1);
-                break
+                break;
             } else {
                 this.resourceCollision = false;
             }
@@ -161,10 +163,12 @@ module.exports = class EntityAI {
                     angle += 360;
                 }
                 if (this.hit) {
-                    angle /= 1;
+                    angle /= 5;
+                } else {
+                    this.stopDistance = 0;
                 }
                 this.rotate(angle, 1);
-                break
+                break;
             } else {
                 this.resourceCollision = false;
             }
@@ -401,6 +405,7 @@ module.exports = class EntityAI {
         
         this.avoidResources(serverState.resources);
         this.avoidArea(serverState.areas);
+        this.avoidStructures(serverState.structures);
         this.boundaryContain(map.size);
 
         

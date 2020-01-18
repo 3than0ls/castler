@@ -25,7 +25,7 @@ module.exports = class StructureState {
         }
     }
 
-    create(serverState) {
+    clear(serverState) {
         // clear area of previous resources and entities that exist inside structure
         for (let [resourceID, resource] of Object.entries(serverState.resources)) {
             if (this.objectWithinRange(resource)) {

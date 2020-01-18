@@ -25,8 +25,8 @@ module.exports = class UserState {
         this.radius = (100 * 0.865)/2;
 
         this.inventory = {
-            cookedMeat: {
-                consumable: true,
+            rawMeat: {
+                consumable: false,
                 amount: 2,
             }
         };

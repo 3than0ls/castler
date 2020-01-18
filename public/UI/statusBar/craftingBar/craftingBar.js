@@ -31,7 +31,7 @@ export class CraftingBar extends React.Component { // used to monitor progress o
             crafting: player.craftingState.crafting,
             craftingComplete: Math.round(player.craftingState.craftingComplete * 125)
         });
-    } // check bump js collision hand detection, may be inaccurate
+    } // there is a delay between the now and displayed now, how to remove?
 
     render() {
         return(

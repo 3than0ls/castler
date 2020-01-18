@@ -1,6 +1,8 @@
 const ResourceState = require('./serverStates/resourceState.js');
 const EntityState = require('./serverStates/entityState.js');
 const EntityAI = require('./serverStates/entityAI.js');
+const StructureState = require('./serverStates/structureState.js');
+const AreaState = require('./serverStates/areaState.js');
 /*
 const AreaState = require('./serverStates/areaState.js');
 const StructureState = require('./serverStates/structureState.js');*/
@@ -27,6 +29,7 @@ module.exports = class CreateMap {
             resources[resource.resourceID] = resource;
         }
     }
+
     static createEntities(entities, type, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
         for (let i = 0; i < amount; i ++) {
             let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type, homeAreaID);
@@ -34,27 +37,32 @@ module.exports = class CreateMap {
             entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
         }
     }
-    /*
-    static createAreas(areas, amount, minX, minY, maxX, maxY, areaConfig) {
-        for (let i = 0; i < amount; i ++) {
-            let config = areaConfig;
-            if (!config.globalX) config.globalX = randomInt(minX, maxX);
-            if (!config.globalY) config.globalY = randomInt(minY, maxY);
-            let area = new AreaState(config);
-            areas[area.areaID] = area;
-        }
-    }
 
-    static createStructures(structures, amount, minX, minY, maxX, maxY, structureConfig) {
+    static createStructures(serverState, amount, minX, minY, maxX, maxY, structureConfig) {
         for (let i = 0; i < amount; i ++) {
             let config = structureConfig;
             if (!config.globalX) config.globalX = randomInt(minX, maxX);
             if (!config.globalY) config.globalY = randomInt(minY, maxY);
             let structure = new StructureState(config);
-            structures[structure.structureID] = structure;
+            serverState.structures[structure.structureID] = structure;
+            structure.clear(serverState);
         }
     }
-    */
+    
+    static createAreas(serverState, amount, minX, minY, maxX, maxY, areaConfig) { 
+        // area state takes special variables because inside area state, this file is also imported, which clashes with each other
+        // to fix this, we don't import this file in area state, but rather pass this class off as a parameter that's used in area state to create entities and resources
+
+        for (let i = 0; i < amount; i ++) {
+            let config = JSON.parse(JSON.stringify(areaConfig)); // created a deep clone copy of the config and edit it if necessary
+            if (!config.globalX) config.globalX = randomInt(minX, maxX);
+            if (!config.globalY) config.globalY = randomInt(minY, maxY);
+            let area = new AreaState(config);
+            serverState.areas[area.areaID] = area;
+            area.create(serverState, CreateMap);
+        }
+    }
+    
     boundaryResource() {
         const size = this.size;
         const increment = 160;
@@ -86,10 +94,10 @@ module.exports = class CreateMap {
         CreateMap.createEntities(this.entities, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createEntities(this.entities, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
-        /*
-        CreateMap.createAreas(this.areas, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2, {
+        
+        // create more restrictive and accurate spawn area based on area size later
+        CreateMap.createAreas(this, 2, -size[0]/4, -size[1]/4, size[0]/4, size[1]/4, {
             type: 'mine',
-            primaryColor: 0x888888,
             entities: [
                 {type: 'beetle', amount: 2},
                 {type: 'boar', amount: 2},
@@ -101,7 +109,7 @@ module.exports = class CreateMap {
             entityLimit: 4,
         });
 
-        CreateMap.createStructures(this.structures, 2, -1000, -1000, 1000, 1000, { type: 'workbench' });
-        CreateMap.createStructures(this.structures, 2, -1000, -1000, 1000, 1000, { type: 'furnace' });*/
+        CreateMap.createStructures(this, 2, -1000, -1000, 1000, 1000, { type: 'workbench' });
+        CreateMap.createStructures(this, 2, -1000, -1000, 1000, 1000, { type: 'furnace' });
     }
 }
