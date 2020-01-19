@@ -14,6 +14,11 @@ export const clientDataUpdate = (socket) => {
         player.attackSpeed = data.attackSpeed;
         player.harvestSpeed = data.harvestSpeed;
 
+        player.displayHand = data.displayHand;
+        if (player.structureHand) {
+            player.structureBuilding(data.structureHand);
+        }
+
         player.globalX = data.globalX;
         player.globalY = data.globalY;
         

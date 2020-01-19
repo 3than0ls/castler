@@ -23,24 +23,25 @@ module.exports = class CreateMap {
         this.size = size || [1000, 1000]
     }
 
-    static createResources(resources, type, amount, minX, minY, maxX=0, maxY=0) {
+    static createResources(serverState, type, amount, minX, minY, maxX=0, maxY=0) {
         for (let i = 0; i < amount; i++) {
             let resource = new ResourceState(randomInt(minX, maxX), randomInt(minY, maxY), type);
-            resources[resource.resourceID] = resource;
+            serverState.resources[resource.resourceID] = resource;
         }
     }
 
-    static createEntities(entities, type, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
+    static createEntities(serverState, type, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
         for (let i = 0; i < amount; i ++) {
             let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type, homeAreaID);
-            entities.entityState[entity.entityID] = entity;
-            entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
+            serverState.entities.entityState[entity.entityID] = entity;
+            serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
+            serverState.entities.entityAI[entity.entityID].displaceIfInsideObject(serverState, minX, minY, maxX, maxY);
         }
     }
 
     static createStructures(serverState, amount, minX, minY, maxX, maxY, structureConfig) {
         for (let i = 0; i < amount; i ++) {
-            let config = structureConfig;
+            let config = JSON.parse(JSON.stringify(structureConfig)); // created a deep clone copy of the config and edit it if necessary
             if (!config.globalX) config.globalX = randomInt(minX, maxX);
             if (!config.globalY) config.globalY = randomInt(minY, maxY);
             let structure = new StructureState(config);
@@ -81,22 +82,17 @@ module.exports = class CreateMap {
             this.resources[rightRowResource.resourceID] = rightRowResource;
         }
     }
-
-    create() {
-
-        this.test();
-    }
-    test() {
+    test(serverState) {
         const size = this.size;
-        CreateMap.createResources(this.resources, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createResources(this.resources, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createResources(serverState, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createResources(serverState, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
-        CreateMap.createEntities(this.entities, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createEntities(this.entities, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createEntities(serverState, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createEntities(serverState, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
         
         // create more restrictive and accurate spawn area based on area size later
-        CreateMap.createAreas(this, 2, -size[0]/4, -size[1]/4, size[0]/4, size[1]/4, {
+        CreateMap.createAreas(serverState, 2, -size[0]/4, -size[1]/4, size[0]/4, size[1]/4, {
             type: 'mine',
             entities: [
                 {type: 'beetle', amount: 2},
@@ -109,7 +105,7 @@ module.exports = class CreateMap {
             entityLimit: 4,
         });
 
-        CreateMap.createStructures(this, 2, -1000, -1000, 1000, 1000, { type: 'workbench' });
-        CreateMap.createStructures(this, 2, -1000, -1000, 1000, 1000, { type: 'furnace' });
+        CreateMap.createStructures(serverState, 2, -1000, -1000, 1000, 1000, { type: 'workbench' });
+        CreateMap.createStructures(serverState, 2, -1000, -1000, 1000, 1000, { type: 'furnace' });
     }
 }

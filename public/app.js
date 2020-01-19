@@ -24,8 +24,7 @@ export const clientState = {
     BIG:
     armor
 
-    move all player stat variables that are sent to server but used in player class not for display (harvest speed)
-    perhaps move most of swing function to server side
+    entities for some reason in areas go to edge and then get stuck there when they try to go back
 
     pvp
 

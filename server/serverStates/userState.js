@@ -8,6 +8,7 @@ module.exports = class UserState {
         this.angle = angle || 0;
         this.swingAngle = 0;
         this.displayHand = 'hand';
+        this.structureHand;
 
         this.nickname = 'default'
         this.score = 0;
@@ -25,9 +26,13 @@ module.exports = class UserState {
         this.radius = (100 * 0.865)/2;
 
         this.inventory = {
-            rawMeat: {
-                consumable: false,
-                amount: 2,
+            cookedMeat: {
+                consumable: true,
+                amount: 20,
+            },
+            workbench: {
+                consumable: true,
+                amount: 1,
             }
         };
         this.toolTier = 'wood';
@@ -174,7 +179,8 @@ module.exports = class UserState {
             }, 1);
         }
     }
-    updateClientInfo(vx, vy, collisionvx, collisionvy, angle, swingAngle, displayHand) {
+
+    updateClientInfo(vx, vy, collisionvx, collisionvy, angle, swingAngle, displayHand, structureHand) {
         // update variables from client
         // vx and vy are directions, telling to go left/up if negative or right/down if positive
         if (vx !== 0 && vy !== 0) {
@@ -185,16 +191,58 @@ module.exports = class UserState {
             this.globalY += vy * this.speed + collisionvy;
         }
 
-
-
         this.angle = angle;
         this.swingAngle = swingAngle;
         this.displayHand = displayHand;
+
+        // this.structureHand = undefined;
+        this.structureHand = structureHand;
+        
 
         if (this.health <= 0) {
             this.dead = true;
         }
     }
+
+    craftableItems(items, serverState) {
+        // craftable items sorting algorithm, first filters out tool tiers that are un-needed, then checks if the item has the require crafting structure nearby
+        // determines what items are craftable with the current inventory
+        const itemFilteredTools = [];
+        for (let item of Object.values(items)) {
+            // determine next craftable tier, and if they already have that tier or higher, don't add that to the next stage of filtering
+            if (this.toolTier === 'stone' && item.name === 'stoneTools') {
+                continue;
+            }
+            if (this.toolTier === 'iron' && (item.name === 'ironTools' || item.name === 'stoneTools')) {
+                continue;
+            }
+
+            if (item.canCraft(this.inventory)) {
+                itemFilteredTools.push(item);
+            }
+        }
+        // checks each craftableItem's crafting structure availability, and if one is not available, remove it from end craftable items (items)
+        const itemFilteredStructures = [];
+        for (let i = 0; i < itemFilteredTools.length; i++) {
+            // filter all crafting structures to only get the ones that the item needs
+            let craftingStructure = itemFilteredTools[i].craftingStructure;
+            let correctCraftingStructure = Object.values(serverState.structures).filter(structure => craftingStructure === structure.type);
+            /*
+                idea: rather than iterating through every correct crafting structures and testing if object is within range
+                iterate through all correct crafting structures and test object is within range of the closest one
+            */
+            for (let j = 0; j < correctCraftingStructure.length; j++) {
+                if (correctCraftingStructure[j].objectWithinRange(this) && itemFilteredTools[i]) {
+                    itemFilteredStructures.push(itemFilteredTools[i].name);
+                    break;
+                }
+            }
+            return itemFilteredStructures;
+        }
+    }
+    
+
+
     clientDataPackage() {
         return {
             clientID: this.clientID,

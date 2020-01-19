@@ -90,7 +90,7 @@ module.exports = class AreaState {
         this.createdObjects = 0;
         for (let i = 0; i < this.config.resources.length; i++) {
             CreateMap.createResources(
-                serverState.resources, this.config.resources[i].type, this.config.resources[i].amount,
+                serverState, this.config.resources[i].type, this.config.resources[i].amount,
                 this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                 this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
             );
@@ -99,7 +99,7 @@ module.exports = class AreaState {
 
         for (let i = 0; i < this.config.entities.length; i++) {
             CreateMap.createEntities(
-                serverState.entities, this.config.entities[i].type, this.config.entities[i].amount, 
+                serverState, this.config.entities[i].type, this.config.entities[i].amount, 
                 this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                 this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
                 this.areaID,

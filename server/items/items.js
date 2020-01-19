@@ -158,5 +158,21 @@ module.exports = {
             }
         ],
         craftingStructure: 'furnace',
+    }),
+
+    
+    workbench: new Item('workbench', {
+        primary: false,
+        consumable: true,
+        craftingTime: 2000,
+        consumeFunction: (user) => {
+            consumed(user, 'cookedMeat');
+            console.log('workbench used')
+        },
+        recipes: [
+            {
+                wood: 1,
+            }
+        ],
     })
 }

@@ -1,4 +1,9 @@
 const imageSize = require('image-size');
+function randomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 module.exports = class EntityAI {
     constructor(entityID, entityState) {
@@ -91,7 +96,7 @@ module.exports = class EntityAI {
                 } else if (angle <= -180) {
                     angle += 360;
                 }
-                this.rotate(angle, 3);
+                this.rotate(angle/2, 3);
                 break;
             } else if (!entityInsideArea && this.entityState.homeAreaID === areaID && !this.hit) {
                 // if the entity is outsude the area and the area is the entities home area, and the entity has not been hit, then turn it owards the area
@@ -108,6 +113,13 @@ module.exports = class EntityAI {
                 this.rotate(angle, 3);
                 break;
             }
+        }
+    }
+
+    objectInsideEntity(object) {
+        if (object.globalX >= -this.radius + this.entityState.globalX && object.globalX <= this.radius + this.entityState.globalX &&
+            object.globalY >= -this.radius + this.entityState.globalY && object.globalY <= this.radius + this.entityState.globalY) {
+            return true;
         }
     }
     
@@ -135,7 +147,7 @@ module.exports = class EntityAI {
                 } else {
                     this.stopDistance = 0;
                 }
-                this.rotate(angle, 1);
+                this.rotate(angle/2, 1);
                 break;
             } else {
                 this.resourceCollision = false;
@@ -377,6 +389,38 @@ module.exports = class EntityAI {
             this.entityState.globalY <= -boundarySize[1]/2 - boundarySize[1]/3 || this.entityState.globalY >= boundarySize[1]/2 + boundarySize[1]/3) {
             this.entityState.globalX = 0;
             this.entityState.globalY = 0;
+        }
+    }
+
+    displaceIfInsideObject(serverState, minX, minY, maxX, maxY) {
+        // if an entity spawns inside of a structure or resource, move it outside of it
+        const objects = {...serverState.resources, ...serverState.structures} // combine resource and structure objects
+        for (let [objectID, object] of Object.entries(objects)) {
+            let maxDisplacementRuns = 100;
+            for (let i = 0; i < maxDisplacementRuns; i++) { // try 100 times to displace
+                if (this.objectInsideEntity(object)) {
+                    // determines if the direction is -1 or +1, adds one to make the direction a true or false value, and then evaluate a ternary operator to see where to
+                    // displace the entity towards. Try to move it closer to the center of the map
+                    let directionX = Math.sign(this.globalX) + 1;
+                    this.globalX += directionX ? -object.size[0] : object.size[0];
+                    let directionY = Math.sign(this.globalY) + 1;
+                    this.globalY += directionY ? -object.size[1] : object.size[1];
+                    if (i % 3 === 0) { // if still displaced, then 
+                        this.globalX = randomInt(minX, maxX);
+                        this.globalY = randomInt(minY, maxY);
+                    }
+                    if (i === maxDisplacementRuns-1) { // if still displaced, just delete the resource
+                        if (objectID[0] === 's') { // tests if it is a structure
+                            delete serverState.structures[objectID]; // if it is, delete from server state structures
+                        } else if (objectID[0] === 'r') { // tests if it is a resource
+                            delete serverState.resources[objectID]; // if it is, delete from server state resources
+                        }
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
         }
     }
 

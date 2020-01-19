@@ -44,8 +44,8 @@ export class Resource {
         player.viewpoint.addChild(resourceGraphic); // hands drawn below body
     }
 
-    collide(playerGraphic) {
-        return bump.circleGameCollision(this.resourceGraphic, playerGraphic, false, true);
+    collide(graphic) {
+        return bump.circleGameCollision(this.resourceGraphic, graphic, false, true);
     }
 
     handSpriteCollision(collisionPoint) {

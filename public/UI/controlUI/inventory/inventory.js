@@ -16,7 +16,11 @@ function importAll (r) {
     r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
     return images;
 }
-const images = importAll(require.context('./../../../assets/items', false,  /\.png$/)); // maybe later, add it so images are loaded dynamically, and only when the player has the item
+
+const itemImages = importAll(require.context('./../../../assets/items', false,  /\.png$/));
+const structureImages = importAll(require.context('./../../../assets/structures', false,  /\.png$/));
+const images = {...itemImages, ...structureImages}; 
+// possibly edit this so images are loaded dynamically, and only when the player has the item
 
 export class Inventory extends React.Component {
     constructor(props) {
@@ -41,8 +45,16 @@ export class Inventory extends React.Component {
         });
     }
 
-    itemClick(item) {
-        clientRequestConsume(socket, item);
+    itemClick(item, player) {
+        if (item === 'workbench') {
+            if (!player.structureHand) {
+                player.structureHand = 'workbench';
+            } else {
+                player.structureHand = undefined;
+            }
+        } else {
+            clientRequestConsume(socket, item);
+        }
     }
 
     render() {
@@ -72,7 +84,7 @@ export class Inventory extends React.Component {
                     </div>
             } else {
                 componentItem = 
-                    <Button variant="clickItem" key={item} className="controlUIItem disableSelect" onClick={() => this.itemClick(item)}>
+                    <Button variant="clickItem" key={item} className="controlUIItem disableSelect" onClick={() => this.itemClick(item, player)}>
                         <div className='controlUIItemName'>{displayRename(item)}{" x"}{itemData.amount}</div>
                         <Image className='controlUIImage' src={this.state.images[item.concat('.png')]}/>
                     </Button>

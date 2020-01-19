@@ -1,4 +1,4 @@
-import { stage, socket, renderer, clientState, particleContainer, worker } from "../app.js";
+import { stage, socket, renderer, clientState, particleContainer, worker, player } from "../app.js";
 import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio, gameWidth } from "./../utils/windowResize.js";
@@ -57,6 +57,12 @@ export class Player {
         this.swingBack = false;
         // mouse variable
         this.mouseHeld = false;
+        this.clicked = true;
+        // building and placement
+        this.structureHand;
+        this.displayStructureHand;
+        this.placeable = false;
+        this.structureSprites = {};
     }
 
     movementKeys() {
@@ -192,7 +198,8 @@ export class Player {
         });
         renderer.plugins.interaction.on('mouseup', () => {
             this.mouseHeld = false;
-        })
+            this.clicked = true;
+        });
     }
 
     render() {
@@ -286,6 +293,41 @@ export class Player {
         }
     }
 
+    structureBuilding(structureHand) {
+        //this.structureHand = structureHand;
+        this.displayStructureHand = structureHand;
+        if (!this.structureSprites[structureHand]) { // if the sprite texture doesn't exist, create it
+            this.structureSprites[structureHand] = new PIXI.Sprite(loader.resources[`structures/${structureHand}`].texture);
+            this.structureSprites[structureHand].zIndex = 51;
+            this.structureSprites[structureHand].anchor.x = 0.5;
+            this.structureSprites[structureHand].anchor.y = 0.5;
+            this.structureSprites[structureHand].circular = true;
+        }
+
+        let x = this.globalX + Math.sin(-this.angle) * 150;
+        let y = this.globalY + Math.cos(this.angle) * 150;
+
+        this.structureSprites[structureHand].position.set(x, y);
+
+        this.placeable = true;
+
+        for (let resource of Object.values(clientState.resources)) {
+            if (Math.hypot(resource.globalX - this.globalX, resource.globalY - this.globalY) < 750) {
+                let test = bump.hitTestCircle(resource.resourceGraphic, this.structureSprites[structureHand]);
+                if (test) {
+                    this.placeable = false;
+                    break;
+                }
+            }
+        }
+
+        if (this.placeable) {
+            this.structureSprites[structureHand].tint = 0xAAAAAAA;
+        } else {
+            this.structureSprites[structureHand].tint = 0xCC3333;
+        }
+    }
+
     attacked() {
         if (this.bodyGraphic.tint === 0xFFFFFF) {
             let tint = charm.redTint(this.bodyGraphic);
@@ -331,16 +373,31 @@ export class Player {
         this.collisions();
 
         // detect clicks and respond
-        if ((this.mouseHeld || this.swingAngle > 0) && this.displayHand !== "hand") { // if mouse held or effectively the swing has already started 
+        if ((this.mouseHeld || this.swingAngle > 0) && (this.displayHand !== "hand")) { // if mouse held or effectively the swing has already started 
             this.swing();
         } else {
             this.swingAvailable = true;
+        }
+
+        if (this.clicked) {
+            this.clicked = false;
+            if (this.displayStructureHand && this.placeable) {
+                // socket emit yadda yadda
+                console.log('socket emit, structure placed')
+                this.structureHand = undefined;
+            }
         }
 
         // add graphics to stage
         let handGraphic = this.handSprites[this.handSpriteKey];
         let bodyGraphic = this.bodyGraphic;
         stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
+
+        if (this.structureHand && this.displayStructureHand) {
+            player.viewpoint.addChild(this.structureSprites[this.displayStructureHand]);
+        } else {
+            player.viewpoint.removeChild(this.structureSprites[this.displayStructureHand]);
+        }
         
         // emit client info to server
         clientEmit(socket, {
@@ -351,6 +408,7 @@ export class Player {
             angle: this.angle,
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
+            structureHand: this.structureHand,
         });
     }
 

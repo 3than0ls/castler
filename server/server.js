@@ -40,7 +40,7 @@ const serverState = {
 }
 
 const map = new CreateMap(serverState, [4000, 4000]);
-map.create();
+map.test(serverState);
 
 /*
 const mine = new AreaState({
@@ -105,7 +105,7 @@ io.on('connection', socket => {
             createUser(data.id);
         }*/
         let user = serverState.users.user[data.id];
-        user.updateClientInfo(data.vx, data.vy, data.collisionvx, data.collisionvy, data.angle, data.swingAngle, data.displayHand);
+        user.updateClientInfo(data.vx, data.vy, data.collisionvx, data.collisionvy, data.angle, data.swingAngle, data.displayHand, data.structureHand);
         user.boundaryContain(map.size);
 
         let clientUpdateData = {
@@ -123,6 +123,8 @@ io.on('connection', socket => {
             toolTier: user.toolTier,
             harvestSpeed: user.harvestSpeed,
             attackSpeed: user.attackSpeed,
+            displayHand: user.displayHand,
+            structureHand: user.structureHand,
         };
 
         serverState.users.userData[data.id] = user.clientDataPackage(); // update data packge
@@ -132,40 +134,10 @@ io.on('connection', socket => {
         }
         user.playerTick(); // tick player
 
-
-        // craftable items sorting algorithm
-        // determines what items are craftable with the current inventory
-        const craftableItems = [];
-        for (item in gameItems) {
-            // determine next craftable tier, and if they already have that tier or higher, don't display
-            if (user.toolTier === 'stone' && gameItems[item].name === 'stoneTools') {
-                continue;
-            }
-            if (user.toolTier === 'iron' && (gameItems[item].name === 'ironTools' || gameItems[item].name === 'stoneTools')) {
-                continue;
-            }
-
-            if (gameItems[item].canCraft(user.inventory)) {
-                craftableItems.push(gameItems[item]);
-            }
+        let items = user.craftableItems(gameItems, serverState);
+        if (items) {
+            socket.emit('craftableItemsUpdate', items);
         }
-        // checks each craftableItem's crafting structure availability, and if one is not available, remove it from end craftable items (items)
-        const items = [];
-        for (let i = 0; i < craftableItems.length; i++) {
-            let craftingStructure = craftableItems[i].craftingStructure;
-            let correctCraftingStructure = Object.values(serverState.structures).filter(structure => craftingStructure === structure.type);
-            /*
-                idea: rather than iterating through every correct crafting structures and testing if object is within range
-                iterate through all correct crafting structures and test object is within range of the closest one
-            */
-            for (let j = 0; j < correctCraftingStructure.length; j++) {
-                if (correctCraftingStructure[j].objectWithinRange(user) && craftableItems[i]) {
-                    items.push(craftableItems[i].name);
-                    break;
-                }
-            }
-        }
-        socket.emit('craftableItemsUpdate', items);
 
         socket.emit('clientDataUpdate', clientUpdateData);
     });
