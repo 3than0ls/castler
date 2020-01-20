@@ -18,13 +18,25 @@ export const clientState = {
     structures: {},
 }
 
+export let windowFocused = true;
+window.onfocus = function() {
+    windowFocused = true;
+}
+window.onblur = function() {
+    windowFocused = false;
+}
+
 /*
     TO DO:
     clean up code
+    ISSUES: 
+    (entity-player bump collision issue)
+    in bump, when the player unfocuses tab, entities can enter inside the player, which increases the overlap and causes the player to move very far distances
+    (entity-area border issue)
+    entities for some reason in areas go to edge and then get stuck there when they try to go back
     BIG:
     armor
 
-    entities for some reason in areas go to edge and then get stuck there when they try to go back
 
     pvp
 

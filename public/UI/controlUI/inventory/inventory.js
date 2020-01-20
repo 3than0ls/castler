@@ -91,12 +91,6 @@ export class Inventory extends React.Component {
 
             }
             inventoryComponents.push(componentItem);
-            /*
-            if (itemData.consumable) {
-                console.log(item + ' is consumable');
-            } else {
-                console.log(item + ' is not consumable');
-            }*/
         }
         /* 
             <Row className='items' variant="primary">Wood x{this.state.wood}</Row>

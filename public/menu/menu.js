@@ -11,6 +11,7 @@ import './menu.css';
     the server will then update/create UserState username property, which will then be sent to all clients to be seen
 
 */
+
 class StartMenu extends React.Component {
     constructor(props) {
         super(props);

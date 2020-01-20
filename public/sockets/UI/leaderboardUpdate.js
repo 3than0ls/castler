@@ -6,6 +6,5 @@ export const leaderboardUpdate = (socket, leaderboard) => {
                 leaderboard.push(leaderboardState[i]); // repopulate the leaderboard with server sent values
             }
         }
-        //console.log(JSON.stringify(leaderboard) + ' a')
     });
 };

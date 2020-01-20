@@ -8,6 +8,7 @@ export const clientEmit = (socket, data) => {
         swingAngle: data.swingAngle,
         displayHand: data.displayHand,
         structureHand: data.structureHand,
+        focused: data.focused,
         id: socket.id,
     });
 }

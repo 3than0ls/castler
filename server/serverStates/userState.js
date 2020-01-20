@@ -3,6 +3,7 @@ const gameItems = require('./../items/items.js');
 module.exports = class UserState {
     constructor(socketID, globalX, globalY, angle) {
         this.clientID = socketID;
+        this.focused = false;
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
         this.angle = angle || 0;
@@ -180,16 +181,25 @@ module.exports = class UserState {
         }
     }
 
-    updateClientInfo(vx, vy, collisionvx, collisionvy, angle, swingAngle, displayHand, structureHand) {
+    updateClientInfo(vx, vy, collisionvx, collisionvy, angle, swingAngle, displayHand, structureHand, focused) {
         // update variables from client
         // vx and vy are directions, telling to go left/up if negative or right/down if positive
+        this.focused = focused;
         if (vx !== 0 && vy !== 0) {
-            this.globalX += vx * this.speed * Math.sin(45) + collisionvx;
-            this.globalY += vy * this.speed * Math.sin(45) + collisionvy;
+            this.globalX += vx * this.speed * Math.sin(45);
+            this.globalY += vy * this.speed * Math.sin(45);
         } else {
-            this.globalX += vx * this.speed + collisionvx;
-            this.globalY += vy * this.speed + collisionvy;
+            this.globalX += vx * this.speed;
+            this.globalY += vy * this.speed;
         }
+
+        if (this.focused) {
+            this.globalX += collisionvx;
+            this.globalY += collisionvy;
+        }
+
+        this.collisionvx = 0;
+        this.collisionvy = 0;
 
         this.angle = angle;
         this.swingAngle = swingAngle;

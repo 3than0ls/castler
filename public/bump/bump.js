@@ -1,5 +1,5 @@
 import { gameWidth, gameHeight } from "../utils/windowResize";
-import { player } from "../app";
+import { player, windowFocused } from "../app";
 
 // added an export of an instance of Bump class at the bottom
 
@@ -424,9 +424,11 @@ class Bump {
       // c1.x -= overlap * dx;
       // c1.y -= overlap * dy;
 
-      // rather than moving circle 1 out of collision, we add the overlap muliplied by the vector to the player global positions
+      // rather than moving circle 1 out of collision, we add the overlap muliplied by the vector to the player collision values
+      // has an issue where if user unfocuses and an entity runs into the player, the overlap causes the player to teleport to other places
       player.collisionvx += (overlap * dx);
       player.collisionvy += (overlap * dy);
+      //console.log(player.collisionvx, player.collisionvy);
       
       //Bounce
       if (bounce) {

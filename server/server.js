@@ -82,7 +82,7 @@ function createUser(socketID) {
     let newUserState = new UserState(socketID);
     serverState.users.user[socketID] = newUserState;
     serverState.users.userData[socketID] = newUserState.clientDataPackage();
-    console.log("Client joined: " + serverState.users.user[socketID].clientID);
+    console.log("Client joined: " + JSON.stringify(serverState.users.user[socketID]));
 }
 
 io.on('connection', socket => {
@@ -105,7 +105,7 @@ io.on('connection', socket => {
             createUser(data.id);
         }*/
         let user = serverState.users.user[data.id];
-        user.updateClientInfo(data.vx, data.vy, data.collisionvx, data.collisionvy, data.angle, data.swingAngle, data.displayHand, data.structureHand);
+        user.updateClientInfo(data.vx, data.vy, data.collisionvx, data.collisionvy, data.angle, data.swingAngle, data.displayHand, data.structureHand, data.focused);
         user.boundaryContain(map.size);
 
         let clientUpdateData = {
@@ -149,10 +149,26 @@ io.on('connection', socket => {
     });
 
     socket.on('clientRequestConsume', data => {
-        if (serverState.users.user[socket.id].inventory[data.item].amount > 0) {
-            gameItems[data.item].consumeFunction(serverState.users.user[socket.id]);
+        if (serverState.users.user[socket.id].inventory[data.item]) { // check if inventory item exists
+            if (serverState.users.user[socket.id].inventory[data.item].amount > 0) {
+                gameItems[data.item].consumeFunction(serverState.users.user[socket.id]);
+            }
         }
     });
+
+    socket.on('clientCreateStructure', data => {
+        if (serverState.users.user[socket.id].inventory[data.type]) { // test if inventory item exists
+            if (serverState.users.user[socket.id].inventory[data.type].amount > 0) {
+                let structure = new StructureState({
+                    globalX: data.globalX,
+                    globalY: data.globalY,
+                    type: data.type,
+                }, serverState.users.user[socket.id].clientID);
+                serverState.structures[structure.structureID] = structure;
+                gameItems[data.type].consumeFunction(serverState.users.user[socket.id]);
+            }
+        }
+    })
 
     socket.on('harvest', data => {
         // subtract the amount harvested from the resource
@@ -211,7 +227,12 @@ io.on('connection', socket => {
     // when disconnected, remove user from server state
     socket.on('disconnect', () => {
       socket.broadcast.emit('userLeave', socket.id);
-      delete serverState.users.user[socket.id];
+      for (let [structureID, structure] of Object.entries(serverState.structures)) {
+        if (structure.parentID === socket.clientID) {
+            delete serverState.structures[structureID]; // delete structures that were created by the client
+        }
+      }
+      delete serverState.users.user[socket.id]; // delete client data
       delete serverState.users.userData[socket.id];
     });
 })
@@ -223,6 +244,8 @@ function update(serverState) {
     io.sockets.emit('entityStates', serverState.entities.entityState);
     io.sockets.emit('areaStates', serverState.areas);
     io.sockets.emit('structureStates', serverState.structures);
+
+    // console.log(Object.keys(serverState.structures).length);
 
     for (let area of Object.values(serverState.areas)) {
         area.respawnTick(serverState);

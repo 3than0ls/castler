@@ -166,8 +166,8 @@ module.exports = {
         consumable: true,
         craftingTime: 2000,
         consumeFunction: (user) => {
-            consumed(user, 'cookedMeat');
-            console.log('workbench used')
+            consumed(user, 'workbench');
+            user.score += 5;
         },
         recipes: [
             {

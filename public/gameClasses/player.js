@@ -1,4 +1,4 @@
-import { stage, socket, renderer, clientState, particleContainer, worker, player } from "../app.js";
+import { stage, socket, renderer, clientState, worker, player, windowFocused } from "../app.js";
 import { loader, assets } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio, gameWidth } from "./../utils/windowResize.js";
@@ -7,6 +7,8 @@ import { harvest } from "../sockets/resources/harvest.js";
 import { attack } from "../sockets/entities/attack.js";
 import { charm } from "../charm/charm.js";
 import { renderDeathMenu } from "../UI/death/menu.js";
+import { clientCreateStructure } from "../sockets/player/clientCreateStructure.js";
+
 
 export class Player {
     constructor(clientID) {
@@ -61,6 +63,8 @@ export class Player {
         // building and placement
         this.structureHand;
         this.displayStructureHand;
+        this.displayStructureHandGlobalX = 0;
+        this.displayStructureHandGlobalY = 0;
         this.placeable = false;
         this.structureSprites = {};
     }
@@ -304,10 +308,10 @@ export class Player {
             this.structureSprites[structureHand].circular = true;
         }
 
-        let x = this.globalX + Math.sin(-this.angle) * 150;
-        let y = this.globalY + Math.cos(this.angle) * 150;
+        this.displayStructureHandGlobalX = this.globalX + Math.sin(-this.angle) * 150;
+        this.displayStructureHandGlobalY = this.globalY + Math.cos(this.angle) * 150;
 
-        this.structureSprites[structureHand].position.set(x, y);
+        this.structureSprites[structureHand].position.set(this.displayStructureHandGlobalX, this.displayStructureHandGlobalY);
 
         this.placeable = true;
 
@@ -349,9 +353,6 @@ export class Player {
         this.mouseX = renderer.plugins.interaction.mouse.global.x/ratio;
         this.mouseY = renderer.plugins.interaction.mouse.global.y/ratio;
 
-        this.collisionvx = 0;
-        this.collisionvy = 0;
-
         // determine hand sprite key
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
         // update positioning to x and y display (not global). x and y will only ever change in screen resizes
@@ -382,8 +383,11 @@ export class Player {
         if (this.clicked) {
             this.clicked = false;
             if (this.displayStructureHand && this.placeable) {
-                // socket emit yadda yadda
-                console.log('socket emit, structure placed')
+                clientCreateStructure(socket, {
+                    type: this.structureHand,
+                    globalX: this.displayStructureHandGlobalX,
+                    globalY: this.displayStructureHandGlobalY,
+                });
                 this.structureHand = undefined;
             }
         }
@@ -409,10 +413,14 @@ export class Player {
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
             structureHand: this.structureHand,
+            focused: windowFocused,
         });
     }
 
     collisions() {
+        this.collisionvx = 0;
+        this.collisionvy = 0;
+
         for (let resource of Object.values(clientState.resources)) {
             resource.collide(this.bodyGraphic);
         }
