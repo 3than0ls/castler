@@ -1,11 +1,19 @@
 const gameItems = require('./../items/items.js');
+const collisions = require('./../collisions.js');
 
 module.exports = class UserState {
     constructor(socketID, globalX, globalY, angle) {
         this.clientID = socketID;
-        this.focused = false;
+
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
+
+        // variablse to be updated in updateClientInfo
+        this.vx = 0;
+        this.vy = 0;
+        this.collisionvx = 0;
+        this.collisionvy = 0;
+        this.focused = false;
         this.angle = angle || 0;
         this.swingAngle = 0;
         this.displayHand = 'hand';
@@ -52,16 +60,71 @@ module.exports = class UserState {
         this.craftingComplete = 1; // 1 for 100% or complete
     }
 
+    update(serverState, map) {
+        this.playerTick();
+        // position updates
+        // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
+        if (this.vx !== 0 && this.vy !== 0) {
+            this.globalX += this.vx * this.speed * Math.sin(45);
+            this.globalY += this.vy * this.speed * Math.sin(45);
+        } else {
+            this.globalX += this.vx * this.speed;
+            this.globalY += this.vy * this.speed;
+        }
+        if (this.health <= 0) {
+            this.dead = true;
+        }
+
+        let objects = {...serverState.resources, ...serverState.entities.entityAI};
+        for (let object of Object.values(objects)) {
+            collisions.playerObjectCollisionHandle(this, object);
+        }
+
+        // make the maximum collisionvx and collisionvy the player speed
+        if (!isFinite(this.collisionvx)) {
+            this.collisionvx = 1;
+        }
+        if (!isFinite(this.collisionvy)) {
+            this.collisionvy = 1;
+        }
+        if (this.collisionvx > this.speed) {
+            this.collisionvx = this.speed;
+        } else if (this.collisionvx < -this.speed) {
+            this.collisionvx = -this.speed;
+        }
+
+        this.boundaryContain(map.size);
+
+        this.globalX += this.collisionvx;
+        this.globalY += this.collisionvy;
+
+        serverState.users.userData[this.clientID] = this.clientDataPackage(); // update data package
+        
+        this.collisionvx = 0;
+        this.collisionvy = 0;
+    }
+
+    updateClientInfo(vx, vy, angle, swingAngle, displayHand, structureHand, focused) {
+        // update variables sent from client, which are used to calculate other properties the player has
+        // for example, vx, vy, collisionvx, collisionvy are set here, but aren't calculated in the addition of global locations until the server ticks the player
+        // vx and vy are directions, telling to go left/up if negative or right/down if positive
+        this.focused = focused;
+        this.vx = vx;
+        this.vy = vy;
+        this.structureHand = structureHand;
+        this.angle = angle;
+        this.swingAngle = swingAngle;
+        this.displayHand = displayHand;
+    }
+
     attacked(damage) {
         this.health -= damage;
         this.attackFlash = true;
     }
-
     heal(amount) {
         this.health += amount;
         // this.healFlash = true; maybe something similar to attack flash, but for healing
     }
-
     harvest(type, amount) {
         let gameItemName;
         switch(type) {
@@ -140,7 +203,6 @@ module.exports = class UserState {
             this.health = 100; // cap health at 100 in case it goes over
         }
     }
-
     boundaryContain(boundarySize) {
         if (this.globalX <= -boundarySize[0]/2) {
             this.globalX = -boundarySize[0]/2;
@@ -164,7 +226,6 @@ module.exports = class UserState {
             this.attacked(10); // and damage them for exploiting, just for good measures
         }
     }
-
     craft(item) { // craft an item after a given interval (for crafting cooldown)
         if (!this.crafting) {
             let intervalID = setInterval(() => {
@@ -178,39 +239,6 @@ module.exports = class UserState {
                     clearInterval(intervalID);
                 }
             }, 1);
-        }
-    }
-
-    updateClientInfo(vx, vy, collisionvx, collisionvy, angle, swingAngle, displayHand, structureHand, focused) {
-        // update variables from client
-        // vx and vy are directions, telling to go left/up if negative or right/down if positive
-        this.focused = focused;
-        if (vx !== 0 && vy !== 0) {
-            this.globalX += vx * this.speed * Math.sin(45);
-            this.globalY += vy * this.speed * Math.sin(45);
-        } else {
-            this.globalX += vx * this.speed;
-            this.globalY += vy * this.speed;
-        }
-
-        if (this.focused) {
-            this.globalX += collisionvx;
-            this.globalY += collisionvy;
-        }
-
-        this.collisionvx = 0;
-        this.collisionvy = 0;
-
-        this.angle = angle;
-        this.swingAngle = swingAngle;
-        this.displayHand = displayHand;
-
-        // this.structureHand = undefined;
-        this.structureHand = structureHand;
-        
-
-        if (this.health <= 0) {
-            this.dead = true;
         }
     }
 

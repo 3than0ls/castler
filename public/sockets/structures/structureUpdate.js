@@ -11,5 +11,14 @@ export const structureUpdate = (socket, clientState) => {
                 clientState.structures[structureID].animate();
             }
         }
+        // delete missing structures
+        const structureIDs = Object.keys(clientState.structures);
+        let structureDifference = structureIDs.filter(function(structureID) {
+            return !serverStateStructures[structureID];
+        }); 
+        for (let i = 0; i < structureDifference.length; i++) {
+            clientState.structures[structureDifference[i]].delete();
+            delete clientState.structures[structureDifference[i]];
+        }
     });
 };

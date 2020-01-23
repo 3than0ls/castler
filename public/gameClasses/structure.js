@@ -32,4 +32,8 @@ export class Structure {
     animate() {
         player.viewpoint.addChild(this.structureGraphic);
     }
+
+    delete() {
+        player.viewpoint.removeChild(this.structureGraphic);
+    }
 }

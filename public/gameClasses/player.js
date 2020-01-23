@@ -1,7 +1,7 @@
-import { stage, socket, renderer, clientState, worker, player, windowFocused } from "../app.js";
-import { loader, assets } from "./../utils/loader.js";
+import { stage, socket, renderer, clientState, worker, player } from "../app.js";
+import { loader } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
-import { ratio, gameWidth } from "./../utils/windowResize.js";
+import { ratio } from "./../utils/windowResize.js";
 import { bump } from "../bump/bump.js";
 import { harvest } from "../sockets/resources/harvest.js";
 import { attack } from "../sockets/entities/attack.js";
@@ -370,8 +370,8 @@ export class Player {
         this.handSprites[this.handSpriteKey].rotation = this.angle;
         this.bodyGraphic.rotation = this.angle;
 
-        // test and handle collisions  for resources and entities
-        this.collisions();
+        // test and handle collisions for resources and entities
+        // this.collisions();
 
         // detect clicks and respond
         if ((this.mouseHeld || this.swingAngle > 0) && (this.displayHand !== "hand")) { // if mouse held or effectively the swing has already started 
@@ -402,18 +402,15 @@ export class Player {
         } else {
             player.viewpoint.removeChild(this.structureSprites[this.displayStructureHand]);
         }
-        
         // emit client info to server
         clientEmit(socket, {
             vx: this.vx,
             vy: this.vy,
-            collisionvx: this.collisionvx,
-            collisionvy: this.collisionvy,
             angle: this.angle,
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
             structureHand: this.structureHand,
-            focused: windowFocused,
+            focused: !document.hidden,
         });
     }
 

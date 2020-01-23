@@ -10,6 +10,9 @@ module.exports = class EntityAI {
         this.entityID = entityID;
         this.entityState = entityState;
 
+        this.globalX = entityState.globalX;
+        this.globalY = entityState.globalY;
+
         // AI variables
         this.actionTicker = 0;
         this.actionTimer = 100;
@@ -25,19 +28,20 @@ module.exports = class EntityAI {
         this.distance = 0;
         this.stopDistance = 0;
         this.walkFinish = true;
-        // radius
+        // size
+        this.size = [imageSize(`./public/assets/entities/${entityState.type}.png`).width, imageSize(`./public/assets/entities/${entityState.type}.png`).width]
         switch (entityState.type) {
             case 'duck':
-                this.radius = (imageSize('./public/assets/entities/duck.png').width * 0.798)/2; // pre calculated values also found in entity.js, when defining entityGraphic radius
+                this.size[0] *= 0.798; // pre calculated values also found in entity.js, when defining entityGraphic radius
+                this.size[1] *= 0.798;
                 break;
             case 'boar':
-                this.radius = (imageSize('./public/assets/entities/boar.png').width * 0.827)/2;
+                this.size[0] *= 0.827;
+                this.size[1] *= 0.827;
                 break;
             case 'beetle':
-                this.radius = (imageSize('./public/assets/entities/beetle.png').width * 0.883)/2;
-                break;
-            default:
-                this.radius = 100;
+                this.size[0] *= 0.883;
+                this.size[1] *= 0.883;
                 break;
         }
         // avoid
@@ -117,8 +121,8 @@ module.exports = class EntityAI {
     }
 
     objectInsideEntity(object) {
-        if (object.globalX >= -this.radius + this.entityState.globalX && object.globalX <= this.radius + this.entityState.globalX &&
-            object.globalY >= -this.radius + this.entityState.globalY && object.globalY <= this.radius + this.entityState.globalY) {
+        if (object.globalX >= -this.size[0] + this.entityState.globalX && object.globalX <= this.size[0] + this.entityState.globalX &&
+            object.globalY >= -this.size[1] + this.entityState.globalY && object.globalY <= this.size[1] + this.entityState.globalY) {
             return true;
         }
     }
@@ -129,7 +133,7 @@ module.exports = class EntityAI {
             const b = this.entityState.globalY - resource.globalY;
             let distance = Math.hypot(a, b);
 
-            let collisionDistance = this.radius + this.avoidPaddingDistance + (resource.size[0]/2+resource.size[1]/2)/2;
+            let collisionDistance = this.size[0] + this.avoidPaddingDistance + (resource.size[0]/2+resource.size[1]/2)/2;
             
             if (distance < collisionDistance) {
                 this.resourceCollision = true;
@@ -161,7 +165,7 @@ module.exports = class EntityAI {
             const b = this.entityState.globalY - structure.globalY;
             let distance = Math.hypot(a, b);
 
-            let collisionDistance = this.radius + this.avoidPaddingDistance + (structure.size[0]/2+structure.size[1]/2)/2;
+            let collisionDistance = this.size[0] + this.avoidPaddingDistance + (structure.size[0]/2+structure.size[1]/2)/2;
             
             if (distance < collisionDistance) {
                 this.resourceCollision = true; // since entities are supposed to react similarly to structures as they do to resources, we can use this interchangeably
@@ -343,7 +347,7 @@ module.exports = class EntityAI {
             this.target.attackFlash = false; // set to true in this.target.attacked, used so that clients can see when other clients are attacked
 
             // if target is within attacking range, then attack
-            this.attackTargetRadius = this.target.radius + this.radius;
+            this.attackTargetRadius = this.target.radius + this.size[0];
             if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
                 if (this.attackTick >= this.attackSpeed) {
                     this.target.attacked(6);
@@ -426,7 +430,9 @@ module.exports = class EntityAI {
 
     update(serverState, map) {
         this.tick();
-        
+
+        this.globalX = this.entityState.globalX;
+        this.globalY = this.entityState.globalY;
             
         if (this.entityState.angle >= 360) { // prevents angle from going to values greater or less than 360 or -360
             this.entityState.angle -= 360;

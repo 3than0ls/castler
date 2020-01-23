@@ -84,6 +84,7 @@ module.exports = class CreateMap {
     }
     test(serverState) {
         const size = this.size;
+        /*
         CreateMap.createResources(serverState, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createResources(serverState, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
@@ -106,6 +107,11 @@ module.exports = class CreateMap {
         });
 
         CreateMap.createStructures(serverState, 2, -1000, -1000, 1000, 1000, { type: 'workbench' });
-        CreateMap.createStructures(serverState, 2, -1000, -1000, 1000, 1000, { type: 'furnace' });
+        CreateMap.createStructures(serverState, 2, -1000, -1000, 1000, 1000, { type: 'furnace' });*/
+        
+        CreateMap.createResources(serverState, 'tree', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createResources(serverState, 'rock', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createEntities(serverState, 'duck', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createEntities(serverState, 'boar', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
     }
 }

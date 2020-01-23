@@ -18,20 +18,19 @@ export const clientState = {
     structures: {},
 }
 
-export let windowFocused = true;
-window.onfocus = function() {
-    windowFocused = true;
-}
-window.onblur = function() {
-    windowFocused = false;
-}
-
 /*
     TO DO:
     clean up code
     ISSUES: 
+    player does not attack flash if their client window is not focused
+
+
     (entity-player bump collision issue)
     in bump, when the player unfocuses tab, entities can enter inside the player, which increases the overlap and causes the player to move very far distances
+    more info:
+        because the worker updates the page and emits client data in bursts, normally when the page is focused, it'll emit an example of 1 client state emit every 
+    1 second. however, if the page is hidden, it will emit 10 client states every exactly ten seconds. to solve this, just remove collisions calculations from the worker "burst"
+
     (entity-area border issue)
     entities for some reason in areas go to edge and then get stuck there when they try to go back
     BIG:

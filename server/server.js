@@ -39,7 +39,7 @@ const serverState = {
     structures: {},
 }
 
-const map = new CreateMap(serverState, [4000, 4000]);
+const map = new CreateMap(serverState, [2000, 2000]);
 map.test(serverState);
 
 /*
@@ -82,7 +82,7 @@ function createUser(socketID) {
     let newUserState = new UserState(socketID);
     serverState.users.user[socketID] = newUserState;
     serverState.users.userData[socketID] = newUserState.clientDataPackage();
-    console.log("Client joined: " + JSON.stringify(serverState.users.user[socketID]));
+    console.log("Client joined: " + socketID);
 }
 
 io.on('connection', socket => {
@@ -100,13 +100,8 @@ io.on('connection', socket => {
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
-        /*
-        if (!serverState.users.user[data.id]) {
-            createUser(data.id);
-        }*/
         let user = serverState.users.user[data.id];
-        user.updateClientInfo(data.vx, data.vy, data.collisionvx, data.collisionvy, data.angle, data.swingAngle, data.displayHand, data.structureHand, data.focused);
-        user.boundaryContain(map.size);
+        user.updateClientInfo(data.vx, data.vy, data.angle, data.swingAngle, data.displayHand, data.structureHand, data.focused);
 
         let clientUpdateData = {
             globalX: user.globalX,
@@ -127,12 +122,11 @@ io.on('connection', socket => {
             structureHand: user.structureHand,
         };
 
-        serverState.users.userData[data.id] = user.clientDataPackage(); // update data packge
         if (user.health <= 0) { // check if client has died
             serverState.users.userData[data.id].dead = true;
             clientUpdateData.dead = true;
         }
-        user.playerTick(); // tick player
+        // user.playerTick(); // tick player
 
         let items = user.craftableItems(gameItems, serverState);
         if (items) {
@@ -163,7 +157,7 @@ io.on('connection', socket => {
                     globalX: data.globalX,
                     globalY: data.globalY,
                     type: data.type,
-                }, serverState.users.user[socket.id].clientID);
+                }, socket.id);
                 serverState.structures[structure.structureID] = structure;
                 gameItems[data.type].consumeFunction(serverState.users.user[socket.id]);
             }
@@ -228,7 +222,7 @@ io.on('connection', socket => {
     socket.on('disconnect', () => {
       socket.broadcast.emit('userLeave', socket.id);
       for (let [structureID, structure] of Object.entries(serverState.structures)) {
-        if (structure.parentID === socket.clientID) {
+        if (structure.parentID === socket.id) {
             delete serverState.structures[structureID]; // delete structures that were created by the client
         }
       }
@@ -238,18 +232,24 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
+    for (let user of Object.values(serverState.users.user)) {
+        user.update(serverState, map);
+    }
+
+    for (let area of Object.values(serverState.areas)) {
+        area.respawnTick(serverState);
+    }
+    // updates states and call the entity AIs
+    for (let entity of Object.values(serverState.entities.entityAI)) {
+        entity.update(serverState, map);
+    }
+
     // emit data (perhaps combine all into one later)
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
     io.sockets.emit('areaStates', serverState.areas);
     io.sockets.emit('structureStates', serverState.structures);
-
-    // console.log(Object.keys(serverState.structures).length);
-
-    for (let area of Object.values(serverState.areas)) {
-        area.respawnTick(serverState);
-    }
 
     // emit leaderboard status (based on player score)
     const orderedPlayerScores = [];
@@ -260,7 +260,6 @@ function update(serverState) {
     orderedPlayerScores.sort(function(a, b) {
         return b[1] - a[1];
     });
-
     const leaderboardState = [];
     orderedPlayerScores.forEach(element => {
         leaderboardState.push({
@@ -271,11 +270,6 @@ function update(serverState) {
     });
     
     io.sockets.emit('leaderboardUpdate', leaderboardState);
-    
-    // updates states and call the entity AIs
-    for (let entity of Object.values(serverState.entities.entityAI)) {
-        entity.update(serverState, map);
-    }
 }
   
 
