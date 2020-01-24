@@ -15,7 +15,9 @@ function importAll (r) {
     r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
     return images;
 }
-const images = importAll(require.context('./../../../assets/items', false,  /\.png$/));
+const itemImages = importAll(require.context('./../../../assets/items', false,  /\.png$/));
+const structureImages = importAll(require.context('./../../../assets/structures', false,  /\.png$/));
+const images = {...itemImages, ...structureImages}; 
 
 export const craftableItemsState = [];
 

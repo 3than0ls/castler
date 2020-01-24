@@ -23,6 +23,7 @@ export const userUpdate = (socket, clientState) => {
                     Player.createHandSprites(enemy.handSprites, serverStateUser.globalX, serverStateUser.globalY, serverStateUser.toolTier);
                 }
                 if (serverStateUser.attackFlash) {
+                    console.log('flashed')
                     clientState.enemies[userID].attackFlash();
                 }
             }

@@ -36,5 +36,42 @@ module.exports = {
 
             return hit;
         }
+    },
+
+    entityObjectCollisionHandle: function(entity, object) {
+        let magnitude, combinedRadii, overlap, vx, vy, dx, dy, s = {}, hit = false;
+
+        vx = object.globalX - entity.globalX;
+        vy = object.globalY - entity.globalY;
+          
+      
+        //Find the distance between the circles by calculating the vector's magnitude (how long the vector is)
+        magnitude = Math.sqrt(vx * vx + vy * vy);
+      
+        combinedRadii = entity.size[0]/2 + object.size[0]/2 + entity.avoidPaddingDistance/2;
+      
+          //Figure out if there's a collision
+          if (magnitude < combinedRadii) {
+      
+            hit = true;
+      
+            //Find the amount of overlap between the circles
+            overlap = combinedRadii - magnitude;
+            
+            let quantumPadding = 0.3;
+            overlap += quantumPadding;
+      
+            //Normalize the vector
+            //These numbers tell us the direction of the collision
+            dx = vx / magnitude;
+            dy = vy / magnitude;
+      
+            // rather than moving circle 1 out of collision, we add the overlap muliplied by the vector to the player collision values
+            // has an issue where if user unfocuses and an entity runs into the player, the overlap causes the player to teleport to other places
+            entity.collisionvx += (overlap * dx);
+            entity.collisionvy += (overlap * dy);
+
+            return hit;
+        }
     }
 }

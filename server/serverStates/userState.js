@@ -75,7 +75,7 @@ module.exports = class UserState {
             this.dead = true;
         }
 
-        let objects = {...serverState.resources, ...serverState.entities.entityAI};
+        let objects = {...serverState.resources, ...serverState.entities.entityAI, ...serverState.structures};
         for (let object of Object.values(objects)) {
             collisions.playerObjectCollisionHandle(this, object);
         }
@@ -167,7 +167,6 @@ module.exports = class UserState {
         this.score += 3;
     }
     playerTick() {
-        this.attackFlash = false;
         this.hungerTick++;
 
         if (this.hunger <= 20) {
@@ -263,25 +262,34 @@ module.exports = class UserState {
         const itemFilteredStructures = [];
         for (let i = 0; i < itemFilteredTools.length; i++) {
             // filter all crafting structures to only get the ones that the item needs
-            let craftingStructure = itemFilteredTools[i].craftingStructure;
-            let correctCraftingStructure = Object.values(serverState.structures).filter(structure => craftingStructure === structure.type);
-            /*
-                idea: rather than iterating through every correct crafting structures and testing if object is within range
-                iterate through all correct crafting structures and test object is within range of the closest one
-            */
-            for (let j = 0; j < correctCraftingStructure.length; j++) {
-                if (correctCraftingStructure[j].objectWithinRange(this) && itemFilteredTools[i]) {
-                    itemFilteredStructures.push(itemFilteredTools[i].name);
-                    break;
+            if (itemFilteredTools[i].craftingStructure) { // if the item has a crafting structure
+                let craftingStructure = itemFilteredTools[i].craftingStructure;
+                let correctCraftingStructure = Object.values(serverState.structures).filter(structure => craftingStructure === structure.type);
+                /*
+                    idea: rather than iterating through every correct crafting structures and testing if object is within range
+                    iterate through all correct crafting structures and test object is within range of the closest one
+                */
+                for (let j = 0; j < correctCraftingStructure.length; j++) {
+                    if (correctCraftingStructure[j].objectWithinRange(this) && itemFilteredTools[i]) {
+                        itemFilteredStructures.push(itemFilteredTools[i].name);
+                        break;
+                    }
                 }
+            } else {
+                itemFilteredStructures.push(itemFilteredTools[i].name);
             }
-            return itemFilteredStructures;
         }
+        return itemFilteredStructures;
     }
     
 
 
     clientDataPackage() {
+        let flash = false;
+        if (this.attackFlash) {
+            flash = true;
+            this.attackFlash = false;
+        }
         return {
             clientID: this.clientID,
             globalX: this.globalX,
@@ -289,7 +297,7 @@ module.exports = class UserState {
             angle: this.angle,
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
-            attackFlash: this.attackFlash,
+            attackFlash: flash,
 
             toolTier: this.toolTier,
 

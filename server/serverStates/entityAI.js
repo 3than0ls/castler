@@ -1,4 +1,5 @@
 const imageSize = require('image-size');
+const collisions = require('./../collisions.js');
 function randomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -12,6 +13,9 @@ module.exports = class EntityAI {
 
         this.globalX = entityState.globalX;
         this.globalY = entityState.globalY;
+
+        this.collisionvx = 0;
+        this.collisionvy = 0;
 
         // AI variables
         this.actionTicker = 0;
@@ -46,7 +50,7 @@ module.exports = class EntityAI {
         }
         // avoid
         this.avoidPaddingDistance = 15; // used as a padding so entities hopefully avoid direct collision
-        this.resourceCollision = false;
+        this.objectCollision = false;
         // neutrality variables
         this.aggroDistance = 500;
         this.hit = false;
@@ -127,66 +131,37 @@ module.exports = class EntityAI {
         }
     }
     
-    avoidResources(serverStateResources) {
-        for (let resource of Object.values(serverStateResources)) { // as the index decreases, it seems like the calculations get rougher
-            const a = this.entityState.globalX - resource.globalX;
-            const b = this.entityState.globalY - resource.globalY;
+    avoidObjects(serverState) {
+        let objects = {...serverState.resources, ...serverState.structures};
+        for (let object of Object.values(objects)) {
+            collisions.entityObjectCollisionHandle(this, object);
+            const a = this.entityState.globalX - object.globalX;
+            const b = this.entityState.globalY - object.globalY;
             let distance = Math.hypot(a, b);
 
-            let collisionDistance = this.size[0] + this.avoidPaddingDistance + (resource.size[0]/2+resource.size[1]/2)/2;
+            let collisionDistance = this.size[0]/2 + this.avoidPaddingDistance + (object.size[0]/2+object.size[1]/2)/2;
             
             if (distance < collisionDistance) {
-                this.resourceCollision = true;
+                this.objectCollision = true;
                 let angle = (Math.round((Math.atan2(
-                    this.entityState.globalY - resource.globalY,
-                    this.entityState.globalX - resource.globalX
+                    this.entityState.globalY - object.globalY,
+                    this.entityState.globalX - object.globalX
                 )) * 180 / Math.PI) - this.entityState.angle + 90);
                 if (angle >= 180) {
                     angle -= 360;
                 } else if (angle <= -180) {
                     angle += 360;
                 }
+                /*
                 if (this.hit) {
                     angle /= 5; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
                 } else {
                     this.stopDistance = 0;
-                }
-                this.rotate(angle/2, 1);
+                }*/
+                this.rotate(angle/15, 1);
                 break;
             } else {
-                this.resourceCollision = false;
-            }
-        }
-    }
-    
-    avoidStructures(serverStateStructures) {
-        for (let structure of Object.values(serverStateStructures)) { // as the index decreases, it seems like the calculations get rougher
-            const a = this.entityState.globalX - structure.globalX;
-            const b = this.entityState.globalY - structure.globalY;
-            let distance = Math.hypot(a, b);
-
-            let collisionDistance = this.size[0] + this.avoidPaddingDistance + (structure.size[0]/2+structure.size[1]/2)/2;
-            
-            if (distance < collisionDistance) {
-                this.resourceCollision = true; // since entities are supposed to react similarly to structures as they do to resources, we can use this interchangeably
-                let angle = (Math.round((Math.atan2(
-                    this.entityState.globalY - structure.globalY,
-                    this.entityState.globalX - structure.globalX
-                )) * 180 / Math.PI) - this.entityState.angle + 90);
-                if (angle >= 180) {
-                    angle -= 360;
-                } else if (angle <= -180) {
-                    angle += 360;
-                }
-                if (this.hit) {
-                    angle /= 5;
-                } else {
-                    this.stopDistance = 0;
-                }
-                this.rotate(angle, 1);
-                break;
-            } else {
-                this.resourceCollision = false;
+                this.objectCollision = false;
             }
         }
     }
@@ -301,7 +276,7 @@ module.exports = class EntityAI {
         } else if (a <= -180) {
             a += 360;
         }
-        if (!this.resourceCollision) {
+        if (!this.objectCollision) {
             this.rotate(a);
         }
         // walk whilst rotating
@@ -331,7 +306,7 @@ module.exports = class EntityAI {
         } else if (a <= -180) {
             a += 360;
         }
-        if (!this.resourceCollision) {
+        if (!this.objectCollision) {
             this.rotate(a);
         }
         // walk towards target, whilst rotating
@@ -344,10 +319,10 @@ module.exports = class EntityAI {
         } else {
             // tick the attack ticker
             this.attackTick++;
-            this.target.attackFlash = false; // set to true in this.target.attacked, used so that clients can see when other clients are attacked
+            // this.target.attackFlash = false; // set to true in this.target.attacked, used so that clients can see when other clients are attacked
 
             // if target is within attacking range, then attack
-            this.attackTargetRadius = this.target.radius + this.size[0];
+            this.attackTargetRadius = this.target.radius + this.size[0]/2;
             if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
                 if (this.attackTick >= this.attackSpeed) {
                     this.target.attacked(6);
@@ -429,6 +404,8 @@ module.exports = class EntityAI {
     }
 
     update(serverState, map) {
+        this.collisionvx = 0;
+        this.collisionvy = 0;
         this.tick();
 
         this.globalX = this.entityState.globalX;
@@ -453,13 +430,15 @@ module.exports = class EntityAI {
             this.actionTicker = 0;
         }
         
-        this.avoidResources(serverState.resources);
+        this.avoidObjects(serverState);
         this.avoidArea(serverState.areas);
-        this.avoidStructures(serverState.structures);
         this.boundaryContain(map.size);
 
         
         this.walk('updateCall');
         this.rotate('updateCall');
+
+        this.entityState.globalX -= this.collisionvx;
+        this.entityState.globalY -= this.collisionvy;
     }
 }

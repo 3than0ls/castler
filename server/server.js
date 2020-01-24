@@ -39,44 +39,11 @@ const serverState = {
     structures: {},
 }
 
-const map = new CreateMap(serverState, [2000, 2000]);
+const map = new CreateMap(serverState, [6000, 6000]);
 map.test(serverState);
 
-/*
-const mine = new AreaState({
-    type: 'mine',
-    globalX: 0,
-    globalY: -700,
-    entities: [
-        {type: 'beetle', amount: 2},
-        {type: 'boar', amount: 2},
-    ],
-    resources: [
-        {type: 'iron', amount: 4},
-        {type: 'rock', amount: 4}
-    ],
-    entityLimit: 4,
-});
-serverState.areas[mine.areaID] = mine;
-mine.create(serverState);
-
-const workbench = new StructureState({
-    type: 'workbench',
-    globalX: -400,
-    globalY: 700,
-});
-serverState.structures[workbench.structureID] = workbench;
-workbench.create(serverState);
-const furnace = new StructureState({
-    type: 'furnace',
-    globalX: 400,
-    globalY: 700,
-});
-serverState.structures[furnace.structureID] = furnace;
-furnace.create(serverState);*/
 
 const gameItems = require('./items/items.js');
-// gameItems.test.test();
 
 function createUser(socketID) {
     let newUserState = new UserState(socketID);
@@ -220,14 +187,15 @@ io.on('connection', socket => {
 
     // when disconnected, remove user from server state
     socket.on('disconnect', () => {
-      socket.broadcast.emit('userLeave', socket.id);
-      for (let [structureID, structure] of Object.entries(serverState.structures)) {
-        if (structure.parentID === socket.id) {
-            delete serverState.structures[structureID]; // delete structures that were created by the client
+        serverState.users.user[socket.id].dead = true;
+        socket.broadcast.emit('userLeave', socket.id);
+        for (let [structureID, structure] of Object.entries(serverState.structures)) {
+            if (structure.parentID === socket.id) {
+                delete serverState.structures[structureID]; // delete structures that were created by the client
+            }
         }
-      }
-      delete serverState.users.user[socket.id]; // delete client data
-      delete serverState.users.userData[socket.id];
+        delete serverState.users.user[socket.id]; // delete client data
+        delete serverState.users.userData[socket.id];
     });
 })
 
