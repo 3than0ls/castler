@@ -13,12 +13,12 @@ export const clientDataUpdate = (socket) => {
 
         Player.createHandSprites(player.handSprites, player.x, player.y, data.toolTier);
 
-        //player.collisions();
-
         player.attackSpeed = data.attackSpeed;
         player.harvestSpeed = data.harvestSpeed;
 
-        player.displayHand = data.displayHand;
+        player.swingAngle = data.swingAngle;
+
+        // player.displayHand = data.displayHand;
         if (player.structureHand) {
             player.structureBuilding(data.structureHand);
         }

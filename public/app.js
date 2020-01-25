@@ -25,7 +25,8 @@ export const clientState = {
     player does not attack flash if their client window is not focused
 
     (tool hand type switch)
-    when switching tool types, the tools seem to glitch and not switch but remain the same, but temporarily disappear
+    tool sprite switches, but swing angle is of the swing angle of the previous tool, but then flashes back to 0. To solve, make updating display hand sent to server and then back to client
+    rather than client first
 
     (entity-area border issue)
     entities for some reason in areas go to edge and then get stuck there when they try to go back

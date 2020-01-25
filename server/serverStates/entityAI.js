@@ -33,7 +33,7 @@ module.exports = class EntityAI {
         this.stopDistance = 0;
         this.walkFinish = true;
         // size
-        this.size = [imageSize(`./public/assets/entities/${entityState.type}.png`).width, imageSize(`./public/assets/entities/${entityState.type}.png`).width]
+        this.size = [imageSize(`./public/assets/entities/${entityState.type}.png`).width, imageSize(`./public/assets/entities/${entityState.type}.png`).height]
         switch (entityState.type) {
             case 'duck':
                 this.size[0] *= 0.798; // pre calculated values also found in entity.js, when defining entityGraphic radius
@@ -322,7 +322,7 @@ module.exports = class EntityAI {
             // this.target.attackFlash = false; // set to true in this.target.attacked, used so that clients can see when other clients are attacked
 
             // if target is within attacking range, then attack
-            this.attackTargetRadius = this.target.radius + this.size[0]/2;
+            this.attackTargetRadius = this.target.size[0]/2 + this.size[0]/2;
             if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
                 if (this.attackTick >= this.attackSpeed) {
                     this.target.attacked(6);

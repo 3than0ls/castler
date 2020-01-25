@@ -1,6 +1,8 @@
 import { player } from "../app";
 import { loader } from "../utils/loader";
 import { bump } from "../bump/bump";
+import { charm } from "../charm/charm";
+import { dust } from "../dust/dust";
 
 export class Structure {
     constructor(areaID, globalX, globalY, type) {
@@ -10,6 +12,8 @@ export class Structure {
         this.globalY = globalY;
 
         this.type = type;
+
+        this.tweenTick = 0;
     }
 
     collide(playerGraphic) {
@@ -29,8 +33,48 @@ export class Structure {
         player.viewpoint.addChild(this.structureGraphic);
     }
 
-    animate() {
+    hit(vx, vy, collisionX, collisionY, harvestSpeed) {
+        // create an effect where the resource appears to have bumped when hit
+        let waypoints = [
+            [this.globalX, this.globalY],
+            [this.globalX+vx, this.globalY+vy],
+            [this.globalX, this.globalY]
+        ]
+        this.tweenTick++; // start tween tick so server update doesn't affect charm animation
+        charm.walkPath(this.structureGraphic, waypoints, harvestSpeed * 10, "smoothstep");
+
+        if (this.tweenTick > harvestSpeed * 10 * (waypoints.length-1)) {
+            this.tweenTick = 0;
+        }
+        
+        // emit particle when hit
+        dust.create(
+            collisionX,
+            collisionY,
+            () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.resourceName : 'stone').concat('Particle'))].texture),
+            player.viewpoint,
+            25,
+            0,
+            true,
+            0, 6.28,
+            12, 24,
+            1.5, 2,
+            0.005, 0.01,
+            0.005, 0.01, // sometimes for a split second, it renders over the resource sprite, fix?
+        );
+    }
+    
+
+    animate(globalX, globalY) {
         player.viewpoint.addChild(this.structureGraphic);
+        if (!this.tweenTick === 0) {
+            // update positioning
+            this.globalX = globalX;
+            this.globalY = globalY;
+            this.resourceGraphic.position.set(this.globalX, this.globalY);
+        } else if (this.tweenTick > 0) {
+            this.tweenTick++;
+        }
     }
 
     delete() {

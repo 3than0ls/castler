@@ -39,8 +39,8 @@ const serverState = {
     structures: {},
 }
 
-const map = new CreateMap(serverState, [6000, 6000]);
-map.test(serverState);
+const map = new CreateMap(serverState, [1000, 1000]);
+map.test3(serverState);
 
 
 const gameItems = require('./items/items.js');
@@ -87,6 +87,7 @@ io.on('connection', socket => {
             attackSpeed: user.attackSpeed,
             displayHand: user.displayHand,
             structureHand: user.structureHand,
+            swingAngle: user.swingAngle,
         };
 
         if (user.health <= 0) { // check if client has died
@@ -129,6 +130,11 @@ io.on('connection', socket => {
                 gameItems[data.type].consumeFunction(serverState.users.user[socket.id]);
             }
         }
+    });
+
+    socket.on('swing', data => {
+        let user = serverState.users.user[socket.id];
+        user.swingRequest = data.swing;
     })
 
     socket.on('harvest', data => {
@@ -201,7 +207,7 @@ io.on('connection', socket => {
 
 function update(serverState) {
     for (let user of Object.values(serverState.users.user)) {
-        user.update(serverState, map);
+        user.update(serverState, map, io);
     }
 
     for (let area of Object.values(serverState.areas)) {

@@ -51,7 +51,7 @@ export class Entity {
         return bump.hitTestPoint(collisionPoint, this.entityGraphic);
     }
 
-    hit(vx, vy, collisionX, collisionY, attackSpeed) {
+    hit(collisionX, collisionY) {
         // charm.slide(this.entityGraphic, this.globalX+vx, this.globalY+vy, 60, "deceleration");
         // emit particle when hit
         dust.create(

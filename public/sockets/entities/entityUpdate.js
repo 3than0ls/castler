@@ -2,7 +2,7 @@ import { Entity } from "../../gameClasses/entity";
 
 export const entityUpdate = (socket, clientState) => {
     socket.on('attacked', data => {
-        clientState.entities[data.entityID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.attackSpeed);
+        clientState.entities[data.entityID].hit(data.collisionX, data.collisionY);
     });
     socket.on('killed', data => {
         clientState.entities[data.entityID].die(data.collisionX, data.collisionY);

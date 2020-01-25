@@ -8,6 +8,7 @@ import { attack } from "../sockets/entities/attack.js";
 import { charm } from "../charm/charm.js";
 import { renderDeathMenu } from "../UI/death/menu.js";
 import { clientCreateStructure } from "../sockets/player/clientCreateStructure.js";
+import { swing } from "../sockets/player/swing.js";
 
 
 export class Player {
@@ -124,7 +125,6 @@ export class Player {
             if (this.displayHand !== 'hand') {
 
                 stage.removeChild(this.handSprites[this.handSpriteKey]);
-                this.swingAngle = 0;
                 this.swingAvailable = true;
                 this.displayHand = 'hand';
             }
@@ -133,7 +133,6 @@ export class Player {
             if (this.displayHand !== 'AxeHand') {
 
                 stage.removeChild(this.handSprites[this.handSpriteKey]);
-                this.swingAngle = 0;
                 this.swingAvailable = true;
                 this.displayHand = 'AxeHand';
             }
@@ -142,58 +141,10 @@ export class Player {
             if (this.displayHand !== 'SwordHand') {
 
                 stage.removeChild(this.handSprites[this.handSpriteKey]);
-                this.swingAngle = 0;
                 this.swingAvailable = true;
                 this.displayHand = 'SwordHand';
             }
         }
-    }
-
-    swing() {
-        if (this.swingAvailable) {
-            this.swingAngle = 0;
-            this.stopRotation = 70;
-            this.swingBack = false;
-            
-            this.swingAvailable = false;
-        }
-        
-        
-        if (!this.swingBack) {
-            if (this.displayHand === "AxeHand") this.swingAngle += this.harvestSpeed;
-            else if (this.displayHand === "SwordHand") this.swingAngle += this.attackSpeed;
-        } else {
-            if (this.displayHand === "AxeHand") this.swingAngle -= this.harvestSpeed;
-            else if (this.displayHand === "SwordHand") this.swingAngle -= this.attackSpeed;
-        }
-
-        if (this.swingAngle < this.stopRotation) {
-            // harvest: if collided with resource during swing and before sto2p rotation, call resource function
-            if (this.displayHand === "AxeHand") {
-                this.resourceHarvest();
-            } else if (this.displayHand === "SwordHand") {
-                this.entityAttack();
-            }
-        } else if (this.swingAngle >= this.stopRotation) {
-            this.swingBack = true;
-        }
-
-        
-        if (this.swingAngle <= 0 && this.swingBack) { // end of animation - swingAvailable is true (another swing is available)
-            /* test tracking
-            let circle = new PIXI.Graphics();
-            circle.beginFill(0x9966FF);
-            circle.drawCircle(this.collisionPoints['axeHand'].x, this.collisionPoints['axeHand'].y, 10);
-            circle.endFill();
-            this.viewpoint.addChild(circle);
-            */
-            this.swingAvailable = true;
-            this.swingAngle = 0;
-        }
-        // determine hand sprite key
-        this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
-
-        this.handSprites[this.handSpriteKey].angle += this.swingAngle;
     }
 
     mouse() {
@@ -368,16 +319,11 @@ export class Player {
         // update angle 
         this.angle = -Math.atan2(this.mouseX - this.x, this.mouseY - this.y);
         this.handSprites[this.handSpriteKey].rotation = this.angle;
+        this.handSprites[this.handSpriteKey].angle += this.swingAngle
         this.bodyGraphic.rotation = this.angle;
 
-        // test and handle collisions for resources and entities
-        // this.collisions();
-
-        // detect clicks and respond
-        if ((this.mouseHeld || this.swingAngle > 0) && (this.displayHand !== "hand")) { // if mouse held or effectively the swing has already started 
-            this.swing();
-        } else {
-            this.swingAvailable = true;
+        if (this.mouseHeld && this.dislayHand !== "hand") {
+            swing(socket, { swing: true });
         }
 
         if (this.clicked) {
@@ -412,75 +358,6 @@ export class Player {
             structureHand: this.structureHand,
             focused: !document.hidden,
         });
-    }
-
-    collisions() {
-        this.collisionvx = 0;
-        this.collisionvy = 0;
-
-        for (let resource of Object.values(clientState.resources)) {
-            resource.collide(this.bodyGraphic);
-        }
-        for (let entity of Object.values(clientState.entities)) {
-            entity.collide(this.bodyGraphic);
-        }
-        for (let structure of Object.values(clientState.structures)) {
-            structure.collide(this.bodyGraphic);
-        }
-    }
-
-    resourceHarvest() {
-        for (let resource of Object.values(clientState.resources)) {
-            if (resource.handSpriteCollision(this.collisionPoints[this.displayHand]) && !resource.alreadyHit) {
-                resource.alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
-                // create velocity and direction in which a resource bumps towards
-                let a = resource.globalX - this.collisionPoints[this.displayHand].x;
-                let b = resource.globalY - this.collisionPoints[this.displayHand].y;
-                let vx = (Math.asin(a / Math.hypot(a, b))*10);
-                let vy = (Math.asin(b / Math.hypot(a, b))*10);
-
-                // then emit harvest
-                harvest(socket, {
-                    resourceID: resource.resourceID,
-                    amount: 1,
-                    vx: vx,
-                    vy: vy,
-                    collisionX: this.collisionPoints[this.displayHand].x,
-                    collisionY: this.collisionPoints[this.displayHand].y,
-                    harvestSpeed: this.harvestSpeed
-                })
-            }
-            if (this.swingAngle <= 0) { // once swing resets, reset alreadyHit to false
-                resource.alreadyHit = false;
-            }
-        }
-    }
-
-    entityAttack() {
-        for (let entity of Object.values(clientState.entities)) {
-            if (entity.handSpriteCollision(this.collisionPoints[this.displayHand]) && !entity.alreadyHit) {
-                entity.alreadyHit = true; // if it's already hit, don't allow another hit to be registered and it to be harvested again
-
-                // create velocity and direction in which an entity gets hit towards
-                let a = entity.globalX - this.collisionPoints[this.displayHand].x;
-                let b = entity.globalY - this.collisionPoints[this.displayHand].y;
-                let vx = (Math.asin(a / Math.hypot(a, b))*10);
-                let vy = (Math.asin(b / Math.hypot(a, b))*10);
-
-                // then emit harvest
-                attack(socket, {
-                    entityID: entity.entityID,
-                    vx: vx,
-                    vy: vy,
-                    collisionX: this.collisionPoints[this.displayHand].x,
-                    collisionY: this.collisionPoints[this.displayHand].y,
-                    attackSpeed: this.attackSpeed
-                })
-            }
-            if (this.swingAngle <= 0) { // once swing resets, reset alreadyHit to false
-                entity.alreadyHit = false;
-            }
-        }
     }
 
     resizeAdjust(x, y) {

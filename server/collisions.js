@@ -10,7 +10,7 @@ module.exports = {
         magnitude = Math.sqrt(vx * vx + vy * vy);
       
         //Add together the circles' combined half-widths
-        combinedRadii = player.radius + object.size[0]/2; // edited this line
+        combinedRadii = player.size[0]/2 + object.size[0]/2; // edited this line
       
           //Figure out if there's a collision
           if (magnitude < combinedRadii) {
@@ -73,5 +73,20 @@ module.exports = {
 
             return hit;
         }
+    },
+
+    collisionPointObject(collisionPoints, object) {
+        let vx, vy, magnitude;
+        let objectGlobalX = object.globalX;
+        let objectGlobalY = object.globalY;
+        if (!object.globalX && !object.globalX) { // if it is an entity (which we can tell if it has the global positioning property), 
+            objectGlobalX = object.entityState.globalX;  // then use the entity state to access the position
+            object.globalY = object.entityState.globalY;
+        }
+        vx = collisionPoints.x - objectGlobalX;
+        vy = collisionPoints.y - objectGlobalY;
+        magnitude = Math.sqrt(vx * vx + vy * vy);
+
+        return magnitude < object.size[0]/2;
     }
 }
