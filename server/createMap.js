@@ -96,7 +96,7 @@ module.exports = class CreateMap {
 
         
         // create more restrictive and accurate spawn area based on area size later
-        CreateMap.createAreas(serverState, 2, -size[0]/4, -size[1]/4, size[0]/4, size[1]/4, {
+        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
             type: 'mine',
             entities: [
                 {type: 'beetle', amount: 2},

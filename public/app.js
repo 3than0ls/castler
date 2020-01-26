@@ -22,7 +22,6 @@ export const clientState = {
     TO DO:
     clean up code
     ISSUES: 
-    player does not attack flash if their client window is not focused
 
     (tool hand type switch)
     tool sprite switches, but swing angle is of the swing angle of the previous tool, but then flashes back to 0. To solve, make updating display hand sent to server and then back to client
@@ -42,8 +41,6 @@ export const clientState = {
 
     SMALL:
     more different resources 
-    add item image for iron
-    add more tiered tool (iron)
 */
 
 document.title = "Game";

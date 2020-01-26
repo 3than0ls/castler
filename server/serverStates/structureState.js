@@ -16,6 +16,18 @@ module.exports = class StructureState {
         this.config = config;
         this.parentID = parentID || null;
 
+        this.health;
+        switch (this.type) {
+            case 'furnace': 
+                this.health = 150;
+                break;
+            case 'workbench':
+                this.health = 150;
+                break;
+            default: 
+                this.health = 100;
+        }
+
         this.structureID = 's' + Math.random().toString(36).substr(2, 9);
     }
 

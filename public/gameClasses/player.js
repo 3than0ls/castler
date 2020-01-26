@@ -250,7 +250,10 @@ export class Player {
 
     structureBuilding(structureHand) {
         //this.structureHand = structureHand;
-        this.displayStructureHand = structureHand;
+        if (this.displayStructureHand !== structureHand) {
+            player.viewpoint.removeChild(this.structureSprites[this.displayStructureHand]);
+            this.displayStructureHand = structureHand;
+        }
         if (!this.structureSprites[structureHand]) { // if the sprite texture doesn't exist, create it
             this.structureSprites[structureHand] = new PIXI.Sprite(loader.resources[`structures/${structureHand}`].texture);
             this.structureSprites[structureHand].zIndex = 51;
@@ -267,11 +270,22 @@ export class Player {
         this.placeable = true;
 
         for (let resource of Object.values(clientState.resources)) {
-            if (Math.hypot(resource.globalX - this.globalX, resource.globalY - this.globalY) < 750) {
+            if (Math.hypot(resource.globalX - this.globalX, resource.globalY - this.globalY) < 750) { // only calculate on resources/objects near the player
                 let test = bump.hitTestCircle(resource.resourceGraphic, this.structureSprites[structureHand]);
                 if (test) {
                     this.placeable = false;
                     break;
+                }
+            }
+        }
+        if (this.placeable) {
+            for (let structure of Object.values(clientState.structures)) {
+                if (Math.hypot(structure.globalX - this.globalX, structure.globalY - this.globalY) < 750) {
+                    let test = bump.hitTestCircle(structure.structureGraphic, this.structureSprites[structureHand]);
+                    if (test) {
+                        this.placeable = false;
+                        break;
+                    }
                 }
             }
         }
@@ -281,6 +295,7 @@ export class Player {
         } else {
             this.structureSprites[structureHand].tint = 0xCC3333;
         }
+        
     }
 
     attacked() {

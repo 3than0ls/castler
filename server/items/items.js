@@ -124,7 +124,7 @@ module.exports = {
         craftingTime: 3500,
         recipes: [
             {
-                ironPiece: 2,
+                ironBars: 1,
             }
         ],
         craftingStructure: 'workbench',
@@ -159,7 +159,6 @@ module.exports = {
         ],
         craftingStructure: 'furnace',
     }),
-
     
     workbench: new Item('workbench', {
         primary: false,
@@ -171,8 +170,41 @@ module.exports = {
         },
         recipes: [
             {
-                wood: 1,
+                wood: 15,
+                stone: 5,
             }
         ],
+    }),
+
+    furnace: new Item('furnace', {
+        primary: false,
+        consumable: true,
+        craftingTime: 2000,
+        consumeFunction: (user) => {
+            consumed(user, 'furnace');
+            user.score += 5;
+        },
+        recipes: [
+            {
+                wood: 5,
+                stone: 15,
+            }
+        ],
+    }),
+
+    wall: new Item('wall', {
+        primary: false,
+        consumable: true,
+        craftingTime: 2000,
+        consumeFunction: (user) => {
+            consumed(user, 'wall');
+            user.score += 5;
+        },
+        recipes: [
+            {
+                wood: 5,
+            }
+        ],
+        craftingStructure: 'workbench',
     })
 }

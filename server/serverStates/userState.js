@@ -42,11 +42,16 @@ module.exports = class UserState {
         this.inventory = {
             cookedMeat: {
                 consumable: true,
-                amount: 20,
+                amount: 500,
             },
-            workbench: {
-                consumable: true,
-                amount: 1,
+            stone: {
+                amount: 500,
+            },
+            wood: {
+                amount: 500,
+            },
+            ironBars: {
+                amount: 500,
             }
         };
         this.toolTier = 'wood';
@@ -170,7 +175,6 @@ module.exports = class UserState {
                 }
                 for (let structure of Object.values(serverState.structures)) {
                     if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], structure) && !this.alreadySwungAt.includes(structure.structureID)) {
-                        // structure.health -= this.damage;
                         this.alreadySwungAt.push(structure.structureID);
                         let a = structure.globalX - this.globalX;
                         let b = structure.globalY - this.globalY;
@@ -184,6 +188,16 @@ module.exports = class UserState {
                             structureID: structure.structureID,
                             harvestSpeed: this.harvestSpeed
                         });
+
+                        structure.health -= this.damage;
+                        if (structure.health <= 0) {
+                            io.emit('destroyed', { // currently does nothing
+                                collisionX: this.collisionPoints[this.displayHandType].x,
+                                collisionY: this.collisionPoints[this.displayHandType].y,
+                                structureID: structure.structureID,
+                            });
+                            delete serverState.structures[structure.structureID];
+                        }
                     }
                 }
             } else if (this.displayHandType === "sword") {
@@ -202,7 +216,7 @@ module.exports = class UserState {
                                 entityID: entity.entityID,
                             });
                             if (entity.entityState.homeAreaID && entity.entityState.homeAreaID !== 'map') { // if entity had a home area and it isn't the map, decrease areas entity amount
-                                serverState.areas[entity.homeAreaID].entityCount--;
+                                serverState.areas[entity.entityState.homeAreaID].entityCount--;
                             }
 
                             delete serverState.entities.entityAI[entity.entityID];
@@ -434,6 +448,9 @@ module.exports = class UserState {
         const itemFilteredTools = [];
         for (let item of Object.values(items)) {
             // determine next craftable tier, and if they already have that tier or higher, don't add that to the next stage of filtering
+            if (this.toolTier === 'wood' && item.name === 'ironTools') {
+                continue;
+            }
             if (this.toolTier === 'stone' && item.name === 'stoneTools') {
                 continue;
             }

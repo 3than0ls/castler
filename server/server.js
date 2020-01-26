@@ -39,8 +39,8 @@ const serverState = {
     structures: {},
 }
 
-const map = new CreateMap(serverState, [1000, 1000]);
-map.test3(serverState);
+const map = new CreateMap(serverState, [3000, 3000]);
+map.test(serverState);
 
 
 const gameItems = require('./items/items.js');
@@ -211,7 +211,7 @@ function update(serverState) {
     }
 
     for (let area of Object.values(serverState.areas)) {
-        area.respawnTick(serverState);
+        area.respawnTick(serverState, CreateMap);
     }
     // updates states and call the entity AIs
     for (let entity of Object.values(serverState.entities.entityAI)) {
@@ -222,8 +222,8 @@ function update(serverState) {
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
-    io.sockets.emit('areaStates', serverState.areas);
     io.sockets.emit('structureStates', serverState.structures);
+    io.sockets.emit('areaStates', serverState.areas);
 
     // emit leaderboard status (based on player score)
     const orderedPlayerScores = [];

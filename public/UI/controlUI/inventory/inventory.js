@@ -46,12 +46,11 @@ export class Inventory extends React.Component {
     }
 
     itemClick(item, player) {
-        if (item === 'workbench') {
-            if (!player.structureHand) {
-                player.structureHand = 'workbench';
-            } else {
+        if (item === 'workbench' || item === 'furnace' || item === 'wall') {
+            if (player.structureHand === item) {
                 player.structureHand = undefined;
             }
+            player.structureHand = item;
         } else {
             clientRequestConsume(socket, item);
         }

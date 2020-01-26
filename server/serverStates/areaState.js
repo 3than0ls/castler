@@ -21,7 +21,7 @@ module.exports = class AreaState {
         this.entityCount = 0;
         config.entities.forEach(entityData => { this.entityCount += entityData.amount });
         this.entityLimit = config.entityLimit || this.entityCount;
-        this.entityRespawnTime = config.entityRespawnTime || 10000;
+        this.entityRespawnTime = config.entityRespawnTime || 1000;
         this.entityRespawnTick = 0;
 
         this.areaID = 'a' + Math.random().toString(36).substr(2, 9);
@@ -37,7 +37,7 @@ module.exports = class AreaState {
         }
     }
 
-    respawnTick() {
+    respawnTick(serverState, CreateMap) {
         // entity count will be decreased when an entity dies, which will be called in entityAI
         if (this.entityCount < this.entityLimit) {
             this.entityRespawnTick++;
@@ -57,13 +57,13 @@ module.exports = class AreaState {
                     }
                 }
 
-                /*
+                console.log('aaa')
                 CreateMap.createEntities(
-                    serverState.entities, type, 1, 
+                    serverState, type, 1, 
                     this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                     this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
                     this.areaID
-                );*/
+                );
                 this.entityCount++;
             }
         }

@@ -12,6 +12,7 @@ export class Structure {
         this.globalY = globalY;
 
         this.type = type;
+        this.particleStream;
 
         this.tweenTick = 0;
     }
@@ -64,9 +65,33 @@ export class Structure {
         );
     }
     
+    emit() {
+        if (!this.particleStream) {
+            if (this.type === 'furnace') {
+                this.particleStream = dust.emitter(
+                    160, () => {
+                        dust.create(
+                            this.globalX,
+                            this.globalY,
+                            () => new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture),
+                            player.viewpoint,
+                            2,
+                            0,
+                            true,
+                            0, 6.28,
+                            20, 60,
+                            0.4, 0.7,
+                            -0.003, -0.008,
+                            0.0025, 0.0075,
+                        )
+                    }
+                )
+                this.particleStream.play();
+            }
+        }
+    }
 
     animate(globalX, globalY) {
-        player.viewpoint.addChild(this.structureGraphic);
         if (!this.tweenTick === 0) {
             // update positioning
             this.globalX = globalX;
@@ -75,9 +100,15 @@ export class Structure {
         } else if (this.tweenTick > 0) {
             this.tweenTick++;
         }
+
+        this.emit();
+        player.viewpoint.addChild(this.structureGraphic);
     }
 
     delete() {
+        if (this.particleStream) {
+            this.particleStream.stop();
+        }
         player.viewpoint.removeChild(this.structureGraphic);
     }
 }
