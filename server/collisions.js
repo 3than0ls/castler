@@ -79,7 +79,7 @@ module.exports = {
         let vx, vy, magnitude;
         let objectGlobalX = object.globalX;
         let objectGlobalY = object.globalY;
-        if (!object.globalX && !object.globalX) { // if it is an entity (which we can tell if it has the global positioning property), 
+        if (!object.hasOwnProperty('globalX') && !object.hasOwnProperty('globalY')) { // if it is an entity (which we can tell if it has the global positioning property), 
             objectGlobalX = object.entityState.globalX;  // then use the entity state to access the position
             object.globalY = object.entityState.globalY;
         }

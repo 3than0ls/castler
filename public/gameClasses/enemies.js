@@ -2,6 +2,7 @@ import { stage, player } from "../app.js";
 import { loader } from "./../utils/loader.js";
 import { Player } from "./player.js";
 import { charm } from "../charm/charm.js";
+import { dust } from "../dust/dust.js";
 
 
 export class Enemy {
@@ -26,6 +27,19 @@ export class Enemy {
                 this.bodyGraphic.tint = 0xFFFFFF
             }
         }
+        dust.create(
+            this.globalX, this.globalY,
+            () => new PIXI.Sprite(loader.resources['particles/bloodParticle'].texture),
+            player.viewpoint,
+            20,
+            0,
+            true,
+            0, 6.28,
+            12, 24,
+            1.5, 2,
+            0.02, 0.04,
+            0.02, 0.04,
+        );
     }
 
     render() { // basically what happens for players
@@ -49,7 +63,7 @@ export class Enemy {
         player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }
 
-    animate(globalX, globalY, angle, swingAngle, displayHand) {
+    animate(globalX, globalY, angle, swingAngle, displayHand, toolTier) {
         // the animate function is different from the update in player class
         // animate takes input supplied from the server and applies it to the enemies
         // update positioning
@@ -61,6 +75,7 @@ export class Enemy {
         // remove current displayed hand (which may be different) and then update it
         player.viewpoint.removeChild(this.handSprites[this.handSpriteKey]);
         this.displayHand = displayHand;
+        this.toolTier = toolTier;
 
         // determine hand sprite key
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
@@ -77,7 +92,7 @@ export class Enemy {
 
         // add graphics to stage
         let handGraphic = this.handSprites[this.handSpriteKey];
-        let bodyGraphic = this.bodyGraphic;                
+        let bodyGraphic = this.bodyGraphic;
         player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }
 

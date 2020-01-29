@@ -97,4 +97,8 @@ export class Resource {
         let resourceGraphic = this.resourceGraphic;       
         player.viewpoint.addChild(resourceGraphic); // hands drawn below body
     }
+
+    delete() { // delete user when disconnected
+        player.viewpoint.removeChild(this.resourceGraphic);
+    }
 }

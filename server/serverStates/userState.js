@@ -27,7 +27,7 @@ module.exports = class UserState {
         this.nickname = 'default'
         this.score = 0;
 
-        this.health = 10;
+        this.health = 100;
         this.hunger = 100;
         this.dead = false;
         this.attackFlash = false;
@@ -94,8 +94,11 @@ module.exports = class UserState {
             this.dead = true;
         }
 
-        let objects = {...serverState.resources, ...serverState.entities.entityAI, ...serverState.structures};
+        let objects = {...serverState.resources, ...serverState.entities.entityAI, ...serverState.structures, ...serverState.users.user};
         for (let object of Object.values(objects)) {
+            if (object.hasOwnProperty('clientID') && object.clientID === this.clientID) {
+                continue;
+            }
             collisions.playerObjectCollisionHandle(this, object);
         }
 
@@ -133,6 +136,10 @@ module.exports = class UserState {
         this.swingRequest = false;
     }
 
+    killUser(user) {
+        this.score += Math.min(Math.ceil(user.score/4) + 5, 100);
+        // perhaps some emitting of data to client
+    }
 
     swing(serverState, io) {
         if (this.swingAvailable) {
@@ -232,6 +239,16 @@ module.exports = class UserState {
 
                         this.alreadySwungAt.push(entity.entityID);
                     };
+                }
+                for (let user of Object.values(serverState.users.user)) {
+                    if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], user) && !this.alreadySwungAt.includes(user.clientID)) {
+                        user.health -= this.damage;
+                        user.attackFlash = true;
+                        if (user.health <= 0 || user.dead) { // user.dead may not be necessary, and this may be buggy
+                            this.killUser(user);
+                        }
+                        this.alreadySwungAt.push(user.clientID);
+                    }
                 }
             }
                 

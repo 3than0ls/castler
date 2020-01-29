@@ -26,6 +26,6 @@ export class Area {
     }
 
     animate() {
-        player.viewpoint.addChild(this.areaGraphic);
+        player.viewpoint.addChild(this.areaGraphic); // may be deprecated, unless additional uses for an animate/update function is found
     }
 }

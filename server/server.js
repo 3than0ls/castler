@@ -220,9 +220,9 @@ function update(serverState) {
 
     // emit data (perhaps combine all into one later)
     io.sockets.emit('userStates', serverState.users.userData);
+    io.sockets.emit('structureStates', serverState.structures);
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
-    io.sockets.emit('structureStates', serverState.structures);
     io.sockets.emit('areaStates', serverState.areas);
 
     // emit leaderboard status (based on player score)

@@ -1,5 +1,4 @@
 import { Enemy } from "../../gameClasses/enemies";
-import { player, animate } from "../../app";
 import { Player } from "../../gameClasses/player";
 
 
@@ -16,14 +15,14 @@ export const userUpdate = (socket, clientState) => {
             
             if (userID !== socket.id) { // if the server sent player id isn't the client id
                 let enemy = clientState.enemies[userID];
-                enemy.animate(
-                    serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand
-                );
                 if (enemy.toolTier !== serverStateUser.toolTier) {
                     Player.createHandSprites(enemy.handSprites, serverStateUser.globalX, serverStateUser.globalY, serverStateUser.toolTier);
+                    console.log('creating');
                 }
+                enemy.animate(
+                    serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand, serverStateUser.toolTier,
+                );
                 if (serverStateUser.attackFlash) {
-                    console.log('flashed')
                     clientState.enemies[userID].attackFlash();
                 }
             }

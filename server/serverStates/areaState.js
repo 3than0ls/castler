@@ -57,7 +57,6 @@ module.exports = class AreaState {
                     }
                 }
 
-                console.log('aaa')
                 CreateMap.createEntities(
                     serverState, type, 1, 
                     this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
@@ -83,6 +82,12 @@ module.exports = class AreaState {
             if (this.objectInsideArea(entity)) {
                 delete serverState.entities.entityState[entityID];
                 delete serverState.entities.entityAI[entityID];
+                this.clearedObjects++;
+            }
+        }
+        for (let [structureID, structure] of Object.entries(serverState.structures)) {
+            if (this.objectInsideArea(structure)) {
+                delete serverState.structures[structureID];
                 this.clearedObjects++;
             }
         }

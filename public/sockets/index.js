@@ -33,8 +33,8 @@ export function socketUpdate(socket) {
     resourceUpdate(socket, clientState);
     entityUpdate(socket, clientState);
     // update areas (may remove) and structures
-    areaUpdate(socket, clientState);
     structureUpdate(socket, clientState);
+    areaUpdate(socket, clientState);
     // update UI data
     // update leaderboard data
     leaderboardUpdate(socket, leaderboardState);

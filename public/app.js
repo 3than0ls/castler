@@ -32,12 +32,13 @@ export const clientState = {
     BIG:
     armor
 
+    pvp <--- NEEDS EXPANSION (but how)
 
-    pvp
+    player placable buildings <-- NEEDS EXPANSION
 
-    player placable buildings
+    make a more organized inventory UI and limit inventory amount <-- NEXT
 
-    specified crafting areas (furnace, workbench, anvil)
+    if nothing else is to be done, work on creating sprites and more entities, resources, and structures until you think of an idea! 
 
     SMALL:
     more different resources 

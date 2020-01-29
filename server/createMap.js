@@ -100,7 +100,6 @@ module.exports = class CreateMap {
             type: 'mine',
             entities: [
                 {type: 'beetle', amount: 2},
-                {type: 'boar', amount: 2},
             ],
             resources: [
                 {type: 'iron', amount: 4},

@@ -306,6 +306,20 @@ export class Player {
                 this.bodyGraphic.tint = 0xFFFFFF
             }
         }
+        dust.create(
+            this.globalX,
+            this.globalY,
+            () => new PIXI.Sprite(loader.resources['particles/bloodParticle'].texture),
+            player.viewpoint,
+            20,
+            0,
+            true,
+            0, 6.28,
+            12, 24,
+            1.5, 2,
+            0.02, 0.04,
+            0.02, 0.04,
+        );
     }
 
     died() {

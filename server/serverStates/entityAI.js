@@ -118,7 +118,7 @@ module.exports = class EntityAI {
                 } else if (angle <= -180) {
                     angle += 360;
                 }
-                this.rotate(angle, 3);
+                this.rotate(angle/2, 3);
                 break;
             }
         }
