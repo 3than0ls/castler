@@ -98,9 +98,6 @@ module.exports = {
         consumedOnCraft: true,
         consumeFunction: (user) => {
             user.toolTier = 'stone';
-            user.damage = 50;
-            user.attackSpeed = 2.5;
-            user.harvestSpeed = 2.5;
         },
         craftingTime: 2500,
         recipes: [
@@ -117,9 +114,6 @@ module.exports = {
         consumedOnCraft: true,
         consumeFunction: (user) => {
             user.toolTier = 'iron';
-            user.damage = 70;
-            user.attackSpeed = 3;
-            user.harvestSpeed = 3;
         },
         craftingTime: 3500,
         recipes: [

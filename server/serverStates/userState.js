@@ -50,11 +50,22 @@ module.exports = class UserState {
             wood: {
                 amount: 500,
             },
-            ironBars: {
+            workbench: {
+                amount: 500,
+                consumable: true,
+            },
+            furnace: {
+                amount: 500,
+                consumable: true,
+            },
+            fur: {
+                amount: 500,
+            },
+            feather: {
                 amount: 500,
             }
         };
-        this.toolTier = 'wood';
+        this.toolTier = 'iron';
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
 
@@ -81,6 +92,20 @@ module.exports = class UserState {
     update(serverState, map, io) {
         this.playerTick();
         this.updateCollisionPoints();
+        // update tool tier
+        if (this.toolTier === "wood") {
+            this.damage = 25;
+            this.harvestSpeed = 2;
+            this.attackSpeed = 2;
+        } else if (this.toolTier === "stone") {
+            this.damage = 35;
+            this.harvestSpeed = 2.3;
+            this.attackSpeed = 2.3;
+        } else if (this.toolTier === "iron") {
+            this.damage = 55;
+            this.harvestSpeed = 2.8;
+            this.attackSpeed = 2.8;
+        }
         // position updates
         // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
         if (this.vx !== 0 && this.vy !== 0) {

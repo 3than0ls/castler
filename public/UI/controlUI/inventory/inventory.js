@@ -91,12 +91,6 @@ export class Inventory extends React.Component {
             }
             inventoryComponents.push(componentItem);
         }
-        /* 
-            <Row className='items' variant="primary">Wood x{this.state.wood}</Row>
-            <Row variant="primary"><Image className='images' src={this.state.woodImage}/></Row>
-            <Row className='items' variant="primary">Stone x{this.state.stone}</Row>
-            <Row variant="primary"><Image className='images' src={this.state.stoneImage}/></Row>
-        */
         return(
             <> 
                 <div>

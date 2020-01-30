@@ -9,6 +9,7 @@ import { charm } from "../charm/charm.js";
 import { renderDeathMenu } from "../UI/death/menu.js";
 import { clientCreateStructure } from "../sockets/player/clientCreateStructure.js";
 import { swing } from "../sockets/player/swing.js";
+import { dust } from "../dust/dust.js";
 
 
 export class Player {
