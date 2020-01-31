@@ -48,6 +48,7 @@ export class Player {
 
         // player inventory and resources, and crafting status
         this.inventory = {};
+        this.consumable = {};
         this.craftingState = {
             crafting: false,
             craftingComplete: 1,
@@ -208,7 +209,13 @@ export class Player {
     }
 
     inventoryUpdate(inventory) {
-        this.inventory = inventory;
+        for (let [itemName, item] of Object.entries(inventory)) {
+            if (item.consumable === true) {
+                this.consumable[itemName] = item;
+            } else {
+                this.inventory[itemName] = item;
+            }
+        }
     }
     
     healthUpdate(health) {
@@ -270,28 +277,27 @@ export class Player {
 
         this.placeable = true;
 
-        for (let resource of Object.values(clientState.resources)) {
-            if (Math.hypot(resource.globalX - this.globalX, resource.globalY - this.globalY) < 750) { // only calculate on resources/objects near the player
-                let test = bump.hitTestCircle(resource.resourceGraphic, this.structureSprites[structureHand]);
-                if (test) {
+        let objects = {...clientState.resources, ...clientState.structures, ...clientState.entities};
+        for (let [objectID, object] of Object.entries(objects)) {
+            if (Math.hypot(object.globalX - this.globalX, object.globalY - this.globalY) < 750) { // only calculate on resources/objects near the player
+                let test;
+                if (objectID.charAt(0) === 's') { // structures
+                    test = bump.hitTestCircle(object.structureGraphic, this.structureSprites[structureHand]);
+                } else if (objectID.charAt(0) === 'r') { // resources
+                    test = bump.hitTestCircle(object.resourceGraphic, this.structureSprites[structureHand]);
+                } else if (objectID.charAt(0) === 'e') { // entities
+                    test = bump.hitTestCircle(object.entityGraphic, this.structureSprites[structureHand]);
+                } else {
+                    test = false; // unidentified object, does not match the ID system
+                }
+                if (test) { // if a collision is found, make object unplaceable
                     this.placeable = false;
                     break;
                 }
             }
         }
-        if (this.placeable) {
-            for (let structure of Object.values(clientState.structures)) {
-                if (Math.hypot(structure.globalX - this.globalX, structure.globalY - this.globalY) < 750) {
-                    let test = bump.hitTestCircle(structure.structureGraphic, this.structureSprites[structureHand]);
-                    if (test) {
-                        this.placeable = false;
-                        break;
-                    }
-                }
-            }
-        }
 
-        if (this.placeable) {
+        if (this.placeable) { // tint structure if not placeable
             this.structureSprites[structureHand].tint = 0xAAAAAAA;
         } else {
             this.structureSprites[structureHand].tint = 0xCC3333;

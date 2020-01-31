@@ -7,17 +7,10 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 
 // images
-import { player, socket } from '../../../app';
-import { clientRequestCraft } from '../../../sockets/player/clientRequestCraft';
+import { player, socket } from '../../app';
+import { clientRequestCraft } from '../../sockets/player/clientRequestCraft';
 
-function importAll (r) {
-    let images = {};
-    r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
-    return images;
-}
-const itemImages = importAll(require.context('./../../../assets/items', false,  /\.png$/));
-const structureImages = importAll(require.context('./../../../assets/structures', false,  /\.png$/));
-const images = {...itemImages, ...structureImages}; 
+import { images } from './controlUI.js';
 
 export const craftableItemsState = [];
 

@@ -52,7 +52,7 @@ export class Structure {
         dust.create(
             collisionX,
             collisionY,
-            () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.resourceName : 'stone').concat('Particle'))].texture),
+            () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.structureName : 'stone').concat('Particle'))].texture),
             player.viewpoint,
             25,
             0,

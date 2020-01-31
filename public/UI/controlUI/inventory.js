@@ -8,19 +8,10 @@ import Button from 'react-bootstrap/Button';
 
 
 // images
-import { player, socket } from '../../../app';
-import { clientRequestConsume } from '../../../sockets/player/clientRequestConsume';
+import { player, socket } from '../../app';
+import { clientRequestConsume } from '../../sockets/player/clientRequestConsume';
 
-function importAll (r) {
-    let images = {};
-    r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
-    return images;
-}
-
-const itemImages = importAll(require.context('./../../../assets/items', false,  /\.png$/));
-const structureImages = importAll(require.context('./../../../assets/structures', false,  /\.png$/));
-const images = {...itemImages, ...structureImages}; 
-// possibly edit this so images are loaded dynamically, and only when the player has the item
+import { images } from './controlUI.js';
 
 export class Inventory extends React.Component {
     constructor(props) {

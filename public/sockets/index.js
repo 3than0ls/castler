@@ -1,6 +1,6 @@
 import { clientState, player, boundary } from "../app.js";
 import { leaderboardState } from "../UI/leaderboard/leaderboard.js";
-import { craftableItemsState } from "../UI/controlUI/crafting/crafting.js";
+import { craftableItemsState } from "../UI/controlUI/crafting.js";
 
 import { userUpdate } from "./player/userUpdate.js";
 import { resourceUpdate } from "./resources/resourceUpdate.js";

@@ -1,10 +1,8 @@
 import React from 'react';
 
-import { Inventory } from "./controlUI/inventory/inventory.js";
 import { HealthBar } from './statusBar/healthBar/healthBar.js';
 import { Leaderboard } from './leaderboard/leaderboard.js';
 import { HungerBar } from './statusBar/hungerBar/hungerBar.js';
-import { CraftingUI } from './controlUI/crafting/crafting.js';
 import { ControlUI } from './controlUI/controlUI.js';
 import { CraftingBar } from './statusBar/craftingBar/craftingBar.js';
 

@@ -36,7 +36,7 @@ export const clientState = {
 
     player placable buildings <-- NEEDS EXPANSION
 
-    make a more organized inventory UI and limit inventory amount <-- NEXT
+    make a more organized inventory UI and limit inventory amount <-- NEXT (create a consumable section for the control UI)
 
     if nothing else is to be done, work on creating sprites and more entities, resources, and structures until you think of an idea! 
 
