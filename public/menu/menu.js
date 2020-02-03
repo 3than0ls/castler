@@ -49,21 +49,14 @@ class StartMenu extends React.Component {
     
     render() {
         return (
-            /* 
-            <form onSubmit={this.handleSubmit} id="nameForm">
-                <input type="text" value={this.state.value} onChange={this.handleChange} placeholder="Name"/>
-                <br></br>
-                <input type="submit" value="Submit" />
-            </form>
-            */
             <Form className='overlayBoxContainer' onSubmit={this.handleSubmit} autoComplete="off" spellCheck="false">
-            <Form.Group controlId="nicknameForm" className="noselect">
-              <Form.Control value={this.state.value} placeholder="Enter nickname" onChange={this.handleChange}/>
-            </Form.Group>
-            
-            <Button variant="primary" type="submit" className="noselect">
-              Play
-            </Button>
+                <Form.Group controlId="nicknameForm" className="noselect">
+                <Form.Control value={this.state.value} placeholder="Enter nickname" onChange={this.handleChange}/>
+                </Form.Group>
+                
+                <Button variant="primary" type="submit" className="noselect">
+                Play
+                </Button>
           </Form>
         );
     }

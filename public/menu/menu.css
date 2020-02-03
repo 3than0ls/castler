@@ -66,8 +66,13 @@ input {
   border-width: 3px;*/
 }
 
-input:focus, button:focus {
+/* disable outline on form and input areas */
+.form-control:focus {
+  border-color: inherit;
+  -webkit-box-shadow: none;
+  box-shadow: none;
   outline: none;
+  border-color: rgb(0, 0, 0, 0)
 }
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */

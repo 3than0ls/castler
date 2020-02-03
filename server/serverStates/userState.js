@@ -28,7 +28,7 @@ module.exports = class UserState {
         this.score = 0;
 
         this.health = 100;
-        this.hunger = 100;
+        this.hunger = 50;
         this.dead = false;
         this.attackFlash = false;
 
@@ -42,7 +42,7 @@ module.exports = class UserState {
         this.inventory = {
             cookedMeat: {
                 consumable: true,
-                amount: 500,
+                amount: 1,
             },
             stone: {
                 amount: 500,
@@ -409,6 +409,19 @@ module.exports = class UserState {
         // increase player score for killing the animal
         this.score += 3;
     }
+    drop(type, amount) {
+        if (typeof amount === "number" && amount === amount) { // test if the amount is a number and it is not NaN
+            if (this.inventory[type]) {
+                this.inventory[type].amount -= amount;
+                if (this.inventory[type].amount <= 0) {
+                    delete this.inventory[type];
+                }
+            } else {
+                console.log(`dropping ${amount} of an undefined ${type} item type`);
+            }
+        }
+    }
+
     playerTick() {
         this.hungerTick++;
 

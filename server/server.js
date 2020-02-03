@@ -191,6 +191,10 @@ io.on('connection', socket => {
         }
     });
 
+    socket.on('dropItem', data => {
+        serverState.users.user[socket.id].drop(data.type, data.amount);
+    });
+
     // when disconnected, remove user from server state
     socket.on('disconnect', () => {
         serverState.users.user[socket.id].dead = true;

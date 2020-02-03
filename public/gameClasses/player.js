@@ -209,13 +209,39 @@ export class Player {
     }
 
     inventoryUpdate(inventory) {
+        // maintain for use in difference waste deletion
+        const serverInventory = {};
+        const serverConsumable = {};
+        // update inventory
         for (let [itemName, item] of Object.entries(inventory)) {
             if (item.consumable === true) {
                 this.consumable[itemName] = item;
+                serverConsumable[itemName] = item;
             } else {
                 this.inventory[itemName] = item;
+                serverInventory[itemName] = item;
             }
         }
+
+        // delete items/consumables that the player does not have/dropped/consumed
+        const clientInventory = Object.keys(this.inventory);
+        let inventoryDifference = clientInventory.filter(function(item) {
+            return !serverInventory[item]
+        }); 
+        for (let i = 0; i < inventoryDifference.length; i++) { // delete
+            delete this.inventory[inventoryDifference[i]];
+        }
+
+        const clientConsumable = Object.keys(this.consumable);
+        // console.log(clientConsumable);
+        let consumableDifference = clientConsumable.filter(function(item) {
+            return !serverConsumable[item]
+        }); 
+        // console.log(consumableDifference)
+        for (let i = 0; i < consumableDifference.length; i++) { // delete
+            delete this.consumable[consumableDifference[i]];
+        }
+
     }
     
     healthUpdate(health) {
@@ -478,9 +504,12 @@ function keyboard(keyCode) {
     key.isUp = true;
     key.press = undefined;
     key.release = undefined;
+
   
     //The `downHandler`
     key.downHandler = event => {
+      if (event.target.matches("input")) return; // disables player movement when input is focused
+
       if (event.keyCode === key.code) {
         if (key.isUp && key.press) key.press();
         key.isDown = true;
