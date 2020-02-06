@@ -7,6 +7,7 @@ export const clientEmit = (socket, data) => {
         displayHand: data.displayHand,
         structureHand: data.structureHand,
         focused: data.focused,
+        openCrate: data.openCrate,
         id: socket.id,
     });
 }
@@ -19,4 +20,5 @@ export const clientEmit = (socket, data) => {
     data.swingAngle,
     data.displayHand,
     data.structureHand
+    data.openCrate
 */

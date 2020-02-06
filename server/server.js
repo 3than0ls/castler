@@ -24,6 +24,7 @@ const UserState = require('./serverStates/userState.js');;
 const CreateMap = require('./createMap.js');
 const AreaState = require('./serverStates/areaState.js');
 const StructureState = require('./serverStates/structureState.js');
+const CrateState = require('./serverStates/crateState.js');
 
 const serverState = {
     users: {
@@ -37,11 +38,11 @@ const serverState = {
     },
     areas: {},
     structures: {},
+    crates: {}, // crates are containers of dropped items from players
 }
 
-const map = new CreateMap(serverState, [3000, 3000]);
-map.test(serverState);
-
+const map = new CreateMap(serverState, [1000, 1000]);
+map.test4(serverState);
 
 const gameItems = require('./items/items.js');
 
@@ -68,7 +69,7 @@ io.on('connection', socket => {
 
     socket.on('clientState', data => {
         let user = serverState.users.user[data.id];
-        user.updateClientInfo(data.vx, data.vy, data.angle, data.swingAngle, data.displayHand, data.structureHand, data.focused);
+        user.updateClientInfo(data.vx, data.vy, data.angle, data.swingAngle, data.displayHand, data.structureHand, data.focused, data.openCrate);
 
         let clientUpdateData = {
             globalX: user.globalX,
@@ -81,7 +82,7 @@ io.on('connection', socket => {
                 crafting: user.crafting,
                 craftingComplete: user.craftingComplete,
             },
-
+            
             toolTier: user.toolTier,
             harvestSpeed: user.harvestSpeed,
             attackSpeed: user.attackSpeed,
@@ -135,7 +136,7 @@ io.on('connection', socket => {
     socket.on('swing', data => {
         let user = serverState.users.user[socket.id];
         user.swingRequest = data.swing;
-    })
+    });    
 
     socket.on('harvest', data => {
         // subtract the amount harvested from the resource
@@ -210,22 +211,25 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
+    // update server states
     for (let user of Object.values(serverState.users.user)) {
         user.update(serverState, map, io);
     }
-
-    for (let area of Object.values(serverState.areas)) {
-        area.respawnTick(serverState, CreateMap);
-    }
-    // updates states and call the entity AIs
     for (let entity of Object.values(serverState.entities.entityAI)) {
         entity.update(serverState, map);
+    }
+    for (let crate of Object.values(serverState.crates)) {
+        crate.update(serverState);
+    }
+    for (let area of Object.values(serverState.areas)) {
+        area.respawnTick(serverState, CreateMap);
     }
 
     // emit data (perhaps combine all into one later)
     io.sockets.emit('userStates', serverState.users.userData);
     io.sockets.emit('structureStates', serverState.structures);
     io.sockets.emit('resourceStates', serverState.resources);
+    io.sockets.emit('crateStates', serverState.crates);
     io.sockets.emit('entityStates', serverState.entities.entityState);
     io.sockets.emit('areaStates', serverState.areas);
 

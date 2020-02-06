@@ -10,6 +10,7 @@ import { renderDeathMenu } from "../UI/death/menu.js";
 import { clientCreateStructure } from "../sockets/player/clientCreateStructure.js";
 import { swing } from "../sockets/player/swing.js";
 import { dust } from "../dust/dust.js";
+import { clientOpenCrate } from "../sockets/player/clientOpenCrate.js";
 
 
 export class Player {
@@ -70,6 +71,8 @@ export class Player {
         this.displayStructureHandGlobalY = 0;
         this.placeable = false;
         this.structureSprites = {};
+        // crate status
+        this.openCrate = false;
     }
 
     movementKeys() {
@@ -78,6 +81,8 @@ export class Player {
         this.a = keyboard(65);
         this.s = keyboard(83);
         this.d = keyboard(68);
+        
+        this.e = keyboard(69);
 
         this.one = keyboard(49);
         this.two = keyboard(50);
@@ -122,6 +127,10 @@ export class Player {
                 this.vy = 0;
             }
         };
+
+        this.e.release = () => {
+            this.openCrate = true;
+        }
         
         this.one.release = () => {
             if (this.displayHand !== 'hand') {
@@ -410,6 +419,12 @@ export class Player {
         } else {
             player.viewpoint.removeChild(this.structureSprites[this.displayStructureHand]);
         }
+
+        let openCrate = false;
+        if (this.openCrate) {
+            openCrate = true;
+            this.openCrate = false;
+        }
         // emit client info to server
         clientEmit(socket, {
             vx: this.vx,
@@ -419,6 +434,7 @@ export class Player {
             displayHand: this.displayHand,
             structureHand: this.structureHand,
             focused: !document.hidden,
+            openCrate: openCrate
         });
     }
 

@@ -41,7 +41,7 @@ export class Resource {
         this.resourceGraphic.zIndex = 25;
 
         let resourceGraphic = this.resourceGraphic;
-        player.viewpoint.addChild(resourceGraphic); // hands drawn below body
+        player.viewpoint.addChild(resourceGraphic);
     }
 
     collide(graphic) {

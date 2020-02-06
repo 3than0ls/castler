@@ -13,6 +13,10 @@ module.exports = function lootDrops(type) {
                 rawMeat: 2,
             }
             break;
+        case "beetle":
+            loot = {
+                rawMeat: 1,
+            }
     }
     return loot;
 }

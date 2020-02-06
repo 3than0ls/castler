@@ -3,6 +3,7 @@ const EntityState = require('./serverStates/entityState.js');
 const EntityAI = require('./serverStates/entityAI.js');
 const StructureState = require('./serverStates/structureState.js');
 const AreaState = require('./serverStates/areaState.js');
+const CrateState = require('./serverStates/crateState.js');
 /*
 const AreaState = require('./serverStates/areaState.js');
 const StructureState = require('./serverStates/structureState.js');*/
@@ -47,6 +48,13 @@ module.exports = class CreateMap {
             let structure = new StructureState(config);
             serverState.structures[structure.structureID] = structure;
             structure.clear(serverState);
+        }
+    }
+
+    static createCrate(serverState, contents, amount, minX, minY, maxX=0, maxY=0) {
+        for (let i = 0; i < amount; i++) {
+            let crate = new CrateState(randomInt(minX, maxX), randomInt(minY, maxY), contents);
+            serverState.crates[crate.crateID] = crate;
         }
     }
     
@@ -124,5 +132,17 @@ module.exports = class CreateMap {
         CreateMap.createResources(serverState, 'rock', 1, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createEntities(serverState, 'duck', 2, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createStructures(serverState, 1, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2, { type: 'workbench' });
+    }
+
+    test4(serverState) {
+        const size = this.size;
+        CreateMap.createCrate(serverState, 
+            { 
+                stone: {
+                    amount: 20,
+                    consumable: false,
+                }
+
+        }, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2)
     }
 }

@@ -10,6 +10,7 @@ import { clientDataUpdate } from "./player/clientDataUpdate.js";
 import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
 import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
 import { structureUpdate } from "./structures/structureUpdate.js";
+import { crateUpdate } from "./crates/crateUpdate.js";
 
 export function clientInit(socket) {
     socket.emit('nickname', window.localStorage.getItem('nickname'));
@@ -32,6 +33,8 @@ export function socketUpdate(socket) {
     // update resource and entity data
     resourceUpdate(socket, clientState);
     entityUpdate(socket, clientState);
+    // update crates
+    crateUpdate(socket, clientState);
     // update areas (may remove) and structures
     structureUpdate(socket, clientState);
     areaUpdate(socket, clientState);

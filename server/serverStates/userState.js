@@ -19,6 +19,7 @@ module.exports = class UserState {
         this.swingAngle = 0;
         this.displayHand = 'hand';
         this.structureHand;
+        this.openCrate = false;
 
         this.collisionPoints = {};
 
@@ -92,6 +93,7 @@ module.exports = class UserState {
     update(serverState, map, io) {
         this.playerTick();
         this.updateCollisionPoints();
+        this.lootCrate(serverState);
         // update tool tier
         if (this.toolTier === "wood") {
             this.damage = 25;
@@ -347,11 +349,12 @@ module.exports = class UserState {
         // console.log(this.collisionPoints[this.displayHandType], this.size[0]);
     }
 
-    updateClientInfo(vx, vy, angle, swingAngle, displayHand, structureHand, focused) {
+    updateClientInfo(vx, vy, angle, swingAngle, displayHand, structureHand, focused, openCrate) {
         // update variables sent from client, which are used to calculate other properties the player has
         // for example, vx, vy, collisionvx, collisionvy are set here, but aren't calculated in the addition of global locations until the server ticks the player
         // vx and vy are directions, telling to go left/up if negative or right/down if positive
         this.focused = focused;
+        this.openCrate = openCrate;
         this.vx = vx;
         this.vy = vy;
         this.structureHand = structureHand;
@@ -410,7 +413,7 @@ module.exports = class UserState {
         this.score += 3;
     }
     drop(type, amount) {
-        if (typeof amount === "number" && amount === amount) { // test if the amount is a number and it is not NaN
+        if (typeof amount === "number" && Number.isNaN(amount)) { // test if the amount is a number and it is not NaN
             if (this.inventory[type]) {
                 this.inventory[type].amount -= amount;
                 if (this.inventory[type].amount <= 0) {
@@ -418,6 +421,33 @@ module.exports = class UserState {
                 }
             } else {
                 console.log(`dropping ${amount} of an undefined ${type} item type`);
+            }
+        }
+    }
+
+    lootCrate(serverState) {
+        if (this.openCrate) {
+            this.openCrate = false;
+            let targetCrate;
+            let targetCrateDist;
+            for (let crate of Object.values(serverState.crates)) {
+                let dist = Math.hypot(this.globalX - crate.globalX, this.globalY - crate.globalY);
+                if (dist < 100) {
+                    if (!targetCrate) {
+                        targetCrate = crate;
+                        targetCrateDist = dist;
+                    } else {
+                        if (dist < targetCrateDist) {
+                            targetCrate = crate;
+                            targetCrateDist = dist;
+                        }
+                    }
+                }
+            }
+
+            if (targetCrate) {
+                console.log(targetCrate.crateID + 'looted!');
+                targetCrate.loot(this);
             }
         }
     }
