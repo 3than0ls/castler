@@ -1,5 +1,7 @@
 const gameItems = require('./../items/items.js');
 const collisions = require('./../collisions.js');
+const createMap = require('./../createMap.js');
+const items = require('./../items/items.js');
 const imageSize = require('image-size');
 
 module.exports = class UserState {
@@ -93,7 +95,7 @@ module.exports = class UserState {
     update(serverState, map, io) {
         this.playerTick();
         this.updateCollisionPoints();
-        this.lootCrate(serverState);
+        //
         // update tool tier
         if (this.toolTier === "wood") {
             this.damage = 25;
@@ -412,10 +414,19 @@ module.exports = class UserState {
         // increase player score for killing the animal
         this.score += 3;
     }
-    drop(type, amount) {
-        if (typeof amount === "number" && Number.isNaN(amount)) { // test if the amount is a number and it is not NaN
-            if (this.inventory[type]) {
+    drop(type, amount, serverState) {
+        if (typeof amount === "number" && !Number.isNaN(amount)) { // test if the amount is a number and it is not NaN
+            if (this.inventory[type] && items[type]) {
                 this.inventory[type].amount -= amount;
+                
+                createMap.createCrate(serverState, 
+                    { 
+                        [type]: {
+                            amount: amount,
+                            consumable: items[type].consumable,
+                    }
+                }, 1, this.globalX - 50, this.globalY - 50, this.globalX + 50, this.globalY + 50);
+
                 if (this.inventory[type].amount <= 0) {
                     delete this.inventory[type];
                 }
@@ -425,30 +436,26 @@ module.exports = class UserState {
         }
     }
 
-    lootCrate(serverState) {
-        if (this.openCrate) {
-            this.openCrate = false;
-            let targetCrate;
-            let targetCrateDist;
-            for (let crate of Object.values(serverState.crates)) {
-                let dist = Math.hypot(this.globalX - crate.globalX, this.globalY - crate.globalY);
-                if (dist < 100) {
-                    if (!targetCrate) {
+    lootCrate(serverState, clientCrateID) {
+        let targetCrate;
+        let targetCrateDist;
+        for (let crate of Object.values(serverState.crates)) {
+            let dist = Math.hypot(this.globalX - crate.globalX, this.globalY - crate.globalY);
+            if (dist < 100) {
+                if (!targetCrate) {
+                targetCrate = crate;
+                    targetCrateDist = dist;
+                } else {
+                    if (dist < targetCrateDist) {
                         targetCrate = crate;
                         targetCrateDist = dist;
-                    } else {
-                        if (dist < targetCrateDist) {
-                            targetCrate = crate;
-                            targetCrateDist = dist;
-                        }
                     }
                 }
             }
+        }
 
-            if (targetCrate) {
-                console.log(targetCrate.crateID + 'looted!');
-                targetCrate.loot(this);
-            }
+        if (targetCrate && clientCrateID === targetCrate.crateID) {
+            targetCrate.loot(this);
         }
     }
 

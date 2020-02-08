@@ -10,7 +10,6 @@ import { renderDeathMenu } from "../UI/death/menu.js";
 import { clientCreateStructure } from "../sockets/player/clientCreateStructure.js";
 import { swing } from "../sockets/player/swing.js";
 import { dust } from "../dust/dust.js";
-import { clientOpenCrate } from "../sockets/player/clientOpenCrate.js";
 
 
 export class Player {
@@ -73,6 +72,8 @@ export class Player {
         this.structureSprites = {};
         // crate status
         this.openCrate = false;
+        this.targetCrate;
+        this.targetCrateDist;
     }
 
     movementKeys() {
@@ -129,7 +130,21 @@ export class Player {
         };
 
         this.e.release = () => {
-            this.openCrate = true;
+            for (let crate of Object.values(clientState.crates)) {
+                let dist = Math.hypot(this.globalX - crate.globalX, this.globalY - crate.globalY);
+                if (dist < 100) {
+                    this.openCrate = true;
+                    if (!this.targetCrate) {
+                        this.targetCrate = crate;
+                        this.targetCrateDist = dist;
+                    } else {
+                        if (dist < this.targetCrateDist) {
+                            this.targetCrate = crate;
+                            this.targetCrateDist = dist;
+                        }
+                    }
+                }
+            }
         }
         
         this.one.release = () => {
@@ -312,7 +327,7 @@ export class Player {
 
         this.placeable = true;
 
-        let objects = {...clientState.resources, ...clientState.structures, ...clientState.entities};
+        let objects = {...clientState.resources, ...clientState.structures, ...clientState.entities, ...clientState.crates};
         for (let [objectID, object] of Object.entries(objects)) {
             if (Math.hypot(object.globalX - this.globalX, object.globalY - this.globalY) < 750) { // only calculate on resources/objects near the player
                 let test;
@@ -322,6 +337,9 @@ export class Player {
                     test = bump.hitTestCircle(object.resourceGraphic, this.structureSprites[structureHand]);
                 } else if (objectID.charAt(0) === 'e') { // entities
                     test = bump.hitTestCircle(object.entityGraphic, this.structureSprites[structureHand]);
+                } else if (objectID.charAt(0) === 'c') { // crates
+                    console.log('aa')
+                    test = bump.hitTestCircle(object.crateGraphic, this.structureSprites[structureHand]);
                 } else {
                     test = false; // unidentified object, does not match the ID system
                 }
@@ -420,11 +438,21 @@ export class Player {
             player.viewpoint.removeChild(this.structureSprites[this.displayStructureHand]);
         }
 
-        let openCrate = false;
-        if (this.openCrate) {
-            openCrate = true;
+        if (this.targetCrate && clientState.crates[this.targetCrate.crateID]) { // if the player has a target crate and it exist in the client state
+            this.targetCrateDist = Math.hypot(this.globalX - this.targetCrate.globalX, this.globalY - this.targetCrate.globalY);
+            if (this.targetCrateDist > 100) {
+                this.openCrate = false;
+                this.targetCrate = undefined;
+                this.targetCrateDist = undefined;
+            }
+        } else {
+            this.targetCrate = undefined;
+            this.targetCrateDist = undefined;
             this.openCrate = false;
         }
+
+
+
         // emit client info to server
         clientEmit(socket, {
             vx: this.vx,
@@ -434,7 +462,7 @@ export class Player {
             displayHand: this.displayHand,
             structureHand: this.structureHand,
             focused: !document.hidden,
-            openCrate: openCrate
+            openCrate: this.openCrate
         });
     }
 

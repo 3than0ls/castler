@@ -109,6 +109,22 @@ export class Structure {
         if (this.particleStream) {
             this.particleStream.stop();
         }
-        player.viewpoint.removeChild(this.structureGraphic);
+        dust.create(
+            this.globalX,
+            this.globalY,
+            () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.structureName : 'stone').concat('Particle'))].texture),
+            player.viewpoint,
+            75,
+            0,
+            true,
+            0, 6.28,
+            10, 35,
+            1.5, 3,
+            0.015, 0.04,
+            0.015, 0.04,
+        );
+        charm.fadeOut(this.structureGraphic, 30).onComplete = () => {
+            player.viewpoint.removeChild(this.structureGraphic);
+        }
     }
 }

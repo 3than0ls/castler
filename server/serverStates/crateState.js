@@ -1,4 +1,5 @@
 const imageSize = require('image-size');
+const items = require('./../items/items.js');
 
 module.exports = class CrateState {
     constructor(globalX, globalY, contents, crateID) {
@@ -18,9 +19,9 @@ module.exports = class CrateState {
     }
     loot(player) {
         for (let [itemName, item] of Object.entries(this.contents)) {
-            if (!player.inventory[itemName]) { // if item does not exist, create it in player inventory
+            if (!player.inventory[itemName] && items[itemName]) { // if item does not exist, create it in player inventory
                 player.inventory[itemName] = {
-                    consumable: item.consumanble,
+                    consumable: items[itemName].consumable,
                     amount: 0,
                 }
             }

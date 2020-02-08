@@ -141,7 +141,7 @@ module.exports = class CreateMap {
                 stone: {
                     amount: 20,
                     consumable: false,
-                }
+            }
 
         }, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2)
     }

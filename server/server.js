@@ -193,7 +193,11 @@ io.on('connection', socket => {
     });
 
     socket.on('dropItem', data => {
-        serverState.users.user[socket.id].drop(data.type, data.amount);
+        serverState.users.user[socket.id].drop(data.type, data.amount, serverState);
+    });
+
+    socket.on('clientLootCrate', data => {
+        serverState.users.user[socket.id].lootCrate(serverState, data.crateID)
     });
 
     // when disconnected, remove user from server state
@@ -227,9 +231,9 @@ function update(serverState) {
 
     // emit data (perhaps combine all into one later)
     io.sockets.emit('userStates', serverState.users.userData);
+    io.sockets.emit('crateStates', serverState.crates);
     io.sockets.emit('structureStates', serverState.structures);
     io.sockets.emit('resourceStates', serverState.resources);
-    io.sockets.emit('crateStates', serverState.crates);
     io.sockets.emit('entityStates', serverState.entities.entityState);
     io.sockets.emit('areaStates', serverState.areas);
 

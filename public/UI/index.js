@@ -5,6 +5,9 @@ import { Leaderboard } from './leaderboard/leaderboard.js';
 import { HungerBar } from './statusBar/hungerBar/hungerBar.js';
 import { ControlUI } from './controlUI/controlUI.js';
 import { CraftingBar } from './statusBar/craftingBar/craftingBar.js';
+import { CrateInventory } from './staticInventories/crateInventory.js';
+import { StaticInventory } from './staticInventories/staticInventory.js';
+import { player } from '../app.js';
 
 
 function importAll (r) {
@@ -25,6 +28,7 @@ export function App() {
                 <HungerBar />
                 <CraftingBar />
                 <Leaderboard />
+                <StaticInventory />
             </div>
         </>
     )
