@@ -2,14 +2,14 @@ const imageSize = require('image-size');
 const items = require('./../items/items.js');
 
 module.exports = class CrateState {
-    constructor(globalX, globalY, contents, crateID) {
+    constructor(globalX, globalY, contents, disappearTime, crateID) {
         this.crateID = crateID || 'c' + Math.random().toString(36).substr(2, 9);
         this.globalX = globalX || 0;
         this.globalY = globalY || 0;
         this.contents = contents || {};
         // this.size = [imageSize(`./public/assets/resources/${type}.png`).width, imageSize(`./public/assets/resources/${type}.png`).height];
 
-        this.disappearTime = 10000;
+        this.disappearTime = disappearTime || 10000;
     }
     update(serverState) {
         this.disappearTime --;

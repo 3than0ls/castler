@@ -17,7 +17,6 @@ export const userUpdate = (socket, clientState) => {
                 let enemy = clientState.enemies[userID];
                 if (enemy.toolTier !== serverStateUser.toolTier) {
                     Player.createHandSprites(enemy.handSprites, serverStateUser.globalX, serverStateUser.globalY, serverStateUser.toolTier);
-                    console.log('creating');
                 }
                 enemy.animate(
                     serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand, serverStateUser.toolTier,

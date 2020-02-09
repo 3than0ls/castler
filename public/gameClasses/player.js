@@ -257,11 +257,9 @@ export class Player {
         }
 
         const clientConsumable = Object.keys(this.consumable);
-        // console.log(clientConsumable);
         let consumableDifference = clientConsumable.filter(function(item) {
             return !serverConsumable[item]
         }); 
-        // console.log(consumableDifference)
         for (let i = 0; i < consumableDifference.length; i++) { // delete
             delete this.consumable[consumableDifference[i]];
         }
@@ -338,7 +336,6 @@ export class Player {
                 } else if (objectID.charAt(0) === 'e') { // entities
                     test = bump.hitTestCircle(object.entityGraphic, this.structureSprites[structureHand]);
                 } else if (objectID.charAt(0) === 'c') { // crates
-                    console.log('aa')
                     test = bump.hitTestCircle(object.crateGraphic, this.structureSprites[structureHand]);
                 } else {
                     test = false; // unidentified object, does not match the ID system
@@ -411,7 +408,7 @@ export class Player {
         this.handSprites[this.handSpriteKey].angle += this.swingAngle
         this.bodyGraphic.rotation = this.angle;
 
-        if (this.mouseHeld && this.dislayHand !== "hand") {
+        if (this.mouseHeld && this.dislayHand !== "hand" && !this.structureHand) {
             swing(socket, { swing: true });
         }
 

@@ -1,4 +1,4 @@
-import { player } from "../../app";
+import { player, boundary } from "../../app";
 import { Player } from "../../gameClasses/player";
 
 export const clientDataUpdate = (socket) => {
@@ -30,6 +30,6 @@ export const clientDataUpdate = (socket) => {
         player.score = data.score;
         if (data.dead) {
             player.died();
-        }
+        };
     })
 };

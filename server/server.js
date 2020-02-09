@@ -41,8 +41,8 @@ const serverState = {
     crates: {}, // crates are containers of dropped items from players
 }
 
-const map = new CreateMap(serverState, [1000, 1000]);
-map.test4(serverState);
+const map = new CreateMap(serverState, [6000, 6000]);
+map.test(serverState);
 
 const gameItems = require('./items/items.js');
 
@@ -91,8 +91,7 @@ io.on('connection', socket => {
             swingAngle: user.swingAngle,
         };
 
-        if (user.health <= 0) { // check if client has died
-            serverState.users.userData[data.id].dead = true;
+        if (user.health <= 0 || user.dead) { // check if client has died
             clientUpdateData.dead = true;
         }
         // user.playerTick(); // tick player
@@ -206,9 +205,11 @@ io.on('connection', socket => {
         socket.broadcast.emit('userLeave', socket.id);
         for (let [structureID, structure] of Object.entries(serverState.structures)) {
             if (structure.parentID === socket.id) {
+                serverState.structures[structureID].destroyed(CreateMap, serverState);
                 delete serverState.structures[structureID]; // delete structures that were created by the client
             }
         }
+        serverState.users.user[socket.id].die(CreateMap, serverState);
         delete serverState.users.user[socket.id]; // delete client data
         delete serverState.users.userData[socket.id];
     });

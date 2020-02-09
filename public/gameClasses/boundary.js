@@ -15,6 +15,7 @@ export class Boundary {
         // draw thin transparent black line edges for boundary boxes
         this.boundaryRect.lineStyle(4, 0x000000, 0.3);
         this.boundaryRect.drawRect(0, 0, this.size[0], this.size[1]);
+        this.boundaryRect.zIndex = -1;
 
         
         this.boundaryRect.pivot.x = this.size[0]/2;

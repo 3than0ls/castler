@@ -103,7 +103,15 @@ module.exports = class CreateMap {
         CreateMap.createStructures(serverState, 3, -1000, -1000, 1000, 1000, { type: 'furnace' });
 
         
-        // create more restrictive and accurate spawn area based on area size later
+        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
+            type: 'lake',
+            entities: [
+                {type: 'beetle', amount: 2},
+            ],
+            resources: [],
+            entityLimit: 4,
+        });
+
         CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
             type: 'mine',
             entities: [
@@ -141,8 +149,21 @@ module.exports = class CreateMap {
                 stone: {
                     amount: 20,
                     consumable: false,
-            }
-
+                },
+                wood: {
+                    amount: 20,
+                    consumable: false,
+                },
         }, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2)
+
+        // create more restrictive and accurate spawn area based on area size later
+        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
+            type: 'lake',
+            entities: [
+                {type: 'beetle', amount: 2},
+            ],
+            resources: [],
+            entityLimit: 4,
+        });
     }
 }

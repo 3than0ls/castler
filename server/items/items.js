@@ -114,6 +114,7 @@ module.exports = {
         consumedOnCraft: true,
         consumeFunction: (user) => {
             user.toolTier = 'iron';
+            consumed(user, 'ironTools');
         },
         craftingTime: 3500,
         recipes: [

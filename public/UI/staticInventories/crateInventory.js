@@ -43,19 +43,22 @@ export class CrateInventory extends React.Component {
             }
             return name;
         }
-        const item = Object.keys(this.props.item)[0];
-        const amount = this.props.item[item].amount;
-        const itemName = displayRename(item);
+        const inventoryItems = [];
+        for (let [item, itemData] of Object.entries(this.props.item)) {
+            inventoryItems.push(
+                <div key={item} className="staticInventoryItem">
+                    <div className="staticInventoryName">
+                        {displayRename(item)} x{itemData.amount}
+                    </div>
+                    <Image className='staticInventoryImage' src={this.state.images[`${item}.png`]}/>
+                </div>
+            )
+        }
         return(
             <> 
                 <div className="staticInventoryWrapper">
                     <div className="staticInventoryContainer">
-                        <div className="staticInventoryItem">
-                            <div className="staticInventoryName">
-                                {itemName} x{amount}
-                            </div>
-                            <Image className='staticInventoryImage' src={this.state.images[`${item}.png`]}/>
-                        </div>
+                        {inventoryItems}
                         <div className="staticInventoryOptions">
                             <Button variant="loot" onClick={this.onLoot}>
                                 Loot

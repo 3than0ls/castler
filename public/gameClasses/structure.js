@@ -13,6 +13,18 @@ export class Structure {
 
         this.type = type;
         this.particleStream;
+        this.particleType;
+        switch (this.type) {
+            case 'workbench':
+            case 'wall':
+                this.particleType = 'splinter';
+                break;
+            case 'furnace':
+                this.particleType = 'stone';
+                break;
+            default: 
+            this.particleType = 'splinter';
+        }
 
         this.tweenTick = 0;
     }
@@ -52,16 +64,17 @@ export class Structure {
         dust.create(
             collisionX,
             collisionY,
-            () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.structureName : 'stone').concat('Particle'))].texture),
+            () => new PIXI.Sprite(loader.resources['particles/'.concat(this.particleType).concat('Particle')].texture),
             player.viewpoint,
-            25,
+            85,
             0,
             true,
             0, 6.28,
             12, 24,
-            1.5, 2,
+            0.75, 1.25,
             0.005, 0.01,
             0.005, 0.01, // sometimes for a split second, it renders over the resource sprite, fix?
+            0.1, 0.2
         );
     }
     
@@ -112,7 +125,7 @@ export class Structure {
         dust.create(
             this.globalX,
             this.globalY,
-            () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.structureName : 'stone').concat('Particle'))].texture),
+            () => new PIXI.Sprite(loader.resources['particles/'.concat(this.particleType).concat('Particle')].texture),
             player.viewpoint,
             75,
             0,

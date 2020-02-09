@@ -72,6 +72,8 @@ module.exports = class UserState {
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
 
+        this.inWater = false;
+
         // hunger and regen tick and timer variables
         this.hungerTick = 0;
         this.hungerSpeed = 800;
@@ -92,10 +94,26 @@ module.exports = class UserState {
         this.alreadySwungAt = [];
     }
 
+    affectPlayerInsideArea(area) {
+        if (area.objectInsideArea(this)) {
+            switch (area.type) {
+                case 'mine': 
+                    // something
+                    break;
+                case 'lake':
+                    this.inWater = true;
+                    break;
+            }
+        }
+    }
+
     update(serverState, map, io) {
         this.playerTick();
         this.updateCollisionPoints();
-        //
+        // update if dead or not
+        if (this.health <= 0) {
+            this.dead = true;
+        }
         // update tool tier
         if (this.toolTier === "wood") {
             this.damage = 25;
@@ -112,6 +130,14 @@ module.exports = class UserState {
         }
         // position updates
         // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
+        // area dependent variables
+        this.inWater = false;
+        for (let area of Object.values(serverState.areas)) {
+            this.affectPlayerInsideArea(area);
+        }
+        if (this.inWater) {
+            this.speed = this.maxSpeed/2;
+        }
         if (this.vx !== 0 && this.vy !== 0) {
             this.globalX += this.vx * this.speed * Math.sin(45);
             this.globalY += this.vy * this.speed * Math.sin(45);
@@ -232,6 +258,7 @@ module.exports = class UserState {
                                 collisionY: this.collisionPoints[this.displayHandType].y,
                                 structureID: structure.structureID,
                             });
+                            structure.destroyed(createMap, serverState)
                             delete serverState.structures[structure.structureID];
                         }
                     }
@@ -345,10 +372,7 @@ module.exports = class UserState {
                     * -Math.cos(-this.angle - (-0.95 + this.swingAngle * (Math.PI/180))),
                 }
             }
-            // console.log(displayHandType, this.collisionPoints[displayHandType].x, this.collisionPoints[displayHandType].y);
         }
-
-        // console.log(this.collisionPoints[this.displayHandType], this.size[0]);
     }
 
     updateClientInfo(vx, vy, angle, swingAngle, displayHand, structureHand, focused, openCrate) {
@@ -577,8 +601,18 @@ module.exports = class UserState {
         }
         return itemFilteredStructures;
     }
-    
 
+    die(createMap, serverState) {
+        let inventory = {};
+        for (let [itemName, itemData] of Object.entries(this.inventory)) {
+            inventory[itemName] = {
+                amount: itemData.amount,
+                consumable: items[itemName].consumable
+            }
+        }
+        createMap.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
+        createMap.createCrate(serverState, { [this.toolTier.concat('Tools')]: { amount: 1, consumable: true } }, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
+    }
 
     clientDataPackage() {
         let flash = false;

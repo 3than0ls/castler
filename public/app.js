@@ -77,7 +77,6 @@ export function update() {
     charm.update();
     dust.update();
 
-    boundary.updateBoundary();
     player.update();
 }
 

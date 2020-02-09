@@ -1,4 +1,5 @@
 const imageSize = require('image-size');
+const items = require('./../items/items.js');
 
 function randomInt(min, max) {
     min = Math.ceil(min);
@@ -36,6 +37,26 @@ module.exports = class StructureState {
             object.globalY >= -this.size[1] + this.globalY && object.globalY <= this.size[1] + this.globalY) {
             return true;
         }
+    }
+
+    destroyed(createMap, serverState) {
+        /* individual bags
+        for (let [itemName, itemAmount] of Object.entries(items[this.type].recipes[0])) {
+            createMap.createCrate(serverState, {
+                [itemName]: {
+                    amount: itemAmount,
+                    consumable: items[itemName].consumable
+                }
+            }, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3)
+        }*/
+        let inventory = {};
+        for (let [itemName, itemAmount] of Object.entries(items[this.type].recipes[0])) {
+            inventory[itemName] = {
+                amount: itemAmount,
+                consumable: items[itemName].consumable
+            }
+        }
+        createMap.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3)
     }
 
     clear(serverState) {
