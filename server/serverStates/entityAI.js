@@ -94,7 +94,7 @@ module.exports = class EntityAI {
         for (let [areaID, area] of Object.entries(serverStateAreas)) {
             let entityInsideArea = area.objectInsideArea(this.entityState); // keep out external entities
             // if the entity is inside the area, the area is not the entities home area, and the entity has not been hit, then turn it away from area
-            if (entityInsideArea && this.entityState.homeAreaID !== areaID && !this.hit) {
+            if (entityInsideArea && this.entityState.homeAreaID === 'map' && !this.hit) {
                 let angle = (Math.round((Math.atan2(
                     this.entityState.globalY - area.globalY,
                     this.entityState.globalX - area.globalX
@@ -389,11 +389,13 @@ module.exports = class EntityAI {
                         this.globalY = randomInt(minY, maxY);
                     }
                     if (i === maxDisplacementRuns-1) { // if still displaced, just delete the resource
-                        if (objectID[0] === 's') { // tests if it is a structure
+                        /*f (objectID[0] === 's') { // tests if it is a structure
                             delete serverState.structures[objectID]; // if it is, delete from server state structures
                         } else if (objectID[0] === 'r') { // tests if it is a resource
                             delete serverState.resources[objectID]; // if it is, delete from server state resources
-                        }
+                        }*/
+                        this.globalX = randomInt(minX, maxX);
+                        this.globalY = randomInt(minY, maxY);
                         break;
                     }
                 } else {

@@ -3,6 +3,7 @@ const collisions = require('./../collisions.js');
 const createMap = require('./../createMap.js');
 const items = require('./../items/items.js');
 const imageSize = require('image-size');
+const effects = require('./../items/effects.js')
 
 module.exports = class UserState {
     constructor(socketID, globalX, globalY, angle) {
@@ -41,6 +42,12 @@ module.exports = class UserState {
         this.maxSpeed = 4
 
         this.size = [imageSize('./public/assets/player/playerBody.png').width * 0.865, imageSize('./public/assets/player/playerBody.png').height * 0.865];
+
+        this.effects = {
+            poisoned: {
+                tick: 0,
+            }
+        };
 
         this.inventory = {
             cookedMeat: {
@@ -98,11 +105,45 @@ module.exports = class UserState {
         if (area.objectInsideArea(this)) {
             switch (area.type) {
                 case 'mine': 
-                    // something
                     break;
                 case 'lake':
-                    this.inWater = true;
+                    this.effects['swimming'] = {
+                        tick: 0,
+                    }
                     break;
+            }
+        }
+    }
+
+    affectPlayerNearStructure(structure) {
+        if (structure.objectWithinRange(this)) {
+            switch (structure.type) {
+                case 'workbench':
+                    break;
+                case 'furnace':
+                    this.effects['warmed'] = {
+                        tick: 0,
+                    }
+                    break;
+                    
+            }
+        }
+    }
+
+    effectsUpdate() {
+        for (let [effectName, effectData] of Object.entries(this.effects)) {
+            if (effects[effectName].effectOverTime) {
+                if (effectData.tick % effects[effectName].effectSpeed === 0) {
+                    effects[effectName].effect(this)
+                }
+            } else {
+                effects[effectName].effect(this);
+            }
+
+            this.effects[effectName].tick ++;
+
+            if (effectData.tick >= effects[effectName].expires) {
+                delete this.effects[effectName];
             }
         }
     }
@@ -130,14 +171,14 @@ module.exports = class UserState {
         }
         // position updates
         // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
-        // area dependent variables
-        this.inWater = false;
+        // update attributes dependent on location relative to areas and structures
         for (let area of Object.values(serverState.areas)) {
             this.affectPlayerInsideArea(area);
         }
-        if (this.inWater) {
-            this.speed = this.maxSpeed/2;
+        for (let structure of Object.values(serverState.structures)) {
+            this.affectPlayerNearStructure(structure);
         }
+        this.effectsUpdate(); // update all effect ticks and handling
         if (this.vx !== 0 && this.vy !== 0) {
             this.globalX += this.vx * this.speed * Math.sin(45);
             this.globalY += this.vy * this.speed * Math.sin(45);
@@ -628,6 +669,7 @@ module.exports = class UserState {
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
             attackFlash: flash,
+            effects: this.effect,
 
             toolTier: this.toolTier,
 

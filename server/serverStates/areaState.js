@@ -34,6 +34,8 @@ module.exports = class AreaState {
                 return false;
             }
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -69,6 +71,7 @@ module.exports = class AreaState {
     }
 
     create(serverState, CreateMap) {
+
         // clear area of previous resources, then insert in new ones
         // clear resources and entities
         this.clearedObjects = 0;

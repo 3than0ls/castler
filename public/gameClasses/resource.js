@@ -72,11 +72,11 @@ export class Resource {
             collisionY,
             () => new PIXI.Sprite(loader.resources['particles/'.concat((this.resourceName ? this.resourceName : 'stone').concat('Particle'))].texture),
             player.viewpoint,
-            25,
+            15,
             0,
             true,
             0, 6.28,
-            12, 24,
+            10, 20,
             1.5, 2,
             0.005, 0.01,
             0.005, 0.01, // sometimes for a split second, it renders over the resource sprite, fix?

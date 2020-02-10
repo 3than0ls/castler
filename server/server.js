@@ -41,8 +41,8 @@ const serverState = {
     crates: {}, // crates are containers of dropped items from players
 }
 
-const map = new CreateMap(serverState, [6000, 6000]);
-map.test(serverState);
+const map = new CreateMap(serverState, [2400, 2400]);
+map.test4(serverState);
 
 const gameItems = require('./items/items.js');
 
@@ -111,9 +111,21 @@ io.on('connection', socket => {
     });
 
     socket.on('clientRequestConsume', data => {
-        if (serverState.users.user[socket.id].inventory[data.item]) { // check if inventory item exists
-            if (serverState.users.user[socket.id].inventory[data.item].amount > 0) {
-                gameItems[data.item].consumeFunction(serverState.users.user[socket.id]);
+        const user = serverState.users.user[socket.id];
+        if (user.inventory[data.item]) { // check if inventory item exists
+            if (user.inventory[data.item].amount > 0) {
+                if (data.item.slice(-5).toLowerCase() === 'tools') {
+                    if (user.toolTier === 'wood' && (data.item === 'stoneTools' || data.item === 'ironTools')) {
+                        gameItems[data.item].consumeFunction(user);
+                    } else if (user.toolTier === 'stone' && (data.item === 'woodTools' || data.item === 'stoneTools')) {
+                        gameItems[data.item].consumeFunction(user);
+                    }
+                    if (user.toolTier === 'iron' && (data.item === 'woodTools' || data.item === 'stoneTools')) {
+                        gameItems[data.item].consumeFunction(user);
+                    }
+                } else {
+                    gameItems[data.item].consumeFunction(user);
+                }
             }
         }
     });

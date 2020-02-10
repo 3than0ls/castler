@@ -68,7 +68,7 @@ module.exports = class CreateMap {
             if (!config.globalY) config.globalY = randomInt(minY, maxY);
             let area = new AreaState(config);
             serverState.areas[area.areaID] = area;
-            area.create(serverState, CreateMap);
+            area.create(serverState, CreateMap, minX, minY, maxX, maxY);
         }
     }
     
@@ -163,6 +163,18 @@ module.exports = class CreateMap {
                 {type: 'beetle', amount: 2},
             ],
             resources: [],
+            entityLimit: 4,
+        });
+
+        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
+            type: 'mine',
+            entities: [
+                {type: 'beetle', amount: 2},
+            ],
+            resources: [
+                {type: 'iron', amount: 4},
+                {type: 'rock', amount: 4}
+            ],
             entityLimit: 4,
         });
     }
