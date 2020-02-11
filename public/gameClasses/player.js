@@ -53,6 +53,8 @@ export class Player {
             crafting: false,
             craftingComplete: 1,
         };
+        this.effects = {};
+        this.particleEffects = {};
 
         // player statuses and small stuff
         // swing animation variables
@@ -218,6 +220,52 @@ export class Player {
         this.viewpoint.position.set(-this.globalX+this.x, -this.gloalY+this.y); // adjust so viewpoint positioned in the middle
         let viewpoint = this.viewpoint;
         stage.addChild(viewpoint);
+    }
+
+    effectsUpdate() {
+        for (let [effectName, effect] of Object.entries(this.effects)) {
+            switch (effectName) {
+                case 'swimming':
+                    if (!this.particleEffects['swimming']) {
+                        this.particleEffects['swimming'] = 
+                        this.particleStream = dust.emitter(
+                            400, () => {
+                                dust.create(
+                                    this.globalX,
+                                    this.globalY,
+                                    () => {
+                                        let sprite = new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture);
+                                        sprite.tint = 0x0e2a51;
+                                        sprite.zIndex = 15;
+                                        return sprite;
+                                    },
+                                    player.viewpoint,
+                                    2,
+                                    0,
+                                    true,
+                                    0, 6.28,
+                                    15, 35,
+                                    0.2, 0.35,
+                                    -0.0025, -0.007,
+                                    0.0025, 0.0075,
+                                )
+                            }
+                        );
+                    }
+                    if (this.vx || this.vy) {
+                        this.particleEffects['swimming'].play();
+                    } else {
+                        this.particleEffects['swimming'].stop();
+                    }
+                    break;
+            }
+        }
+
+        for (let [effectName, effectEmitter] of Object.entries(this.particleEffects)) {
+            if (!this.effects[effectName]) {
+                effectEmitter.stop();
+            }
+        }
     }
 
     viewpointUpdate() {
@@ -395,6 +443,9 @@ export class Player {
         // update positioning to x and y display (not global). x and y will only ever change in screen resizes
         this.bodyGraphic.position.set(this.x, this.y);
         this.handSprites[this.handSpriteKey].position.set(this.x, this.y);
+
+        // update particles
+        this.effectsUpdate();
 
         // update viewpoint
         this.viewpointUpdate();

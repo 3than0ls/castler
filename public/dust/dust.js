@@ -113,7 +113,9 @@ class Dust {
       //The `particles` array needs to be updated by the game loop each frame particles.push(particle);
       particles.push(particle);
 
-      particle.zIndex = 100;
+      if (!particle.zIndex) { // added particle z indexes
+        particle.zIndex = 49;
+      }
 
       //Add the particle to its parent container
       container.addChild(particle);

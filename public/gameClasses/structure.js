@@ -82,11 +82,15 @@ export class Structure {
         if (!this.particleStream) {
             if (this.type === 'furnace') {
                 this.particleStream = dust.emitter(
-                    160, () => {
+                    240, () => {
                         dust.create(
                             this.globalX,
                             this.globalY,
-                            () => new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture),
+                            () => {
+                                let sprite = new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture);
+                                sprite.tint = 0x232323;
+                                return sprite;
+                            },
                             player.viewpoint,
                             2,
                             0,

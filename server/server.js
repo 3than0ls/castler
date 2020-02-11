@@ -82,7 +82,7 @@ io.on('connection', socket => {
                 crafting: user.crafting,
                 craftingComplete: user.craftingComplete,
             },
-            
+            effects: user.effects,
             toolTier: user.toolTier,
             harvestSpeed: user.harvestSpeed,
             attackSpeed: user.attackSpeed,

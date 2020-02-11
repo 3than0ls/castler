@@ -16,6 +16,8 @@ export const clientDataUpdate = (socket) => {
         player.attackSpeed = data.attackSpeed;
         player.harvestSpeed = data.harvestSpeed;
 
+        player.effects = data.effects;
+
         player.swingAngle = data.swingAngle;
 
         // player.displayHand = data.displayHand;

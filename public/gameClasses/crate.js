@@ -54,7 +54,11 @@ export class Crate {
                     dust.create(
                         this.globalX,
                         this.globalY,
-                        () => new PIXI.Sprite(loader.resources['particles/redSmokeParticle'].texture),
+                        () => {
+                            let sprite = new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture);
+                            sprite.tint = 0x510e0e;
+                            return sprite
+                        },
                         player.viewpoint,
                         Math.max(2, Math.ceil((Object.values(this.contents)[0].amount/20))),
                         0,

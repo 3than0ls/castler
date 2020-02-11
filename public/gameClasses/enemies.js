@@ -17,6 +17,9 @@ export class Enemy {
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
         this.handSprites = {};
         this.toolTier = toolTier;
+
+        this.effects = {};
+        this.particleEffects = {};
     }
 
     attackFlash() {
@@ -42,6 +45,52 @@ export class Enemy {
         );
     }
 
+    effectsUpdate() {
+        for (let [effectName, effect] of Object.entries(this.effects)) {
+            switch (effectName) {
+                case 'swimming':
+                    if (!this.particleEffects['swimming']) {
+                        this.particleEffects['swimming'] = 
+                        this.particleStream = dust.emitter(
+                            400, () => {
+                                dust.create(
+                                    this.globalX,
+                                    this.globalY,
+                                    () => {
+                                        let sprite = new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture);
+                                        sprite.tint = 0x0e2a51;
+                                        sprite.zIndex = 15;
+                                        return sprite;
+                                    },
+                                    player.viewpoint,
+                                    2,
+                                    0,
+                                    true,
+                                    0, 6.28,
+                                    15, 35,
+                                    0.2, 0.35,
+                                    -0.0025, -0.007,
+                                    0.0025, 0.0075,
+                                )
+                            }
+                        );
+                    }
+                    if (this.vx || this.vy) {
+                        this.particleEffects['swimming'].play();
+                    } else {
+                        this.particleEffects['swimming'].stop();
+                    }
+                    break;
+            }
+        }
+
+        for (let [effectName, effectEmitter] of Object.entries(this.particleEffects)) {
+            if (!this.effects[effectName]) {
+                effectEmitter.stop();
+            }
+        }
+    }
+
     render() { // basically what happens for players
         // render body graphic
         this.bodyGraphic = new PIXI.Sprite(loader.resources['player/playerBody'].texture);
@@ -63,14 +112,24 @@ export class Enemy {
         player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }
 
-    animate(globalX, globalY, angle, swingAngle, displayHand, toolTier) {
+    animate(globalX, globalY, angle, swingAngle, displayHand, toolTier, effects) {
         // the animate function is different from the update in player class
         // animate takes input supplied from the server and applies it to the enemies
         // update positioning
+        this.cachedGlobalX = JSON.parse(JSON.stringify(this.globalX)); // deep clone for cached values, which are previous values
+        this.cachedGlobalY = JSON.parse(JSON.stringify(this.globalY));
         this.globalX = globalX;
         this.globalY = globalY;
+
+        this.vx = this.globalX - this.cachedGlobalX; // used in swimming particle playing
+        this.vy = this.globalY - this.cachedGlobalY;
+
         // update angle 
         this.angle = angle;
+
+        // update effects
+        this.effects = effects;
+        this.effectsUpdate();
 
         // remove current displayed hand (which may be different) and then update it
         player.viewpoint.removeChild(this.handSprites[this.handSpriteKey]);

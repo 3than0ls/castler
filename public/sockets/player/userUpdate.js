@@ -19,7 +19,7 @@ export const userUpdate = (socket, clientState) => {
                     Player.createHandSprites(enemy.handSprites, serverStateUser.globalX, serverStateUser.globalY, serverStateUser.toolTier);
                 }
                 enemy.animate(
-                    serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand, serverStateUser.toolTier,
+                    serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand, serverStateUser.toolTier, serverStateUser.effects
                 );
                 if (serverStateUser.attackFlash) {
                     clientState.enemies[userID].attackFlash();

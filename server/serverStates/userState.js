@@ -105,6 +105,7 @@ module.exports = class UserState {
         if (area.objectInsideArea(this)) {
             switch (area.type) {
                 case 'mine': 
+                    delete this.effects['swimming'];
                     break;
                 case 'lake':
                     this.effects['swimming'] = {
@@ -140,10 +141,12 @@ module.exports = class UserState {
                 effects[effectName].effect(this);
             }
 
-            this.effects[effectName].tick ++;
-
             if (effectData.tick >= effects[effectName].expires) {
                 delete this.effects[effectName];
+            }
+
+            if (this.effects[effectName]) {
+                this.effects[effectName].tick ++;
             }
         }
     }
@@ -172,9 +175,10 @@ module.exports = class UserState {
         // position updates
         // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
         // update attributes dependent on location relative to areas and structures
-        for (let area of Object.values(serverState.areas)) {
+        for (let area of Object.values(serverState.areas).sort((a,b) => (a.zIndex > b.zIndex) ? 1 : ((b.zIndex > a.zIndex) ? -1 : 0))) { // apply effects based on area z index
             this.affectPlayerInsideArea(area);
         }
+        console.log('a-a-a-')
         for (let structure of Object.values(serverState.structures)) {
             this.affectPlayerNearStructure(structure);
         }
@@ -669,7 +673,7 @@ module.exports = class UserState {
             swingAngle: this.swingAngle,
             displayHand: this.displayHand,
             attackFlash: flash,
-            effects: this.effect,
+            effects: this.effects,
 
             toolTier: this.toolTier,
 

@@ -7,7 +7,7 @@ function randomInt(min, max) {
 }
 
 module.exports = class AreaState {
-    constructor(config) {
+    constructor(config, zIndex) {
         this.globalX = config.globalX;
         this.globalY = config.globalY;
 
@@ -23,6 +23,8 @@ module.exports = class AreaState {
         this.entityLimit = config.entityLimit || this.entityCount;
         this.entityRespawnTime = config.entityRespawnTime || 1000;
         this.entityRespawnTick = 0;
+
+        this.zIndex = zIndex || 0;
 
         this.areaID = 'a' + Math.random().toString(36).substr(2, 9);
     }
@@ -71,7 +73,6 @@ module.exports = class AreaState {
     }
 
     create(serverState, CreateMap) {
-
         // clear area of previous resources, then insert in new ones
         // clear resources and entities
         this.clearedObjects = 0;

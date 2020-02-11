@@ -58,7 +58,7 @@ module.exports = class CreateMap {
         }
     }
     
-    static createAreas(serverState, amount, minX, minY, maxX, maxY, areaConfig) { 
+    static createAreas(serverState, amount, minX, minY, maxX, maxY, areaConfig, zIndex) { 
         // area state takes special variables because inside area state, this file is also imported, which clashes with each other
         // to fix this, we don't import this file in area state, but rather pass this class off as a parameter that's used in area state to create entities and resources
 
@@ -66,9 +66,9 @@ module.exports = class CreateMap {
             let config = JSON.parse(JSON.stringify(areaConfig)); // created a deep clone copy of the config and edit it if necessary
             if (!config.globalX) config.globalX = randomInt(minX, maxX);
             if (!config.globalY) config.globalY = randomInt(minY, maxY);
-            let area = new AreaState(config);
+            let area = new AreaState(config, zIndex + i);
             serverState.areas[area.areaID] = area;
-            area.create(serverState, CreateMap, minX, minY, maxX, maxY);
+            area.create(serverState, CreateMap);
         }
     }
     
@@ -164,7 +164,7 @@ module.exports = class CreateMap {
             ],
             resources: [],
             entityLimit: 4,
-        });
+        }, 0);
 
         CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
             type: 'mine',
@@ -176,6 +176,6 @@ module.exports = class CreateMap {
                 {type: 'rock', amount: 4}
             ],
             entityLimit: 4,
-        });
+        }, 1);
     }
 }
