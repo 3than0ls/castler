@@ -17,4 +17,3 @@ export const areaUpdate = (socket, clientState) => {
 };
 
 // perhaps not needed, areas only require a create
-// also, reformat other game object socket updates to this format

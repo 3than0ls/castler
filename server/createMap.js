@@ -106,7 +106,7 @@ module.exports = class CreateMap {
         CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
             type: 'lake',
             entities: [
-                {type: 'beetle', amount: 2},
+                {type: 'frog', amount: 2},
             ],
             resources: [],
             entityLimit: 4,
@@ -144,6 +144,13 @@ module.exports = class CreateMap {
 
     test4(serverState) {
         const size = this.size;
+        
+        CreateMap.createResources(serverState, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createResources(serverState, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+
+        CreateMap.createEntities(serverState, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        CreateMap.createEntities(serverState, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+        
         CreateMap.createCrate(serverState, 
             { 
                 stone: {
@@ -160,7 +167,7 @@ module.exports = class CreateMap {
         CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
             type: 'lake',
             entities: [
-                {type: 'beetle', amount: 2},
+                {type: 'frog', amount: 2},
             ],
             resources: [],
             entityLimit: 4,

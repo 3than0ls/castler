@@ -22,16 +22,18 @@ module.exports = {
         effectOverTime: true,
         effectSpeed: 200,
         effect: function(user) {
-            user.health -= 3;
+            user.health -= 5;
+            user.attackFlash = true;
         },
-        expires: 2000,
+        expires: 1400,
     }),
 
     warmed: new Effect('warmed', {
         effectOverTime: true,
-        effectSpeed: 500,
+        effectSpeed: 300,
         effect: function(user) {
             user.health ++;
         },
+        expires: 300,
     })
 }

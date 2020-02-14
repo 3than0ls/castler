@@ -29,6 +29,9 @@ export class Entity {
             case "beetle":
                 this.entityGraphic.radius = (this.entityGraphic.width * 0.883)/2;
                 break;
+            case "frog":
+                this.entityGraphic.radius = (this.entityGraphic.width * 0.865)/2;
+                break;
         }
         
         // set positions

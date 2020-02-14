@@ -15,7 +15,7 @@ module.exports = function lootDrops(type) {
             break;
         case "beetle":
             loot = {
-                rawMeat: 1,
+                mandibles: 1,
             }
     }
     return loot;

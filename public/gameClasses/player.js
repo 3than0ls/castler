@@ -56,6 +56,8 @@ export class Player {
         this.effects = {};
         this.particleEffects = {};
 
+        this.walkParticles;
+
         // player statuses and small stuff
         // swing animation variables
         this.swingAngle = 0;
@@ -227,9 +229,8 @@ export class Player {
             switch (effectName) {
                 case 'swimming':
                     if (!this.particleEffects['swimming']) {
-                        this.particleEffects['swimming'] = 
-                        this.particleStream = dust.emitter(
-                            400, () => {
+                        this.particleEffects['swimming'] =  dust.emitter(
+                            600, () => {
                                 dust.create(
                                     this.globalX,
                                     this.globalY,
@@ -245,7 +246,7 @@ export class Player {
                                     true,
                                     0, 6.28,
                                     15, 35,
-                                    0.2, 0.35,
+                                    0.05, 0.1,
                                     -0.0025, -0.007,
                                     0.0025, 0.0075,
                                 )
@@ -257,6 +258,35 @@ export class Player {
                     } else {
                         this.particleEffects['swimming'].stop();
                     }
+                    break;
+                    
+                case 'poisoned':
+                    if (!this.particleEffects['poisoned']) {
+                        this.particleEffects['poisoned'] = dust.emitter(
+                            500, () => {
+                                dust.create(
+                                    this.globalX+35*(Math.random()-0.5),
+                                    this.globalY+35*(Math.random()-0.5),
+                                    () => {
+                                        let sprite = new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture);
+                                        sprite.tint = 0x0B5819;
+                                        sprite.zIndex = 15;
+                                        return sprite;
+                                    },
+                                    player.viewpoint,
+                                    2,
+                                    0,
+                                    true,
+                                    0, 6.28,
+                                    10, 17,
+                                    0.33, 0.35,
+                                    -0.0025, -0.003,
+                                    0.00375, 0.00385,
+                                )
+                            }
+                        );
+                    }
+                    this.particleEffects['poisoned'].play();
                     break;
             }
         }

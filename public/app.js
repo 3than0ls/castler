@@ -31,13 +31,11 @@ export const clientState = {
     (entity-area border issue)
     entities for some reason in areas go to edge and then get stuck there when they try to go back
     BIG:
-    armor
+    armor <-- NEXT
 
-    pvp <--- NEEDS EXPANSION (but how)
+    HOSTILE ENTITIES
 
-    player placable buildings <-- NEEDS EXPANSION
-
-    make a more organized inventory UI and limit inventory amount <-- NEXT (create a consumable section for the control UI)
+    create walking particle
 
     if nothing else is to be done, work on creating sprites and more entities, resources, and structures until you think of an idea! 
 

@@ -82,6 +82,27 @@ function consumed(user, itemName) {
     }
 };
 
+function swapTools(user, newToolTier) {
+    const currentTools = user.toolTier.concat('Tools');
+    const newTools = newToolTier.concat('Tools');
+    if (!user.inventory[currentTools]) {
+        user.inventory[currentTools] = {
+            amount: 0,
+            consumable: true,
+        }
+    }
+    user.inventory[currentTools].amount += 1;
+    user.inventory[currentTools].consumable = true; // should be uneccessary and redundant, but just in case...
+
+    user.toolTier = newToolTier;
+    if (user.inventory[newTools]) {
+        user.inventory[newTools].amount --;
+        if (user.inventory[newTools].amount <= 0) {
+            delete user.inventory[newTools];
+        }
+    }
+}
+
 // make the only parameter for Item a config
 
 module.exports = {
@@ -91,13 +112,27 @@ module.exports = {
     rawMeat: new Item('rawMeat', {primary: true}),
     feather: new Item('feather', {primary: true}),
     fur: new Item('fur', {primary: true}),
+    mandibles: new Item('mandibles', {primary: true}),
+
+    woodTools: new Item('woodTools', {
+        primary: false,
+        consumable: true,
+        consumeFunction: (user) => {
+            swapTools(user, 'wood');
+        },
+        craftingTime: 2500,
+        recipes: [
+            {
+                wood: 5,
+            }
+        ],
+    }),
 
     stoneTools: new Item('stoneTools', {
         primary: false,
         consumable: true,
-        consumedOnCraft: true,
         consumeFunction: (user) => {
-            user.toolTier = 'stone';
+            swapTools(user, 'stone');
         },
         craftingTime: 2500,
         recipes: [
@@ -111,15 +146,29 @@ module.exports = {
     ironTools: new Item('ironTools', {
         primary: false,
         consumable: true,
-        consumedOnCraft: true,
         consumeFunction: (user) => {
-            user.toolTier = 'iron';
-            consumed(user, 'ironTools');
+            swapTools(user, 'iron');
         },
         craftingTime: 3500,
         recipes: [
             {
                 ironBars: 1,
+            }
+        ],
+        craftingStructure: 'workbench',
+    }),
+
+    mandibleTools: new Item('mandibleTools', {
+        primary: false,
+        consumable: true,
+        consumeFunction: (user) => {
+            swapTools(user, 'mandible');
+        },
+        craftingTime: 3500,
+        recipes: [
+            {
+                ironBars: 2,
+                mandibles: 4,
             }
         ],
         craftingStructure: 'workbench',

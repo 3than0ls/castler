@@ -112,21 +112,8 @@ io.on('connection', socket => {
 
     socket.on('clientRequestConsume', data => {
         const user = serverState.users.user[socket.id];
-        if (user.inventory[data.item]) { // check if inventory item exists
-            if (user.inventory[data.item].amount > 0) {
-                if (data.item.slice(-5).toLowerCase() === 'tools') {
-                    if (user.toolTier === 'wood' && (data.item === 'stoneTools' || data.item === 'ironTools')) {
-                        gameItems[data.item].consumeFunction(user);
-                    } else if (user.toolTier === 'stone' && (data.item === 'woodTools' || data.item === 'stoneTools')) {
-                        gameItems[data.item].consumeFunction(user);
-                    }
-                    if (user.toolTier === 'iron' && (data.item === 'woodTools' || data.item === 'stoneTools')) {
-                        gameItems[data.item].consumeFunction(user);
-                    }
-                } else {
-                    gameItems[data.item].consumeFunction(user);
-                }
-            }
+        if (user.inventory[data.item] && gameItems[data.item].consumable) { // check if inventory item exists
+            gameItems[data.item].consumeFunction(user);
         }
     });
 

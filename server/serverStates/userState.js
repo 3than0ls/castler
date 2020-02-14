@@ -43,18 +43,20 @@ module.exports = class UserState {
 
         this.size = [imageSize('./public/assets/player/playerBody.png').width * 0.865, imageSize('./public/assets/player/playerBody.png').height * 0.865];
 
-        this.effects = {
-            poisoned: {
-                tick: 0,
-            }
-        };
+        this.effects = {};
 
         this.inventory = {
             cookedMeat: {
                 consumable: true,
-                amount: 1,
+                amount: 100,
+            },
+            ironBars: {
+                amount: 50,
             },
             stone: {
+                amount: 500,
+            },
+            mandibles: {
                 amount: 500,
             },
             wood: {
@@ -68,14 +70,9 @@ module.exports = class UserState {
                 amount: 500,
                 consumable: true,
             },
-            fur: {
-                amount: 500,
-            },
-            feather: {
-                amount: 500,
-            }
         };
-        this.toolTier = 'iron';
+        this.toolTier = 'wood';
+        this.toolTierUnlocked = 0;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
 
@@ -101,7 +98,7 @@ module.exports = class UserState {
         this.alreadySwungAt = [];
     }
 
-    affectPlayerInsideArea(area) {
+    effectPlayerInsideArea(area) {
         if (area.objectInsideArea(this)) {
             switch (area.type) {
                 case 'mine': 
@@ -116,14 +113,16 @@ module.exports = class UserState {
         }
     }
 
-    affectPlayerNearStructure(structure) {
+    effectPlayerNearStructure(structure) {
         if (structure.objectWithinRange(this)) {
             switch (structure.type) {
                 case 'workbench':
                     break;
                 case 'furnace':
-                    this.effects['warmed'] = {
-                        tick: 0,
+                    if (!this.effects['warmed']) {
+                        this.effects['warmed'] = {
+                            tick: 0,
+                        }
                     }
                     break;
                     
@@ -134,7 +133,7 @@ module.exports = class UserState {
     effectsUpdate() {
         for (let [effectName, effectData] of Object.entries(this.effects)) {
             if (effects[effectName].effectOverTime) {
-                if (effectData.tick % effects[effectName].effectSpeed === 0) {
+                if (effectData.tick % effects[effectName].effectSpeed === 0 && effectData.tick !== 0) {
                     effects[effectName].effect(this)
                 }
             } else {
@@ -159,28 +158,36 @@ module.exports = class UserState {
             this.dead = true;
         }
         // update tool tier
-        if (this.toolTier === "wood") {
-            this.damage = 25;
-            this.harvestSpeed = 2;
-            this.attackSpeed = 2;
-        } else if (this.toolTier === "stone") {
-            this.damage = 35;
-            this.harvestSpeed = 2.3;
-            this.attackSpeed = 2.3;
-        } else if (this.toolTier === "iron") {
-            this.damage = 55;
-            this.harvestSpeed = 2.8;
-            this.attackSpeed = 2.8;
+        switch (this.toolTier) {
+            case 'wood':
+                this.damage = 25;
+                this.harvestSpeed = 2;
+                this.attackSpeed = 2;
+                break;
+            case 'stone':
+                this.damage = 35;
+                this.harvestSpeed = 2.3;
+                this.attackSpeed = 2.3;
+                break;
+            case 'iron':
+                this.damage = 55;
+                this.harvestSpeed = 2.8;
+                this.attackSpeed = 2.8;
+                break;
+            case 'mandible':
+                this.damage = 55;
+                this.harvestSpeed = 3.1;
+                this.attackSpeed = 2.9;
+                break;
         }
         // position updates
         // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
         // update attributes dependent on location relative to areas and structures
         for (let area of Object.values(serverState.areas).sort((a,b) => (a.zIndex > b.zIndex) ? 1 : ((b.zIndex > a.zIndex) ? -1 : 0))) { // apply effects based on area z index
-            this.affectPlayerInsideArea(area);
+            this.effectPlayerInsideArea(area);
         }
-        console.log('a-a-a-')
         for (let structure of Object.values(serverState.structures)) {
-            this.affectPlayerNearStructure(structure);
+            this.effectPlayerNearStructure(structure);
         }
         this.effectsUpdate(); // update all effect ticks and handling
         if (this.vx !== 0 && this.vy !== 0) {
@@ -344,6 +351,9 @@ module.exports = class UserState {
                 for (let user of Object.values(serverState.users.user)) {
                     if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], user) && !this.alreadySwungAt.includes(user.clientID)) {
                         user.health -= this.damage;
+                        if (this.toolTier === 'mandible') {
+                            user.effects['poisoned'] = { tick: 0 }
+                        }
                         user.attackFlash = true;
                         if (user.health <= 0 || user.dead) { // user.dead may not be necessary, and this may be buggy
                             this.killUser(user);
@@ -605,20 +615,9 @@ module.exports = class UserState {
 
     craftableItems(items, serverState) {
         // craftable items sorting algorithm, first filters out tool tiers that are un-needed, then checks if the item has the require crafting structure nearby
-        // determines what items are craftable with the current inventory
+        // determines what items are craftable with the current inventory. The progression is wood -> stone -> iron -> anything else
         const itemFilteredTools = [];
         for (let item of Object.values(items)) {
-            // determine next craftable tier, and if they already have that tier or higher, don't add that to the next stage of filtering
-            if (this.toolTier === 'wood' && item.name === 'ironTools') {
-                continue;
-            }
-            if (this.toolTier === 'stone' && item.name === 'stoneTools') {
-                continue;
-            }
-            if (this.toolTier === 'iron' && (item.name === 'ironTools' || item.name === 'stoneTools')) {
-                continue;
-            }
-
             if (item.canCraft(this.inventory)) {
                 itemFilteredTools.push(item);
             }

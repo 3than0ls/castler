@@ -17,6 +17,8 @@ module.exports = class EntityAI {
         this.collisionvx = 0;
         this.collisionvy = 0;
 
+        this.damage = 6;
+
         // AI variables
         this.actionTicker = 0;
         this.actionTimer = 100;
@@ -42,10 +44,17 @@ module.exports = class EntityAI {
             case 'boar':
                 this.size[0] *= 0.827;
                 this.size[1] *= 0.827;
+                this.damage = 14;
                 break;
             case 'beetle':
                 this.size[0] *= 0.883;
                 this.size[1] *= 0.883;
+                this.damage = 8;
+                break;
+            case 'frog':
+                this.size[0] *= 0.865;
+                this.size[1] *= 0.865;
+                this.damage = 6;
                 break;
         }
         // avoid
@@ -88,6 +97,26 @@ module.exports = class EntityAI {
         } else {
             return false;
         }
+    }
+
+    searchTargets(serverState) {
+        let shortestDistance;
+        let closestTarget;
+        for (let [clientID, user] of Object.entries(serverState.users.user)) {
+            let a = this.entityState.globalX-user.globalX;
+            let b = this.entityState.globalY-user.globalY;
+            let distance = Math.hypot(a, b);
+            if (distance < this.aggroDistance) {
+                if (!shortestDistance && !closestTarget) { // if a closestTarget doesn't exist, add this one
+                    shortestDistance = distance;
+                    closestTarget = user;
+                } else if (distance < shortestDistance) { // if a closestTarget does exist, and is closer than the current shortest distance, make new user new closest target
+                    shortestDistance = distance;
+                    closestTarget = user;
+                }
+            }
+        }
+        return closestTarget;
     }
 
     avoidArea(serverStateAreas) {
@@ -152,12 +181,6 @@ module.exports = class EntityAI {
                 } else if (angle <= -180) {
                     angle += 360;
                 }
-                /*
-                if (this.hit) {
-                    angle /= 5; // if the entity was hit/aggroed, decrease the angle to compensate for the angle it takes for following the player
-                } else {
-                    this.stopDistance = 0;
-                }*/
                 this.rotate(angle/15, 1);
                 break;
             } else {
@@ -198,20 +221,6 @@ module.exports = class EntityAI {
                 }
             }
         }
-        /*
-        if (this.entityState.angle < this.stopAngle) { // if the entity angle is greater than stop angle
-            this.entityState.angle += this.speed; // turn right
-            if (this.entityState.angle >= this.stopAngle) { // if the entity angle has reached the stop angle, then stop
-                this.rotateFinish = true;
-                this.entityState.angle = this.stopAngle;
-            }
-        } else if (this.entityState.angle >= this.stopAngle) { // of the entity angle is less than the stop angle
-            this.entityState.angle -= this.speed; // turn left
-            if (this.entityState.angle <= this.stopAngle) { // if the entity angle has reached the stop angle, then stop
-                this.rotateFinish = true;
-                this.entityState.angle = this.stopAngle;
-            }
-        }*/
 
         if (this.rotateFinish && this.thenWalk) {
             this.walk(this.thenWalk);
@@ -325,7 +334,10 @@ module.exports = class EntityAI {
             this.attackTargetRadius = this.target.size[0]/2 + this.size[0]/2;
             if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
                 if (this.attackTick >= this.attackSpeed) {
-                    this.target.attacked(6);
+                    this.target.attacked(this.damage);
+                    if (this.entityState.type === 'beetle') {
+                        this.target.effects['poisoned'] = { tick: 0 };
+                    }
                     this.attackTick = 0;
                 }
             }
@@ -341,7 +353,7 @@ module.exports = class EntityAI {
 
     move() {
         // sort of an AI for the entity
-        if (this.entityState.neutrality === "passive" || this.entityState.neutrality === "neutral") {
+        if (this.entityState.neutrality === "passive" || this.entityState.neutrality === "neutral" || this.entityState.neutrality === "aggressive") {
             this.decideAction();
         }
     }
@@ -419,17 +431,29 @@ module.exports = class EntityAI {
             this.entityState.angle += 360;
         }
         
-
-        if (this.hit) {
-            if (this.entityState.neutrality === "passive") {
-                this.flee();
-            } else if (this.entityState.neutrality === "neutral") {
-                this.attack();
+        if (this.entityState.neutrality === "passive" || this.entityState.neutrality === "neutral") {
+            if (this.hit) {
+                if (this.entityState.neutrality === "passive") {
+                    this.flee();
+                } else if (this.entityState.neutrality === "neutral") {
+                    this.attack();
+                }
+            } else if (this.actionTicker >= this.actionTimer) {
+                this.move();
+                this.actionTimer = Math.floor(Math.random() * (300 - 100 + 1) + 100); // gen random number betwee 100 and 800
+                this.actionTicker = 0;
             }
-        } else if (this.actionTicker >= this.actionTimer) {
-            this.move();
-            this.actionTimer = Math.floor(Math.random() * (300 - 100 + 1) + 100); // gen random number betwee 100 and 800
-            this.actionTicker = 0;
+        } else if (this.entityState.neutrality === "aggressive") {
+            this.target = this.searchTargets(serverState);
+            if (this.target && !tooFarFromHomeArea) {
+                // chase after target
+                this.attack();
+                this.hit = true;
+            } else if (this.actionTicker >= this.actionTimer) { // no target - proceed as normal
+                this.move();
+                this.actionTimer = Math.floor(Math.random() * (300 - 100 + 1) + 100); // gen random number betwee 100 and 800
+                this.actionTicker = 0;
+            }
         }
         
         this.avoidObjects(serverState);
