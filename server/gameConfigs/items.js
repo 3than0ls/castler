@@ -113,6 +113,7 @@ module.exports = {
     feather: new Item('feather', {primary: true}),
     fur: new Item('fur', {primary: true}),
     mandibles: new Item('mandibles', {primary: true}),
+    rubies: new Item('rubies', {primary: true}),
 
     woodTools: new Item('woodTools', {
         primary: false,
@@ -169,6 +170,22 @@ module.exports = {
             {
                 ironBars: 2,
                 mandibles: 4,
+            }
+        ],
+        craftingStructure: 'workbench',
+    }),
+
+    mandibleTools: new Item('rubyTools', {
+        primary: false,
+        consumable: true,
+        consumeFunction: (user) => {
+            swapTools(user, 'ruby');
+        },
+        craftingTime: 3500,
+        recipes: [
+            {
+                ironBars: 2,
+                rubies: 80,
             }
         ],
         craftingStructure: 'workbench',

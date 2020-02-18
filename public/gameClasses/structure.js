@@ -23,7 +23,7 @@ export class Structure {
                 this.particleType = 'stone';
                 break;
             default: 
-            this.particleType = 'splinter';
+                this.particleType = 'splinter';
         }
 
         this.tweenTick = 0;

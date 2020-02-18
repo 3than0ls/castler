@@ -117,9 +117,11 @@ module.exports = class CreateMap {
         }, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2)
 
         
-        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.lake);
+        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.lake);
 
         CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.mine);
+
+        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.rubyMine);
     }
     test2(serverState) {
         const size = this.size;

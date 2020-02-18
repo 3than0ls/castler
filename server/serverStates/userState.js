@@ -70,7 +70,7 @@ module.exports = class UserState {
                 consumable: true,
             },
         };
-        this.toolTier = 'wood';
+        this.toolTier = 'ruby';
         this.toolTierUnlocked = 0;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
@@ -177,6 +177,11 @@ module.exports = class UserState {
                 this.damage = 55;
                 this.harvestSpeed = 3.1;
                 this.attackSpeed = 2.9;
+                break;
+            case 'ruby':
+                this.damage = 35;
+                this.harvestSpeed = 5;
+                this.attackSpeed = 5;
                 break;
         }
         // position updates
@@ -463,6 +468,9 @@ module.exports = class UserState {
             case 'iron':
                 gameItemName = gameItems['ironChunk'].name;
                 break;
+            case 'ruby':
+                gameItemName = gameItems['rubies'].name;
+                break;
             default:
                 gameItemName = gameItems['stone'].name;
         }
@@ -614,7 +622,7 @@ module.exports = class UserState {
 
     craftableItems(items, serverState) {
         // craftable items sorting algorithm, first filters out tool tiers that are un-needed, then checks if the item has the require crafting structure nearby
-        // determines what items are craftable with the current inventory. The progression is wood -> stone -> iron -> anything else
+        // determines what items are craftable with the current inventory. The progression is wood -> stone -> iron -> anything else REMOVED, NEEDS TO BE RE ADDED
         const itemFilteredTools = [];
         for (let item of Object.values(items)) {
             if (item.canCraft(this.inventory)) {

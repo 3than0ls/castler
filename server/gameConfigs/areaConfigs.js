@@ -23,5 +23,16 @@ module.exports = {
         entityLimit: 4,
         entityRespawnTime: 1000,
         zIndex: 1,
+    },
+    rubyMine: {
+        type: 'rubyMine',
+        entities: [],
+        resources: [
+            {type: 'rock', amount: 6},
+            {type: 'ruby', amount: 2},
+        ],
+        entityLimit: 0,
+        entityRespawnTime: 1000,
+        zIndex: 5,
     }
 };

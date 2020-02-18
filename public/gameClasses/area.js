@@ -16,7 +16,17 @@ export class Area {
     }
 
     render() {
-        this.areaGraphic = new PIXI.Sprite(loader.resources[`areas/${this.type}`].texture);
+        let baseType;
+        switch (this.type) {
+            case 'lake':
+                baseType = 'lake';
+                break;
+            case 'mine':
+            case 'rubyMine':
+                baseType = 'mine';
+                break;
+        }
+        this.areaGraphic = new PIXI.Sprite(loader.resources[`areas/${baseType}`].texture);
         this.areaGraphic.anchor.x = 0.5;
         this.areaGraphic.anchor.y = 0.5;
         this.areaGraphic.position.set(this.globalX, this.globalY);

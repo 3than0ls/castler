@@ -12,7 +12,17 @@ module.exports = class AreaState {
         this.globalY = config.globalY;
 
         this.type = config.type;
-        this.size = [imageSize(`./public/assets/areas/${config.type}.png`).width, imageSize(`./public/assets/areas/${config.type}.png`).height];
+        let baseType;
+        switch (config.type) {
+            case 'lake':
+                baseType = 'lake';
+                break;
+            case 'mine':
+            case 'rubyMine':
+                baseType = 'mine';
+                break;
+        }
+        this.size = [imageSize(`./public/assets/areas/${baseType}.png`).width, imageSize(`./public/assets/areas/${baseType}.png`).height];
         this.config = config;
 
         this.spawnPadding = Math.round(((this.size[0] + this.size[1])/2)/15);
