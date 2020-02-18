@@ -445,11 +445,12 @@ module.exports = class EntityAI {
             }
         } else if (this.entityState.neutrality === "aggressive") {
             this.target = this.searchTargets(serverState);
-            if (this.target && !tooFarFromHomeArea) {
-                // chase after target
+            if (this.target) {
+                // chase after target as if it was hit/enraged
                 this.attack();
                 this.hit = true;
             } else if (this.actionTicker >= this.actionTimer) { // no target - proceed as normal
+                this.hit = false;
                 this.move();
                 this.actionTimer = Math.floor(Math.random() * (300 - 100 + 1) + 100); // gen random number betwee 100 and 800
                 this.actionTicker = 0;

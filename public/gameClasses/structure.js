@@ -84,8 +84,8 @@ export class Structure {
                 this.particleStream = dust.emitter(
                     240, () => {
                         dust.create(
-                            this.globalX,
-                            this.globalY,
+                            this.globalX+15*(Math.random()-0.5),
+                            this.globalY+15*(Math.random()-0.5),
                             () => {
                                 let sprite = new PIXI.Sprite(loader.resources['particles/smokeParticle'].texture);
                                 sprite.tint = 0x232323;

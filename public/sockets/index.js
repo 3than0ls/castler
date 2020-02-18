@@ -11,6 +11,7 @@ import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
 import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
 import { structureUpdate } from "./structures/structureUpdate.js";
 import { crateUpdate } from "./crates/crateUpdate.js";
+import { timeTick } from "./timeTick/timeTick.js";
 
 export function clientInit(socket) {
     socket.emit('nickname', window.localStorage.getItem('nickname'));
@@ -43,4 +44,6 @@ export function socketUpdate(socket) {
     leaderboardUpdate(socket, leaderboardState);
     // update craftable items data
     craftableItemsUpdate(socket, craftableItemsState)
+    // update time cycle
+    timeTick(socket, clientState);
 }

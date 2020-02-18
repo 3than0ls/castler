@@ -4,6 +4,8 @@ const EntityAI = require('./serverStates/entityAI.js');
 const StructureState = require('./serverStates/structureState.js');
 const AreaState = require('./serverStates/areaState.js');
 const CrateState = require('./serverStates/crateState.js');
+
+const areaConfigs = require('./gameConfigs/areaConfigs.js');
 /*
 const AreaState = require('./serverStates/areaState.js');
 const StructureState = require('./serverStates/structureState.js');*/
@@ -66,7 +68,7 @@ module.exports = class CreateMap {
             let config = JSON.parse(JSON.stringify(areaConfig)); // created a deep clone copy of the config and edit it if necessary
             if (!config.globalX) config.globalX = randomInt(minX, maxX);
             if (!config.globalY) config.globalY = randomInt(minY, maxY);
-            let area = new AreaState(config, zIndex + i);
+            let area = new AreaState(config);
             serverState.areas[area.areaID] = area;
             area.create(serverState, CreateMap);
         }
@@ -101,28 +103,23 @@ module.exports = class CreateMap {
 
         CreateMap.createStructures(serverState, 3, -1000, -1000, 1000, 1000, { type: 'workbench' });
         CreateMap.createStructures(serverState, 3, -1000, -1000, 1000, 1000, { type: 'furnace' });
+        
+        CreateMap.createCrate(serverState, 
+            { 
+                stone: {
+                    amount: 20,
+                    consumable: false,
+                },
+                wood: {
+                    amount: 20,
+                    consumable: false,
+                },
+        }, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2)
 
         
-        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
-            type: 'lake',
-            entities: [
-                {type: 'frog', amount: 2},
-            ],
-            resources: [],
-            entityLimit: 4,
-        });
+        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.lake);
 
-        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
-            type: 'mine',
-            entities: [
-                {type: 'beetle', amount: 2},
-            ],
-            resources: [
-                {type: 'iron', amount: 4},
-                {type: 'rock', amount: 4}
-            ],
-            entityLimit: 4,
-        });
+        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.mine);
     }
     test2(serverState) {
         const size = this.size;
@@ -140,49 +137,5 @@ module.exports = class CreateMap {
         CreateMap.createResources(serverState, 'rock', 1, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createEntities(serverState, 'duck', 2, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
         CreateMap.createStructures(serverState, 1, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2, { type: 'workbench' });
-    }
-
-    test4(serverState) {
-        const size = this.size;
-        
-        CreateMap.createResources(serverState, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createResources(serverState, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-
-        CreateMap.createEntities(serverState, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createEntities(serverState, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        
-        CreateMap.createCrate(serverState, 
-            { 
-                stone: {
-                    amount: 20,
-                    consumable: false,
-                },
-                wood: {
-                    amount: 20,
-                    consumable: false,
-                },
-        }, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2)
-
-        // create more restrictive and accurate spawn area based on area size later
-        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
-            type: 'lake',
-            entities: [
-                {type: 'frog', amount: 2},
-            ],
-            resources: [],
-            entityLimit: 4,
-        }, 0);
-
-        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, {
-            type: 'mine',
-            entities: [
-                {type: 'beetle', amount: 2},
-            ],
-            resources: [
-                {type: 'iron', amount: 4},
-                {type: 'rock', amount: 4}
-            ],
-            entityLimit: 4,
-        }, 1);
     }
 }

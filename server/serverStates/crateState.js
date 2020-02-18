@@ -1,5 +1,5 @@
 const imageSize = require('image-size');
-const items = require('./../items/items.js');
+const items = require('./../gameConfigs/items.js');
 
 module.exports = class CrateState {
     constructor(globalX, globalY, contents, disappearTime, crateID) {

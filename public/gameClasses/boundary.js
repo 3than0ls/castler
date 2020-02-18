@@ -23,9 +23,6 @@ export class Boundary {
 
 
         player.viewpoint.addChild(this.boundaryRect);
-    }
-
-    updateBoundary() {
-        player.viewpoint.addChild(this.boundaryRect);
+        
     }
 }

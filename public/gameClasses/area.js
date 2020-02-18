@@ -1,6 +1,6 @@
 import { player } from "../app";
 import { loader } from "../utils/loader";
-import { bump } from "../bump/bump";
+import { dust } from "../dust/dust";
 
 export class Area {
     constructor(areaID, config) {
@@ -11,10 +11,11 @@ export class Area {
 
         this.type = config.type;
         this.size = config.size;
+
+        this.particleStream;
     }
 
     render() {
-
         this.areaGraphic = new PIXI.Sprite(loader.resources[`areas/${this.type}`].texture);
         this.areaGraphic.anchor.x = 0.5;
         this.areaGraphic.anchor.y = 0.5;
@@ -26,6 +27,6 @@ export class Area {
     }
 
     animate() {
-        player.viewpoint.addChild(this.areaGraphic); // may be deprecated, unless additional uses for an animate/update function is found
+        player.viewpoint.addChild(this.areaGraphic); // may be unnecesary
     }
 }

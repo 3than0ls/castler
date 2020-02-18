@@ -7,7 +7,7 @@ function randomInt(min, max) {
 }
 
 module.exports = class AreaState {
-    constructor(config, zIndex) {
+    constructor(config) {
         this.globalX = config.globalX;
         this.globalY = config.globalY;
 
@@ -24,7 +24,7 @@ module.exports = class AreaState {
         this.entityRespawnTime = config.entityRespawnTime || 1000;
         this.entityRespawnTick = 0;
 
-        this.zIndex = zIndex || 0;
+        this.zIndex = config.zIndex || 0;
 
         this.areaID = 'a' + Math.random().toString(36).substr(2, 9);
     }

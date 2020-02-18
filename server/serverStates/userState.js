@@ -1,9 +1,8 @@
-const gameItems = require('./../items/items.js');
+const gameItems = require('./../gameConfigs/items.js');
 const collisions = require('./../collisions.js');
 const createMap = require('./../createMap.js');
-const items = require('./../items/items.js');
 const imageSize = require('image-size');
-const effects = require('./../items/effects.js')
+const effects = require('./../gameConfigs/effects.js')
 
 module.exports = class UserState {
     constructor(socketID, globalX, globalY, angle) {
@@ -495,14 +494,14 @@ module.exports = class UserState {
     }
     drop(type, amount, serverState) {
         if (typeof amount === "number" && !Number.isNaN(amount)) { // test if the amount is a number and it is not NaN
-            if (this.inventory[type] && items[type]) {
+            if (this.inventory[type] && gameItems[type]) {
                 this.inventory[type].amount -= amount;
                 
                 createMap.createCrate(serverState, 
                     { 
                         [type]: {
                             amount: amount,
-                            consumable: items[type].consumable,
+                            consumable: gameItems[type].consumable,
                     }
                 }, 1, this.globalX - 50, this.globalY - 50, this.globalX + 50, this.globalY + 50);
 
@@ -651,7 +650,7 @@ module.exports = class UserState {
         for (let [itemName, itemData] of Object.entries(this.inventory)) {
             inventory[itemName] = {
                 amount: itemData.amount,
-                consumable: items[itemName].consumable
+                consumable: gameItems[itemName].consumable
             }
         }
         createMap.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);

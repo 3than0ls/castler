@@ -298,12 +298,29 @@ export class Player {
         }
     }
 
+    cycleNight() {
+        if (!this.playerTintOverlay) { // maybe add to render()?
+            this.playerTintOverlay = new PIXI.Graphics();
+            this.playerTintOverlay.beginFill(0x000000, 0.90);
+            this.playerTintOverlay.drawRect(0, 0, window.innerWidth, window.innerHeight);
+            this.playerTintOverlay.endFill();
+            this.playerTintOverlay.zIndex = 150;
+        }
+        // include day and night cycle
+        if (clientState.timeTick < 5000) {
+            // day time
+            stage.removeChild(this.playerTintOverlay);
+        } else if (clientState.timeTick >= 5000) { // look into pixi js masks, perhaps they can help recreate this effect of darkening
+            stage.addChild(this.playerTintOverlay);
+        }
+    }
+
     viewpointUpdate() {
         /*
             things that appear to move when the player moves are added to the viewpoint display group
             once added, when the player inputs movement commands, anything in the viewpoint display group will move rather than the player
             this gives the illusion that the player is moving, rather than everything else
-        */        
+        */   
 
         this.viewpoint.position.set(-this.globalX+this.x, -this.globalY+this.y);
         let viewpoint = this.viewpoint; // render viewpoint to stage
@@ -476,6 +493,9 @@ export class Player {
 
         // update particles
         this.effectsUpdate();
+
+        // cycle time
+        this.cycleNight();
 
         // update viewpoint
         this.viewpointUpdate();

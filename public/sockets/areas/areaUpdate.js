@@ -10,7 +10,7 @@ export const areaUpdate = (socket, clientState) => {
                 newArea.render(); // render area
                 clientState.areas[area.areaID] = newArea;
             } else {
-                //clientState.areas[areaID].animate();
+                // clientState.areas[area.areaID].animate();
             }
         }
     });

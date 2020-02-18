@@ -17,12 +17,16 @@ export const clientState = {
     areas: {},
     structures: {},
     crates: {},
+
+    timeTick: 0,
 }
 
 /*
     TO DO:
     clean up code
     ISSUES: 
+
+    aggressive entities remain angered even without a target
 
     (tool hand type switch)
     tool sprite switches, but swing angle is of the swing angle of the previous tool, but then flashes back to 0. To solve, make updating display hand sent to server and then back to client
@@ -36,6 +40,8 @@ export const clientState = {
     HOSTILE ENTITIES
 
     create walking particle
+
+    turn boundaries into a map/game client side class, where we can implement time cycles normally
 
     if nothing else is to be done, work on creating sprites and more entities, resources, and structures until you think of an idea! 
 
@@ -58,6 +64,7 @@ document.body.appendChild(renderer.view); // add renderer to html document
 
 // Create Stage
 export const stage = new PIXI.Container();
+stage.sortableChildren = true;
 renderer.render(stage); // add stage to renderer
 
 

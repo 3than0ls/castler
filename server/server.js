@@ -39,12 +39,14 @@ const serverState = {
     areas: {},
     structures: {},
     crates: {}, // crates are containers of dropped items from players
+
+    timeTick: 4000,
 }
 
 const map = new CreateMap(serverState, [2400, 2400]);
-map.test4(serverState);
+map.test(serverState);
 
-const gameItems = require('./items/items.js');
+const gameItems = require('./gameConfigs/items.js');
 
 function createUser(socketID) {
     let newUserState = new UserState(socketID);
@@ -215,6 +217,11 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
+    serverState.timeTick ++;
+    if (serverState.timeTick > 10000) {
+        serverState.timeTick = 0; // reset to day
+    }
+
     // update server states
     for (let user of Object.values(serverState.users.user)) {
         user.update(serverState, map, io);
@@ -236,6 +243,7 @@ function update(serverState) {
     io.sockets.emit('resourceStates', serverState.resources);
     io.sockets.emit('entityStates', serverState.entities.entityState);
     io.sockets.emit('areaStates', serverState.areas);
+    io.sockets.emit('timeTick', serverState.timeTick);
 
     // emit leaderboard status (based on player score)
     const orderedPlayerScores = [];
