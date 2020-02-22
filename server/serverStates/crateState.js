@@ -13,8 +13,10 @@ module.exports = class CrateState {
     }
     update(serverState) {
         this.disappearTime --;
+        serverState.crates.crateData[this.crateID] = this.crateDataPackage();
         if (this.disappearTime <= 0) {
-            delete serverState.crates[this.crateID];
+            delete serverState.crates.crate[this.crateID];
+            delete serverState.crates.crateData[this.crateID];
         }
     }
     loot(player) {
@@ -28,5 +30,14 @@ module.exports = class CrateState {
             player.inventory[itemName].amount += item.amount;
         }
         this.disappearTime = 0;
+    }
+
+    crateDataPackage() {
+        return {
+            crateID: this.crateID,
+            globalX: this.globalX,
+            globalY: this.globalY,
+            contents: this.contents,
+        }
     }
 }

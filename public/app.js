@@ -23,30 +23,23 @@ export const clientState = {
 
 /*
     TO DO:
-    clean up code
     ISSUES: 
+    need to add scroll bar to crates
 
-    aggressive entities remain angered even without a target
-
-    (tool hand type switch)
-    tool sprite switches, but swing angle is of the swing angle of the previous tool, but then flashes back to 0. To solve, make updating display hand sent to server and then back to client
-    rather than client first
-
-    (entity-area border issue)
-    entities for some reason in areas go to edge and then get stuck there when they try to go back
     BIG:
-    armor <-- NEXT
-
-    HOSTILE ENTITIES
-
     create walking particle
 
-    turn boundaries into a map/game client side class, where we can implement time cycles normally
-
-    if nothing else is to be done, work on creating sprites and more entities, resources, and structures until you think of an idea! 
+    turn boundaries into a map/game client side class, where we can implement time cycles normally (read code cleanup description)
 
     SMALL:
-    more different resources 
+    more different resources, areas, entities, weapons, 
+    create sprites for armor
+
+
+    CODE CLEANING:
+        - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
+        - create a server state class with appopriate functions whose main purpose is to contain the serverState and update it
+        - create a client state class with appropriate functions, which include containing the clientState, updating it, updating boundaries, running day/night cycles, and other types of things that don't seem to have a place
 */
 
 document.title = "Game";

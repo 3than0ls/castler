@@ -61,16 +61,29 @@ module.exports = class StructureState {
 
     clear(serverState) {
         // clear area of previous resources and entities that exist inside structure
-        for (let [resourceID, resource] of Object.entries(serverState.resources)) {
+        for (let [resourceID, resource] of Object.entries(serverState.resources.resource)) {
             if (this.objectWithinRange(resource)) {
-                delete serverState.resources[resourceID];
+                delete serverState.resources.resource[resourceID];
             }
         }
-        for (let [entityID, entity] of Object.entries(serverState.entities.entityState)) {
+        for (let [entityID, entity] of Object.entries(serverState.entities.entity)) {
             if (this.objectWithinRange(entity)) {
-                delete serverState.entities.entityState[entityID];
-                delete serverState.entities.entityAI[entityID];
+                delete serverState.entities.entity[entityID];
+                delete serverState.entities.entityData[entityID];
             }
+        }
+    }
+
+    update(serverState) {
+        serverState.structures.structureData[this.structureID] = this.structureDataPackage();
+    }
+
+    structureDataPackage() {
+        return {
+            structureID: this.structureID,
+            type: this.type,
+            globalX: this.globalX,
+            globalY: this.globalY,
         }
     }
 }

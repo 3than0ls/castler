@@ -6,6 +6,7 @@ const AreaState = require('./serverStates/areaState.js');
 const CrateState = require('./serverStates/crateState.js');
 
 const areaConfigs = require('./gameConfigs/areaConfigs.js');
+const entityConfigs = require('./gameConfigs/entityConfigs');
 /*
 const AreaState = require('./serverStates/areaState.js');
 const StructureState = require('./serverStates/structureState.js');*/
@@ -29,16 +30,16 @@ module.exports = class CreateMap {
     static createResources(serverState, type, amount, minX, minY, maxX=0, maxY=0) {
         for (let i = 0; i < amount; i++) {
             let resource = new ResourceState(randomInt(minX, maxX), randomInt(minY, maxY), type);
-            serverState.resources[resource.resourceID] = resource;
+            serverState.resources.resource[resource.resourceID] = resource;
+            serverState.resources.resourceData[resource.resourceID] = resource;
         }
     }
 
-    static createEntities(serverState, type, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
+    static createEntities(serverState, entityConfig, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
         for (let i = 0; i < amount; i ++) {
-            let entity = new EntityState(randomInt(minX, maxX), randomInt(minY, maxY), type, homeAreaID);
-            serverState.entities.entityState[entity.entityID] = entity;
-            serverState.entities.entityAI[entity.entityID] = new EntityAI(entity.entityID, entity);
-            serverState.entities.entityAI[entity.entityID].displaceIfInsideObject(serverState, minX, minY, maxX, maxY);
+            let entity = new EntityAI(entityConfig, randomInt(minX, maxX), randomInt(minY, maxY), homeAreaID);
+            serverState.entities.entity[entity.entityID] = entity;
+            serverState.entities.entityData[entity.entityID] = entity.entityDataPackage();
         }
     }
 
@@ -48,7 +49,8 @@ module.exports = class CreateMap {
             if (!config.globalX) config.globalX = randomInt(minX, maxX);
             if (!config.globalY) config.globalY = randomInt(minY, maxY);
             let structure = new StructureState(config);
-            serverState.structures[structure.structureID] = structure;
+            serverState.structures.structure[structure.structureID] = structure;
+            serverState.structures.structureData[structure.structureID] = structure;
             structure.clear(serverState);
         }
     }
@@ -56,7 +58,8 @@ module.exports = class CreateMap {
     static createCrate(serverState, contents, amount, minX, minY, maxX=0, maxY=0) {
         for (let i = 0; i < amount; i++) {
             let crate = new CrateState(randomInt(minX, maxX), randomInt(minY, maxY), contents);
-            serverState.crates[crate.crateID] = crate;
+            serverState.crates.crate[crate.crateID] = crate;
+            serverState.crates.crateData[crate.crateID] = crate.crateDataPackage();
         }
     }
     
@@ -69,7 +72,8 @@ module.exports = class CreateMap {
             if (!config.globalX) config.globalX = randomInt(minX, maxX);
             if (!config.globalY) config.globalY = randomInt(minY, maxY);
             let area = new AreaState(config);
-            serverState.areas[area.areaID] = area;
+            serverState.areas.area[area.areaID] = area;
+            serverState.areas.areaData[area.areaID] = area.areaDataPackage();
             area.create(serverState, CreateMap);
         }
     }
@@ -92,52 +96,18 @@ module.exports = class CreateMap {
             this.resources[rightRowResource.resourceID] = rightRowResource;
         }
     }
-    test(serverState) {
-        const size = this.size;
-        
-        CreateMap.createResources(serverState, 'tree', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createResources(serverState, 'rock', size[1]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
 
-        CreateMap.createEntities(serverState, 'duck', size[0]/120, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createEntities(serverState, 'boar', size[1]/140, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
+    test4(serverState) {
+        CreateMap.createEntities(serverState, entityConfigs.duck, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        CreateMap.createEntities(serverState, entityConfigs.boar, 2, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        CreateMap.createEntities(serverState, entityConfigs.frog, 2, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        // CreateMap.createEntities(serverState, entityConfigs.beetle, 2, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
 
-        CreateMap.createStructures(serverState, 3, -1000, -1000, 1000, 1000, { type: 'workbench' });
-        CreateMap.createStructures(serverState, 3, -1000, -1000, 1000, 1000, { type: 'furnace' });
-        
-        CreateMap.createCrate(serverState, 
-            { 
-                stone: {
-                    amount: 20,
-                    consumable: false,
-                },
-                wood: {
-                    amount: 20,
-                    consumable: false,
-                },
-        }, 3, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2)
+        CreateMap.createStructures(serverState, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, {type:'workbench'});
+        CreateMap.createCrate(serverState, {wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        CreateMap.createCrate(serverState, {stone:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        CreateMap.createCrate(serverState, {ruby:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
 
-        
-        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.lake);
-
-        CreateMap.createAreas(serverState, 2, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.mine);
-
-        CreateMap.createAreas(serverState, 1, -size[0]/3, -size[1]/3, size[0]/3, size[1]/3, areaConfigs.rubyMine);
-    }
-    test2(serverState) {
-        const size = this.size;
-        CreateMap.createStructures(serverState, 3, -1000, -1000, 1000, 1000, { type: 'workbench' });
-        CreateMap.createStructures(serverState, 3, -1000, -1000, 1000, 1000, { type: 'furnace' });
-        
-        CreateMap.createResources(serverState, 'tree', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createResources(serverState, 'rock', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createEntities(serverState, 'duck', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createEntities(serverState, 'boar', 4, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-    }
-
-    test3(serverState) {
-        const size = this.size;
-        CreateMap.createResources(serverState, 'rock', 1, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createEntities(serverState, 'duck', 2, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2);
-        CreateMap.createStructures(serverState, 1, -size[0]/2, -size[1]/2, size[0]/2, size[1]/2, { type: 'workbench' });
+        CreateMap.createAreas(serverState, 1, -this.size[0]/3, -this.size[1]/3, this.size[0]/3, this.size[1]/3, areaConfigs.mine);
     }
 }

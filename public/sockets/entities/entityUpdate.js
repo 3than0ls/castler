@@ -15,12 +15,11 @@ export const entityUpdate = (socket, clientState) => {
             // if new entity found, add it
             if (!clientState.entities[entityID]) {
                 // if new id and info found, create new entity and add it to client state
-                const newEntity = new Entity(entity.entityID, entity.type, entity.nuetrality, entity.amount, entity.globalX, entity.globalY);
+                const newEntity = new Entity(entity.entityID, entity.type, entity.globalX, entity.globalY);
                 newEntity.render(); // render entity
                 clientState.entities[entityID] = newEntity;
             }
-            
-            clientState.entities[entityID].animate(entity.globalX, entity.globalY, entity.angle, entity.nuetrality);
+            clientState.entities[entityID].animate(entity.globalX, entity.globalY, entity.angle);
         }
         // delete dead entities
         const entityIDs = Object.keys(clientState.entities);

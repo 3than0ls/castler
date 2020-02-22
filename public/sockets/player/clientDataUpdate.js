@@ -5,6 +5,8 @@ export const clientDataUpdate = (socket) => {
     // update the client inventory, specifically made so react will display the amount of resources the player has
     socket.on('clientDataUpdate', data => {
 
+        player.attackFlash = data.attackFlash;
+        
         player.inventoryUpdate(data.inventory);
         player.healthUpdate(data.health);
         player.hungerUpdate(data.hunger);

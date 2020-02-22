@@ -5,9 +5,8 @@ import { charm } from "../charm/charm";
 import { dust } from "../dust/dust";
 
 export class Entity {
-    constructor(entityID, type, nuetrality, globalX, globalY) {
+    constructor(entityID, type, globalX, globalY) {
         this.type = type;
-        this.nuetrality = nuetrality;
         this.entityID = entityID;
 
         this.alreadyHit = false;
@@ -121,7 +120,7 @@ export class Entity {
         }
     }
     
-    animate(globalX, globalY, angle, nuetrality) {
+    animate(globalX, globalY, angle) {
         // update positioning
         this.globalX = globalX;
         this.globalY = globalY;

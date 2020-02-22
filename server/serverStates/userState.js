@@ -71,6 +71,7 @@ module.exports = class UserState {
             },
         };
         this.toolTier = 'ruby';
+        this.armorTier = 'dev';
         this.toolTierUnlocked = 0;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
@@ -184,13 +185,25 @@ module.exports = class UserState {
                 this.attackSpeed = 5;
                 break;
         }
+
+        switch (this.armorTier) {
+            case 'iron':
+                this.armorDamageReduction = 0.2;
+                break;
+            case 'dev':
+                this.armorDamageReduction = 1;
+                break;
+            default: 
+                this.armorDamageReduction = 0;
+        }
+
         // position updates
         // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
         // update attributes dependent on location relative to areas and structures
-        for (let area of Object.values(serverState.areas).sort((a,b) => (a.zIndex > b.zIndex) ? 1 : ((b.zIndex > a.zIndex) ? -1 : 0))) { // apply effects based on area z index
+        for (let area of Object.values(serverState.areas.area).sort((a,b) => (a.zIndex > b.zIndex) ? 1 : ((b.zIndex > a.zIndex) ? -1 : 0))) { // apply effects based on area z index
             this.effectPlayerInsideArea(area);
         }
-        for (let structure of Object.values(serverState.structures)) {
+        for (let structure of Object.values(serverState.structures.structure)) {
             this.effectPlayerNearStructure(structure);
         }
         this.effectsUpdate(); // update all effect ticks and handling
@@ -205,7 +218,7 @@ module.exports = class UserState {
             this.dead = true;
         }
 
-        let objects = {...serverState.resources, ...serverState.entities.entityAI, ...serverState.structures, ...serverState.users.user};
+        let objects = {...serverState.resources.resource, ...serverState.entities.entity, ...serverState.structures.structure, ...serverState.users.user};
         for (let object of Object.values(objects)) {
             if (object.hasOwnProperty('clientID') && object.clientID === this.clientID) {
                 continue;
@@ -268,7 +281,7 @@ module.exports = class UserState {
             let amount = 1;
             // detect any collisions that may occur
             if (this.displayHandType === "axe") {
-                for (let resource of Object.values(serverState.resources)) {
+                for (let resource of Object.values(serverState.resources.resource)) {
                     if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], resource) && !this.alreadySwungAt.includes(resource.resourceID)) {
                         // subtract the amount harvested from the resource
                         resource.harvest(amount);
@@ -291,7 +304,7 @@ module.exports = class UserState {
                         });
                     };
                 }
-                for (let structure of Object.values(serverState.structures)) {
+                for (let structure of Object.values(serverState.structures.structure)) {
                     if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], structure) && !this.alreadySwungAt.includes(structure.structureID)) {
                         this.alreadySwungAt.push(structure.structureID);
                         let a = structure.globalX - this.globalX;
@@ -314,32 +327,33 @@ module.exports = class UserState {
                                 collisionY: this.collisionPoints[this.displayHandType].y,
                                 structureID: structure.structureID,
                             });
-                            structure.destroyed(createMap, serverState)
-                            delete serverState.structures[structure.structureID];
+                            structure.destroyed(createMap, serverState);
+                            delete serverState.structures.structure[structure.structureID];
+                            delete serverState.structures.structureData[structure.structureID];
                         }
                     }
                 }
             } else if (this.displayHandType === "sword") {
-                for (let entity of Object.values(serverState.entities.entityAI)) {
+                for (let entity of Object.values(serverState.entities.entity)) {
                     if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], entity) && !this.alreadySwungAt.includes(entity.entityID)) {
                         // subtract the amount of health that the entity took
                         entity.attacked(this.damage, this);
 
                         /* if the entity was killed */
-                        if (entity.entityState.killed()) {
+                        if (entity.killed()) {
                             // add the amount harvested from kill to client inventory
-                            this.kill(entity.entityState.loot);
+                            this.kill(entity.loot);
                             io.emit('killed', {
                                 collisionX: this.collisionPoints[this.displayHandType].x,
                                 collisionY: this.collisionPoints[this.displayHandType].y,
                                 entityID: entity.entityID,
                             });
-                            if (entity.entityState.homeAreaID && entity.entityState.homeAreaID !== 'map') { // if entity had a home area and it isn't the map, decrease areas entity amount
-                                serverState.areas[entity.entityState.homeAreaID].entityCount--;
+                            if (entity.homeAreaID && entity.homeAreaID !== 'map') { // if entity had a home area and it isn't the map, decrease areas entity amount
+                                serverState.areas.area[entity.homeAreaID].entityCount--;
                             }
 
-                            delete serverState.entities.entityAI[entity.entityID];
-                            delete serverState.entities.entityState[entity.entityID];
+                            delete serverState.entities.entity[entity.entityID];
+                            delete serverState.entities.entityData[entity.entityID];
                         }
                         
                         // emit attack event occuring
@@ -354,11 +368,10 @@ module.exports = class UserState {
                 }
                 for (let user of Object.values(serverState.users.user)) {
                     if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], user) && !this.alreadySwungAt.includes(user.clientID)) {
-                        user.health -= this.damage;
+                        user.attacked(this.damage)
                         if (this.toolTier === 'mandible') {
                             user.effects['poisoned'] = { tick: 0 }
                         }
-                        user.attackFlash = true;
                         if (user.health <= 0 || user.dead) { // user.dead may not be necessary, and this may be buggy
                             this.killUser(user);
                         }
@@ -449,7 +462,7 @@ module.exports = class UserState {
     }
 
     attacked(damage) {
-        this.health -= damage;
+        this.health -= damage - (damage * this.armorDamageReduction);
         this.attackFlash = true;
     }
     heal(amount) {
@@ -525,7 +538,7 @@ module.exports = class UserState {
     lootCrate(serverState, clientCrateID) {
         let targetCrate;
         let targetCrateDist;
-        for (let crate of Object.values(serverState.crates)) {
+        for (let crate of Object.values(serverState.crates.crate)) {
             let dist = Math.hypot(this.globalX - crate.globalX, this.globalY - crate.globalY);
             if (dist < 100) {
                 if (!targetCrate) {
@@ -559,7 +572,9 @@ module.exports = class UserState {
             if (this.hunger > 0) {
                 this.hunger -= 5;
             } else if (this.hunger <= 0) {
-                this.attacked(5);
+                // this.attacked(5);
+                this.health -= 15;
+                this.attackFlash = true;
                 // take damage from starving
             }
             this.hungerTick = 0;
@@ -635,7 +650,7 @@ module.exports = class UserState {
             // filter all crafting structures to only get the ones that the item needs
             if (itemFilteredTools[i].craftingStructure) { // if the item has a crafting structure
                 let craftingStructure = itemFilteredTools[i].craftingStructure;
-                let correctCraftingStructure = Object.values(serverState.structures).filter(structure => craftingStructure === structure.type);
+                let correctCraftingStructure = Object.values(serverState.structures.structure).filter(structure => craftingStructure === structure.type);
                 /*
                     idea: rather than iterating through every correct crafting structures and testing if object is within range
                     iterate through all correct crafting structures and test object is within range of the closest one

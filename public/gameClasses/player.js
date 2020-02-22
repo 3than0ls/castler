@@ -302,7 +302,7 @@ export class Player {
         if (!this.playerTintOverlay) { // maybe add to render()?
             this.playerTintOverlay = new PIXI.Graphics();
             this.playerTintOverlay.beginFill(0x000000, 0.90);
-            this.playerTintOverlay.drawRect(0, 0, window.innerWidth, window.innerHeight);
+            this.playerTintOverlay.drawRect(0, 0, 5000, 5000); // window.innerWidth/innerHeight have shown to be unreliable on edge, so we use this
             this.playerTintOverlay.endFill();
             this.playerTintOverlay.zIndex = 150;
         }
@@ -362,12 +362,17 @@ export class Player {
     }
     
     healthUpdate(health) {
-        if (health < this.health) {
-            this.health = health;
+        if (this.attackFlash) {
             this.attacked();
-        } else if (health > this.health) {
-            this.health = health;
         }
+        this.health = health;
+
+        /*
+        if (health < this.health) {
+            this.attacked();
+        }
+        this.health = health;
+        */
 
         if (health <= 0) {
             this.health = 0;

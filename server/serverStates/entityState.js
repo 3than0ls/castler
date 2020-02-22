@@ -35,7 +35,4 @@ module.exports = class EntityState {
                 break;
         }
     }
-    killed() {
-        return this.health <= 0;
-    }
 }

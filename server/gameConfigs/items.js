@@ -175,7 +175,7 @@ module.exports = {
         craftingStructure: 'workbench',
     }),
 
-    mandibleTools: new Item('rubyTools', {
+    rubyTools: new Item('rubyTools', {
         primary: false,
         consumable: true,
         consumeFunction: (user) => {

@@ -1,10 +1,11 @@
 // areas have configs as well, specifying attributes like entity and resource types. This class is created so we do not have to copy and paste config types every time we want to create one
+const entityConfigs = require('./entityConfigs.js')
 
 module.exports = {
     lake: {
         type: 'lake',
         entities: [
-            {type: 'frog', amount: 2},
+            {config: entityConfigs.frog, amount: 2},
         ],
         resources: [],
         entityLimit: 4,
@@ -14,7 +15,7 @@ module.exports = {
     mine: {
         type: 'mine',
         entities: [
-            {type: 'beetle', amount: 2},
+            {config: entityConfigs.beetle, amount: 2},
         ],
         resources: [
             {type: 'iron', amount: 4},

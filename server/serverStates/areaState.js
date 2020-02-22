@@ -1,4 +1,6 @@
-const imageSize = require('image-size')
+const imageSize = require('image-size');
+const entityConfigs = require('./../gameConfigs/entityConfigs.js')
+const areaConfigs = require('./../gameConfigs/areaConfigs.js')
 
 function randomInt(min, max) {
     min = Math.ceil(min);
@@ -29,7 +31,7 @@ module.exports = class AreaState {
 
         // entity respawning in an area
         this.entityCount = 0;
-        config.entities.forEach(entityData => { this.entityCount += entityData.amount });
+        config.entities.forEach(entityData => { this.entityCount += entityData.amount }); // count entity amount
         this.entityLimit = config.entityLimit || this.entityCount;
         this.entityRespawnTime = config.entityRespawnTime || 1000;
         this.entityRespawnTick = 0;
@@ -52,27 +54,27 @@ module.exports = class AreaState {
     }
 
     respawnTick(serverState, CreateMap) {
-        // entity count will be decreased when an entity dies, which will be called in entityAI
+        // entity count will be decreased when an entity dies
         if (this.entityCount < this.entityLimit) {
             this.entityRespawnTick++;
             if (this.entityRespawnTick >= this.entityRespawnTime) {
                 this.entityRespawnTick = 0;
 
-                let type;
+                let config;
                 if (this.config.entities.length === 1) {
-                    type = this.config.entities[0].type;
-                } else if (this.config.entities.length > 1) {
-                    type = Math.random();
-                    for (let i = 0; i < this.config.entities.length; i++) {
-                        if (type > i/this.config.entities.length && type <= (i+1)/this.config.entities.length) {
-                            type = this.config.entities[i].type;
+                    config = areaConfigs[this.type].entities[0].config;
+                } else if (areaConfigs[this.type].entities.length > 1) {
+                    config = Math.random();
+                    for (let i = 0; i < areaConfigs[this.type].entities.length; i++) {
+                        if (config > i/areaConfigs[this.type].entities.length && type <= (i+1)/areaConfigs[this.type].entities.length) {
+                            config = areaConfigs[this.type].entities[i].config;
                             break;
                         }
                     }
                 }
 
                 CreateMap.createEntities(
-                    serverState, type, 1, 
+                    serverState, config, 1, 
                     this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                     this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
                     this.areaID
@@ -86,22 +88,24 @@ module.exports = class AreaState {
         // clear area of previous resources, then insert in new ones
         // clear resources and entities
         this.clearedObjects = 0;
-        for (let [resourceID, resource] of Object.entries(serverState.resources)) {
+        for (let [resourceID, resource] of Object.entries(serverState.resources.resource)) {
             if (this.objectInsideArea(resource)) {
-                delete serverState.resources[resourceID];
+                delete serverState.resources.resource[resourceID];
+                delete serverState.resources.resourceData[resourceID];
                 this.clearedObjects++;
             }
         }
-        for (let [entityID, entity] of Object.entries(serverState.entities.entityState)) {
+        for (let [entityID, entity] of Object.entries(serverState.entities.entity)) {
             if (this.objectInsideArea(entity)) {
-                delete serverState.entities.entityState[entityID];
-                delete serverState.entities.entityAI[entityID];
+                delete serverState.entities.entity[entityID];
+                delete serverState.entities.entityData[entityID];
                 this.clearedObjects++;
             }
         }
-        for (let [structureID, structure] of Object.entries(serverState.structures)) {
+        for (let [structureID, structure] of Object.entries(serverState.structures.structure)) {
             if (this.objectInsideArea(structure)) {
-                delete serverState.structures[structureID];
+                delete serverState.structures.structure[structureID];
+                delete serverState.structures.structureData[structureID];
                 this.clearedObjects++;
             }
         }
@@ -118,7 +122,7 @@ module.exports = class AreaState {
 
         for (let i = 0; i < this.config.entities.length; i++) {
             CreateMap.createEntities(
-                serverState, this.config.entities[i].type, this.config.entities[i].amount, 
+                serverState, this.config.entities[i].config, this.config.entities[i].amount, 
                 this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                 this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
                 this.areaID,
@@ -127,5 +131,21 @@ module.exports = class AreaState {
         }
         // console.log(`Cleared ${this.clearedObjects} objects when constructing a '${this.type}' area`);
         // console.log(`Created ${this.createdObjects} object TYPES when constructing a '${this.type}' area`);
+    }
+
+    update(serverState, CreateMap) {
+        this.respawnTick(serverState, CreateMap);
+        serverState.areas.areaData[this.areaID] = this.areaDataPackage();
+    }
+
+    areaDataPackage() {
+        return {
+            areaID: this.areaID,
+            type: this.type,
+            globalX: this.globalX,
+            globalY: this.globalY,
+            zIndex: this.zIndex,
+            config: this.config, // perhaps simplify later and only include what is needed from config?
+        }
     }
 }

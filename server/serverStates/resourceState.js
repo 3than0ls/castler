@@ -13,4 +13,13 @@ module.exports = class ResourceState {
     harvest(amount) {
         this.amount -= amount;
     }
+
+    resourceDataPackage() {
+        return {
+            resourceID: this.resourceID,
+            type: this.type,
+            globalX: this.globalX,
+            globalY: this.globalY,
+        }
+    }
 }
