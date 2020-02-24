@@ -2,20 +2,6 @@
 <html>
   <head>
     <title>Game</title>
-    <style>
-      canvas {
-        pointer-events: initial;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: -1;
-        padding: 0;
-        margin: 0;
-      }
-      /*body, html {
-        pointer-events: none;
-      }*/
-    </style>
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -24,15 +10,15 @@
     />
   </head>
   <body>
-      <div id='menuWrapper'>
-        <script src='menu.bundle.js'></script>
-      </div>
 
-      <div id="gameWrapper">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.5/pixi.js"></script>
-        <div id='ui'></div>
-        <script id='gameApp'></script>
-      </div>
+    <!--div id="gameWrapper">
+      <div id='ui'></div>
+      <script id='gameApp'></script>
+    </div-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.5/pixi.js"></script>
+    <div id='menuWrapper'>
+      <script src='app.bundle.js'></script>
+    </div>
   </body>
 </html>

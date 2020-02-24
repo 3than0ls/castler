@@ -4,13 +4,8 @@
 import React from 'react';
 
 // react bootstrap components
-import Image from 'react-bootstrap/Image';
-import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form'
 
 import { player } from '../../app.js';
-import { images } from '../controlUI/controlUI.js';
 import { CrateInventory } from './crateInventory.js';
 
 export class StaticInventory extends React.Component {

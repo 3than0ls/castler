@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 // react bootstrap components
 import Image from 'react-bootstrap/Image';
@@ -7,12 +6,11 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 
 // images
-import { player, socket } from '../../app';
+import { player, socket, craftableItemsState } from '../../app';
 import { clientRequestCraft } from '../../sockets/player/clientRequestCraft';
 
 import { images } from './controlUI.js';
 
-export const craftableItemsState = [];
 
 export class CraftingUI extends React.Component {
     constructor() {

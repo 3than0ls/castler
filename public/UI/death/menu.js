@@ -33,7 +33,7 @@ class DeathMenu extends React.Component {
                 <Form className='overlayBoxContainer fadeInFast' onSubmit={this.handleSubmit} autoComplete="off" spellCheck="false">
                     <h2>{this.state.nickname} died!</h2>
                     <span>Score: {this.props.score}</span>
-                <Button variant="primary" type="submit" className="noselect">
+                <Button variant="play" type="submit" className="noselect">
                 Play Again
                 </Button>
             </Form>

@@ -1,5 +1,29 @@
+
+
+/*
+    TO DO:
+    ISSUES: 
+    need to add scroll bar to crates
+
+    BIG:
+    create walking particle
+
+    turn boundaries into a map/game client side class, where we can implement time cycles normally (read code cleanup description)
+
+    SMALL:
+    more different resources, areas, entities, weapons, 
+    create sprites for armor
+
+
+    CODE CLEANING:
+        - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
+        - create a server state class with appopriate functions whose main purpose is to contain the serverState and update it
+        - create a client state class with appropriate functions, which include containing the clientState, updating it, updating boundaries, running day/night cycles, and other types of things that don't seem to have a place
+*/
+
 const express = require('express');
 const path = require('path');
+const cacheControl = require('express-cache-controller');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
@@ -8,18 +32,27 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
 
-const configs = require('../webpack.config.js');
-for (let i = 0; i < configs.length; i++) {
-    let configCompiler = webpack(configs[i]);
-    app.use(webpackDevMiddleware(configCompiler, {
-        publicPath: configs[i].output.publicPath,
-    }));
-}
+const config = require('../webpack.config.js');
+let configCompiler = webpack(config);
+app.use(webpackDevMiddleware(configCompiler));
 
 
 // app.use(express.static(path.join(__dirname, './src/')));
+app.use(cacheControl())
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, './public/')));
+
+/*app.post('/', (req, res, next) => { LOOK INTO AJAX
+    console.log(req.body);
+    /*
+        client(submit form with name)---------------\
+            |                                        |
+        client(create and connect socket)       client(post form data {nickname})
+            |                                                         \
+        server(create socket userState in serverState)              server(send client rest of game )
+    
+})*/
 
 const UserState = require('./serverStates/userState.js');;
 const CreateMap = require('./createMap.js');
@@ -97,6 +130,7 @@ io.on('connection', socket => {
             },
             effects: user.effects,
             toolTier: user.toolTier,
+            armorTier: user.armorTier,
             harvestSpeed: user.harvestSpeed,
             attackSpeed: user.attackSpeed,
             displayHand: user.displayHand,
@@ -140,6 +174,7 @@ io.on('connection', socket => {
                     type: data.type,
                 }, socket.id);
                 serverState.structures.structure[structure.structureID] = structure;
+                serverState.structures.structureData[structure.structureID] = structure.structureDataPackage();
                 gameItems[data.type].consumeFunction(serverState.users.user[socket.id]);
             }
         }
@@ -238,10 +273,13 @@ function update(serverState) {
         user.update(serverState, map, io);
     }
     for (let entity of Object.values(serverState.entities.entity)) {
-        entity.update(serverState, map);
+        entity.update(serverState, map, io);
     }
     for (let crate of Object.values(serverState.crates.crate)) {
         crate.update(serverState);
+    }
+    for (let structure of Object.values(serverState.structures.structure)) {
+        structure.update(serverState, CreateMap, io);
     }
     for (let area of Object.values(serverState.areas.area)) {
         area.update(serverState, CreateMap);

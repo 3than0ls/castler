@@ -2,16 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 // react bootstrap components
-import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import ListGroup from 'react-bootstrap/ListGroup';
 
 // custom style sheets
 import './../styles.css';
 import './leaderboard.css';
 
-export const leaderboardState = [];
+import { leaderboardState } from '../../app';
+
 
 // move nickname here
 

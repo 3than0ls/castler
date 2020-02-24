@@ -1,5 +1,6 @@
 html, body {
   background: rgb(255, 255, 255);
+  pointer-events: initial;
 }
 
 #menuWrapper {
@@ -9,7 +10,7 @@ html, body {
 }
 
 
-.overlayBoxContainer {
+.menuBoxContainer {
   margin: 0;
   border: 0;
   height: 95%;
@@ -33,7 +34,7 @@ html, body {
   user-select: none; 
 }
 
-button {
+.btn-play {
   background: rgb(0, 173, 52);
   border: none;
   border-radius: 15px;

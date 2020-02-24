@@ -1,6 +1,13 @@
-html, body {
-    background-color: inherit;
+#ui {
+    z-index: 10;
 }
+canvas {
+    pointer-events: initial;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
 
 .overlayContainer {
     pointer-events: none;

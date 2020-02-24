@@ -322,7 +322,7 @@ module.exports = class UserState {
 
                         structure.health -= this.damage;
                         if (structure.health <= 0) {
-                            io.emit('destroyed', { // currently does nothing
+                            io.emit('destroyed', {
                                 collisionX: this.collisionPoints[this.displayHandType].x,
                                 collisionY: this.collisionPoints[this.displayHandType].y,
                                 structureID: structure.structureID,

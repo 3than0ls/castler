@@ -38,7 +38,7 @@ module.exports = {
         }
     },
 
-    entityObjectCollisionHandle: function(entity, object) {
+    entityObjectCollisionHandle: function(entity, object, io) {
         let magnitude, combinedRadii, overlap, vx, vy, dx, dy, s = {}, hit = false;
 
         vx = object.globalX - entity.globalX;
@@ -70,6 +70,26 @@ module.exports = {
             // has an issue where if user unfocuses and an entity runs into the player, the overlap causes the player to teleport to other places
             entity.collisionvx += (overlap * dx);
             entity.collisionvy += (overlap * dy);
+
+            if (entity.hit) {
+                if (entity.attackTick >= entity.attackSpeed) {
+                    object.health -= entity.damage;
+                    entity.attackTick = 0;
+                    
+                    let a = object.globalX - entity.globalX;
+                    let b = object.globalY - entity.globalY;
+                    let vx = (Math.asin(a / Math.hypot(a, b))*10);
+                    let vy = (Math.asin(b / Math.hypot(a, b))*10);
+                    io.emit('hit', {
+                        vx: vx,
+                        vy: vy,
+                        collisionX: a/2,
+                        collisionY: b/2,
+                        structureID: object.structureID,
+                        // harvestSpeed: this.harvestSpeed
+                    });
+                }
+            }
 
             return hit;
         }

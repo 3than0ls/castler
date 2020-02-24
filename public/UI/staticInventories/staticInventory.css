@@ -110,7 +110,7 @@
     filter: brightness(90%);
 }
 
-.btn:active {
+.btn-exit:active, .btn-loot:active {
   border-style: outset;
   border: none;
 }

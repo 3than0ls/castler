@@ -2,6 +2,7 @@ import { Structure } from "../../gameClasses/structure";
 
 export const structureUpdate = (socket, clientState) => {
     socket.on('hit', data => {
+        if (!data.harvestSpeed) data.harvestSpeed = 4;
         clientState.structures[data.structureID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
     });
     socket.on('structureStates', serverStateStructures => {
@@ -10,9 +11,8 @@ export const structureUpdate = (socket, clientState) => {
                 const newStructure = new Structure(structureID, structure.globalX, structure.globalY, structure.type);
                 newStructure.render();
                 clientState.structures[structureID] = newStructure;
-            } else {
-                clientState.structures[structureID].animate(structure.globalX, structure.globalY);
             }
+            clientState.structures[structureID].animate(structure.globalX, structure.globalY);
         }
         // delete missing structures
         const structureIDs = Object.keys(clientState.structures);

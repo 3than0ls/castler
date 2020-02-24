@@ -8,6 +8,8 @@ import { CraftingBar } from './statusBar/craftingBar/craftingBar.js';
 import { CrateInventory } from './staticInventories/crateInventory.js';
 import { StaticInventory } from './staticInventories/staticInventory.js';
 import { player } from '../app.js';
+import { renderDeathMenu } from './death/menu.js';
+
 
 
 function importAll (r) {

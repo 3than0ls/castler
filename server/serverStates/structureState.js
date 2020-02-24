@@ -74,8 +74,18 @@ module.exports = class StructureState {
         }
     }
 
-    update(serverState) {
+    update(serverState, createMap, io) {
         serverState.structures.structureData[this.structureID] = this.structureDataPackage();
+        if (this.health <= 0) {
+            io.emit('destroyed', {
+                collisionX: this.globalX,
+                collisionY: this.globalY,
+                structureID: this.structureID,
+            });
+            this.destroyed(createMap, serverState);
+            delete serverState.structures.structure[this.structureID];
+            delete serverState.structures.structureData[this.structureID];
+        }
     }
 
     structureDataPackage() {

@@ -11,7 +11,7 @@ export const clientDataUpdate = (socket) => {
         player.healthUpdate(data.health);
         player.hungerUpdate(data.hunger);
 
-        player.toolUpdate(data.toolTier);
+        player.tierUpdate(data.toolTier, data.armorTier);
 
         Player.createHandSprites(player.handSprites, player.x, player.y, data.toolTier);
 

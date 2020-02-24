@@ -1,16 +1,15 @@
-import { clientState, player, boundary } from "../app.js";
-import { leaderboardState } from "../UI/leaderboard/leaderboard.js";
-import { craftableItemsState } from "../UI/controlUI/crafting.js";
+import { clientState, player, boundary, leaderboardState, craftableItemsState } from "../app.js";
+
+import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
+import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
 
 import { userUpdate } from "./player/userUpdate.js";
 import { resourceUpdate } from "./resources/resourceUpdate.js";
 import { entityUpdate } from "./entities/entityUpdate.js";
-import { areaUpdate } from "./areas/areaUpdate.js";
-import { clientDataUpdate } from "./player/clientDataUpdate.js";
-import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
-import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
 import { structureUpdate } from "./structures/structureUpdate.js";
 import { crateUpdate } from "./crates/crateUpdate.js";
+import { areaUpdate } from "./areas/areaUpdate.js";
+import { clientDataUpdate } from "./player/clientDataUpdate.js";
 import { timeTick } from "./timeTick/timeTick.js";
 
 export function clientInit(socket) {

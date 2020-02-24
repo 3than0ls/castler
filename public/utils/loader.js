@@ -1,7 +1,5 @@
 const path = require('path');
 
-import { setup } from "../app.js";
-
 
 /*/ import images
 import playerBody from "./../assets/playerBody.png";
@@ -25,21 +23,17 @@ function importAll(context) {
     });
     return images;
 }
-const images = importAll(require.context('./../assets', true,  /\.png$/));
-
-export const assets = path.relative(__dirname, '/public/assets/'); // remove
 
 export const loader = PIXI.Loader.shared;
 
-function loadImages(images) {
+export function loadImages() {
+    const images = importAll(require.context('./../assets', true,  /\.png$/));
     for (let keyName in images) {
         let textureName = keyName.replace('.png', '');
         loader.add(textureName, images[keyName]);
     }
 }
-loadImages(images);
 
-loader.load(setup);
 
 /*
 loader

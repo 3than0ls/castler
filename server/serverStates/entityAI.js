@@ -156,10 +156,10 @@ module.exports = class EntityAI {
         }
     }
     
-    avoidObjects(serverState) {
+    avoidObjects(serverState, io) {
         let objects = {...serverState.resources.resource, ...serverState.structures.structure};
         for (let object of Object.values(objects)) {
-            collisions.entityObjectCollisionHandle(this, object);
+            collisions.entityObjectCollisionHandle(this, object, io);
             const a = this.globalX - object.globalX;
             const b = this.globalY - object.globalY;
             let distance = Math.hypot(a, b);
@@ -406,7 +406,7 @@ module.exports = class EntityAI {
         }
     }
 
-    update(serverState, map) {
+    update(serverState, map, io) {
         this.collisionvx = 0;
         this.collisionvy = 0;
         this.tick();
@@ -446,7 +446,7 @@ module.exports = class EntityAI {
             }
         }
         
-        this.avoidObjects(serverState);
+        this.avoidObjects(serverState, io);
         this.avoidArea(serverState.areas.area);
         this.boundaryContain(map.size);
 

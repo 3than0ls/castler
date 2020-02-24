@@ -3,13 +3,13 @@ import { loader } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio } from "./../utils/windowResize.js";
 import { bump } from "../bump/bump.js";
-import { harvest } from "../sockets/resources/harvest.js";
-import { attack } from "../sockets/entities/attack.js";
 import { charm } from "../charm/charm.js";
-import { renderDeathMenu } from "../UI/death/menu.js";
 import { clientCreateStructure } from "../sockets/player/clientCreateStructure.js";
 import { swing } from "../sockets/player/swing.js";
 import { dust } from "../dust/dust.js";
+
+
+// import { renderDeathMenu } from "../UI/death/menu.js";
 
 
 export class Player {
@@ -198,9 +198,6 @@ export class Player {
 
         // render and create hands
         Player.createHandSprites(this.handSprites, this.x, this.y, this.toolTier);
-
-        // create client needed hand/tool collision points
-        this.updateCollisionPoints();
 
         // movement keys
         this.movementKeys();
@@ -397,10 +394,13 @@ export class Player {
         }
     }
 
-    toolUpdate(toolTier) {
+    tierUpdate(toolTier, armorTier) {
         if (toolTier !== this.toolTier) {
             this.toolTier = toolTier;
             stage.removeChild(this.handSprites[this.handSpriteKey]);
+        }
+        if (armorTier !== this.armorTier) {
+            
         }
     }
 
@@ -482,7 +482,7 @@ export class Player {
     died() {
         socket.disconnect();
         worker.terminate();
-        renderDeathMenu();
+        // renderDeathMenu();
     }
 
     update() {
