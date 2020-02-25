@@ -58,7 +58,9 @@ export class CrateInventory extends React.Component {
             <> 
                 <div className="staticInventoryWrapper">
                     <div className="staticInventoryContainer">
-                        {inventoryItems}
+                        <div className="staticInventory">
+                            {inventoryItems}
+                        </div>
                         <div className="staticInventoryOptions">
                             <Button variant="loot" onClick={this.onLoot}>
                                 Loot

@@ -13,18 +13,14 @@
 
 .staticInventoryContainer {
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: column;
     align-items: center;
     justify-content: flex-start;
 
     background: rgb(124, 96, 5);
     border-radius: 1vw;
 
-    /*width: 20%;
-    height: 20%;*/
-
     padding: 1% 1.5%;
-    overflow: auto;
 }
 
 .staticInventoryItem {
@@ -65,6 +61,13 @@
     max-height: 80px;
 
     margin: 5%;
+}
+
+.staticInventory {
+    max-height: 80vh;
+    overflow: auto;
+    position: relative;
+    padding: 0.4vw;
 }
 
 .staticInventoryOptions {

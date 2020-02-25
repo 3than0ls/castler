@@ -71,7 +71,7 @@ module.exports = class UserState {
             },
         };
         this.toolTier = 'ruby';
-        this.armorTier = 'dev';
+        this.armorTier = 'basic';
         this.toolTierUnlocked = 0;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
@@ -697,6 +697,7 @@ module.exports = class UserState {
             effects: this.effects,
 
             toolTier: this.toolTier,
+            armorTier: this.armorTier,
 
             nickname: this.nickname,
             score: this.score,

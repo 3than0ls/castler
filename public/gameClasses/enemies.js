@@ -6,7 +6,7 @@ import { dust } from "../dust/dust.js";
 
 
 export class Enemy {
-    constructor(clientID, globalX, globalY, toolTier) {
+    constructor(clientID, globalX, globalY, toolTier, armorTier) {
         // basically is the same as player class, but without any required user input parts
         // basically a puppet, which is controlled by server sent data
         this.globalX = globalX;
@@ -16,7 +16,9 @@ export class Enemy {
         this.displayHand = 'hand';
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
         this.handSprites = {};
+        this.armorSprites = {};
         this.toolTier = toolTier;
+        this.armorTier = armorTier;
 
         this.effects = {};
         this.particleEffects = {};
@@ -140,7 +142,7 @@ export class Enemy {
         player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
     }
 
-    animate(globalX, globalY, angle, swingAngle, displayHand, toolTier, effects) {
+    animate(globalX, globalY, angle, swingAngle, displayHand, toolTier, armorTier, effects) {
         // the animate function is different from the update in player class
         // animate takes input supplied from the server and applies it to the enemies
         // update positioning
@@ -159,18 +161,25 @@ export class Enemy {
         this.effects = effects;
         this.effectsUpdate();
 
-        // remove current displayed hand (which may be different) and then update it
+        // remove current displayed hand and armor (which may be different) and then update it
         player.viewpoint.removeChild(this.handSprites[this.handSpriteKey]);
+        player.viewpoint.removeChild(this.armorSprites[this.armorTier.concat('Armor')]);
         this.displayHand = displayHand;
         this.toolTier = toolTier;
+        this.armorTier = armorTier;
+
+        Player.createHandSprites(this.handSprites, this.globalX, this.globalY, this.toolTier);
+        Player.createArmorSprites(this.armorSprites, this.globalX, this.globalY, this.armorTier);
 
         // determine hand sprite key
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
 
         this.handSprites[this.handSpriteKey].zIndex = 49;
+        this.armorSprites[this.armorTier.concat('Armor')].zIndex = 70;
 
         // update rendered position
-        this.handSprites[this.handSpriteKey].position.set(globalX, globalY);  // <- remove the this in displayhand later
+        this.handSprites[this.handSpriteKey].position.set(globalX, globalY); 
+        this.armorSprites[this.armorTier.concat('Armor')].position.set(globalX, globalY);
         this.bodyGraphic.position.set(globalX, globalY);
         // update rendered angle
         this.handSprites[this.handSpriteKey].rotation = angle;
@@ -180,13 +189,15 @@ export class Enemy {
         // add graphics to stage
         let handGraphic = this.handSprites[this.handSpriteKey];
         let bodyGraphic = this.bodyGraphic;
-        player.viewpoint.addChild(handGraphic, bodyGraphic); // hands drawn below body
+        let armorGraphic = this.armorSprites[this.armorTier.concat('Armor')];
+        player.viewpoint.addChild(handGraphic,  armorGraphic, bodyGraphic); // hands drawn below body
     }
 
     delete() { // delete user when disconnected
         let bodyGraphic = this.bodyGraphic 
         let hand = this.handSprites[this.handSpriteKey];
-        player.viewpoint.removeChild(bodyGraphic, hand);
+        let armor = this.armorSprites[this.armorTier.concat('Armor')];
+        player.viewpoint.removeChild(bodyGraphic, hand, armor);
         // add more sprite removals if needed
     }
 }

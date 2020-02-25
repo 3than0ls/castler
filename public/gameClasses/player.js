@@ -28,7 +28,11 @@ export class Player {
         this.displayHand = 'hand';
         this.handSprites = {};
         this.collisionPoints = {};
+        // armor related
+        this.armorTier = 'basic';
+        this.armorSprites = {};
 
+        // velocity and collision variables
         this.vx = 0;
         this.vy = 0;
         this.collisionvx = 0;
@@ -198,13 +202,14 @@ export class Player {
 
         // render and create hands
         Player.createHandSprites(this.handSprites, this.x, this.y, this.toolTier);
+        Player.createArmorSprites(this.armorSprites, this.x, this.y, this.armorTier);
 
         // movement keys
         this.movementKeys();
         // mouse event detection
         this.mouse();
 
-        // determine hand sprite key
+        // determine hand and armor sprite key
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
 
         // finally, render each to the stage
@@ -396,12 +401,14 @@ export class Player {
 
     tierUpdate(toolTier, armorTier) {
         if (toolTier !== this.toolTier) {
-            this.toolTier = toolTier;
             stage.removeChild(this.handSprites[this.handSpriteKey]);
+            this.toolTier = toolTier;
         }
+
         if (armorTier !== this.armorTier) {
-            
-        }
+            stage.removeChild(this.armorSprites[this.armorTier.concat('Armor')]);
+            this.armorTier = armorTier;
+        }        
     }
 
     structureBuilding(structureHand) {
@@ -490,11 +497,17 @@ export class Player {
         this.mouseX = renderer.plugins.interaction.mouse.global.x/ratio;
         this.mouseY = renderer.plugins.interaction.mouse.global.y/ratio;
 
-        // determine hand sprite key
+        // determine hand and armor sprite key
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
+
+        Player.createHandSprites(this.handSprites, this.x, this.y, this.toolTier);
+        Player.createArmorSprites(this.armorSprites, this.x, this.y, this.armorTier);
+
+
         // update positioning to x and y display (not global). x and y will only ever change in screen resizes
         this.bodyGraphic.position.set(this.x, this.y);
         this.handSprites[this.handSpriteKey].position.set(this.x, this.y);
+        this.armorSprites[this.armorTier.concat('Armor')].position.set(this.x, this.y);
 
         // update particles
         this.effectsUpdate();
@@ -533,7 +546,8 @@ export class Player {
         // add graphics to stage
         let handGraphic = this.handSprites[this.handSpriteKey];
         let bodyGraphic = this.bodyGraphic;
-        stage.addChild(handGraphic, bodyGraphic); // hands drawn below body
+        let armorGraphic = this.armorSprites[this.armorTier.concat('Armor')];
+        stage.addChild(handGraphic, bodyGraphic, armorGraphic); // hands drawn below body
 
         if (this.structureHand && this.displayStructureHand) {
             player.viewpoint.addChild(this.structureSprites[this.displayStructureHand]);
@@ -577,6 +591,7 @@ export class Player {
 
     updateCollisionPoints() { // the math is a bit off, can check later
         // we will use the current tool tiered as the sample to base all calculations off of, but all tools, no matter tier, are the same
+        console.log(this.toolTier, 'asdasd')
         this.collisionPoints['AxeHand'] = {
             x: this.globalX - 
             (this.handSprites[this.toolTier.concat('AxeHand')].width+this.bodyGraphic.width-50)/2
@@ -642,7 +657,17 @@ export class Player {
 
         // etc.
     }
+
+    static createArmorSprites(armorSprites, x, y, tier) {
+        if (!armorSprites[tier.concat('Armor')]) {
+            armorSprites[tier.concat('Armor')] = new PIXI.Sprite(loader.resources[`player/${tier}Armor`].texture);
+            armorSprites[tier.concat('Armor')].anchor.x = 0.5;
+            armorSprites[tier.concat('Armor')].anchor.y = 0.5;
+            armorSprites[tier.concat('Armor')].position.set(x, y);
+        }
+    }
 }
+
 
 function keyboard(keyCode) {
     var key = {};

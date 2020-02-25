@@ -8,18 +8,15 @@ export const userUpdate = (socket, clientState) => {
             // if new player found, add it
             if (!clientState.enemies[userID] && userID !== socket.id) { // if not user isnt already found and isn't the client
                 // if new id and info found, create new enemy and add it to client state
-                const newEnemy = new Enemy(serverStateUser.clientID, -serverStateUser.globalX, -serverStateUser.globalY, serverStateUser.toolTier);
+                const newEnemy = new Enemy(serverStateUser.clientID, -serverStateUser.globalX, -serverStateUser.globalY, serverStateUser.toolTier, serverStateUser.armorTier);
                 newEnemy.render(); // render enemy
                 clientState.enemies[userID] = newEnemy;
             }
             
             if (userID !== socket.id) { // if the server sent player id isn't the client id
                 let enemy = clientState.enemies[userID];
-                if (enemy.toolTier !== serverStateUser.toolTier) {
-                    Player.createHandSprites(enemy.handSprites, serverStateUser.globalX, serverStateUser.globalY, serverStateUser.toolTier);
-                }
                 enemy.animate(
-                    serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand, serverStateUser.toolTier, serverStateUser.effects
+                    serverStateUser.globalX, serverStateUser.globalY, serverStateUser.angle, serverStateUser.swingAngle, serverStateUser.displayHand, serverStateUser.toolTier, serverStateUser.armorTier, serverStateUser.effects
                 );
                 if (serverStateUser.attackFlash) {
                     clientState.enemies[userID].attackFlash();

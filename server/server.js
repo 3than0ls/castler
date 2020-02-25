@@ -13,6 +13,7 @@
     SMALL:
     more different resources, areas, entities, weapons, 
     create sprites for armor
+    custom scroll bars with different IDs/class names
 
 
     CODE CLEANING:
@@ -106,6 +107,8 @@ io.on('connection', socket => {
     socket.on('nickname', nickname => {
         serverState.users.user[socket.id].nickname = nickname;
     }); // update the server info of the clients nickname when client connects
+
+    socket.emit('connected');
 
     socket.emit('playerInit', {
         mapSize: map.size,

@@ -13,8 +13,6 @@ export const clientDataUpdate = (socket) => {
 
         player.tierUpdate(data.toolTier, data.armorTier);
 
-        Player.createHandSprites(player.handSprites, player.x, player.y, data.toolTier);
-
         player.attackSpeed = data.attackSpeed;
         player.harvestSpeed = data.harvestSpeed;
 
