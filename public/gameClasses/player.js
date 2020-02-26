@@ -526,6 +526,7 @@ export class Player {
         this.handSprites[this.handSpriteKey].rotation = this.angle;
         this.handSprites[this.handSpriteKey].angle += this.swingAngle
         this.bodyGraphic.rotation = this.angle;
+        this.armorSprites[this.armorTier.concat('Armor')].rotation = this.angle + Math.PI; // add one radian to turn it around 180 degrees
 
         if (this.mouseHeld && this.dislayHand !== "hand" && !this.structureHand) {
             swing(socket, { swing: true });

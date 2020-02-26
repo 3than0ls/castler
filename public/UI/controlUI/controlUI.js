@@ -23,7 +23,8 @@ function importAll (r) {
 
 const itemImages = importAll(require.context('./../../assets/items', false,  /\.png$/));
 const structureImages = importAll(require.context('./../../assets/structures', false,  /\.png$/));
-export const images = {...itemImages, ...structureImages}; 
+const playerImages = importAll(require.context('./../../assets/player', false,  /\.png$/));
+export const images = {...itemImages, ...structureImages, ...playerImages}; 
 
 
 export class ControlUI extends React.Component {

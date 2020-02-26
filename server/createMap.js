@@ -106,7 +106,7 @@ module.exports = class CreateMap {
         // CreateMap.createStructures(serverState, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, {type:'workbench'});
         CreateMap.createCrate(serverState, {wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
         CreateMap.createCrate(serverState, {stone:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
-        CreateMap.createCrate(serverState, {ruby:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        CreateMap.createCrate(serverState, {rubies:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
 
         CreateMap.createAreas(serverState, 1, -this.size[0]/3, -this.size[1]/3, this.size[0]/3, this.size[1]/3, areaConfigs.lake);
     }

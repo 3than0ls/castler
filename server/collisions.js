@@ -73,6 +73,7 @@ module.exports = {
 
             if (entity.hit) {
                 if (entity.attackTick >= entity.attackSpeed) {
+                    entity.objectCollision = true;
                     object.health -= entity.damage;
                     entity.attackTick = 0;
                     
@@ -83,10 +84,10 @@ module.exports = {
                     io.emit('hit', {
                         vx: vx,
                         vy: vy,
-                        collisionX: a/2,
-                        collisionY: b/2,
+                        collisionX: a/2 + entity.globalX,
+                        collisionY: b/2 + entity.globalY,
                         structureID: object.structureID,
-                        // harvestSpeed: this.harvestSpeed
+                        harvestSpeed: 2
                     });
                 }
             }

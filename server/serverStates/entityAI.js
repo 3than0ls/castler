@@ -1,6 +1,4 @@
-const imageSize = require('image-size');
 const collisions = require('./../collisions.js');
-const entityConfigs =  require('./../gameConfigs/entityConfigs.js');
 
 function randomInt(min, max) {
     min = Math.ceil(min);
@@ -84,7 +82,7 @@ module.exports = class EntityAI {
         }
     }
 
-    detectTarget(radius) {
+    detectTarget(radius) { // used to see if the target is in range
         let a = this.globalX-this.target.globalX;
         let b = this.globalY-this.target.globalY;
         let distance = Math.hypot(a, b);
@@ -95,7 +93,7 @@ module.exports = class EntityAI {
         }
     }
 
-    searchTargets(serverState) {
+    searchTargets(serverState) { // used for aggressive entities
         let shortestDistance;
         let closestTarget;
         for (let [clientID, user] of Object.entries(serverState.users.user)) {
@@ -160,6 +158,9 @@ module.exports = class EntityAI {
         let objects = {...serverState.resources.resource, ...serverState.structures.structure};
         for (let object of Object.values(objects)) {
             collisions.entityObjectCollisionHandle(this, object, io);
+        }
+
+        for (let object of Object.values(objects)) {
             const a = this.globalX - object.globalX;
             const b = this.globalY - object.globalY;
             let distance = Math.hypot(a, b);
@@ -177,7 +178,7 @@ module.exports = class EntityAI {
                 } else if (angle <= -180) {
                     angle += 360;
                 }
-                this.rotate(angle/15, 1);
+                this.rotate(angle/15);
                 break;
             } else {
                 this.objectCollision = false;
@@ -278,7 +279,7 @@ module.exports = class EntityAI {
             this.rotate(a);
         }
         // walk whilst rotating
-        this.walk(5);
+        this.walk(3);
         // if target outside of aggro distance, then untarget and reset hit
         if (!this.detectTarget(this.aggroDistance)) {
             this.target = undefined;
@@ -308,7 +309,7 @@ module.exports = class EntityAI {
             this.rotate(a);
         }
         // walk towards target, whilst rotating
-        this.walk(5);
+        this.walk(3);
         // if target outside of aggro distance and target exists, then untarget it and reset attack tick to attack speed to ready for next attack
         if (!this.detectTarget(this.aggroDistance)) {
             this.target = undefined;
@@ -317,14 +318,13 @@ module.exports = class EntityAI {
         } else {
             // tick the attack ticker
             this.attackTick++;
-            // this.target.attackFlash = false; // set to true in this.target.attacked, used so that clients can see when other clients are attacked
 
             // if target is within attacking range, then attack
             this.attackTargetRadius = this.target.size[0]/2 + this.size[0]/2;
             if (this.detectTarget(this.attackTargetRadius + 7)) { // 7 is an extra padding space
                 if (this.attackTick >= this.attackSpeed) {
                     this.target.attacked(this.damage);
-                    if (this.type === 'beetle') {
+                    if (this.type === 'beetle') { // maybe move to userState.attacked()?
                         this.target.effects['poisoned'] = { tick: 0 };
                     }
                     this.attackTick = 0;
@@ -334,6 +334,7 @@ module.exports = class EntityAI {
 
         // if target has died, than untarget and reset hit
         if (!this.targetExists()) {
+
             this.target = undefined;
             this.hit = false;
             this.attackTick = this.attackSpeed;
@@ -409,6 +410,7 @@ module.exports = class EntityAI {
     update(serverState, map, io) {
         this.collisionvx = 0;
         this.collisionvy = 0;
+        this.objectCollision = false;
         this.tick();
 
         this.globalX = this.globalX;
@@ -426,6 +428,7 @@ module.exports = class EntityAI {
                     this.flee();
                 } else if (this.neutrality === "neutral") {
                     this.attack();
+                    console.log(this.objectCollision);
                 }
             } else if (this.actionTicker >= this.actionTimer) {
                 this.move();

@@ -103,6 +103,31 @@ function swapTools(user, newToolTier) {
     }
 }
 
+function swapArmor(user, newArmorTier) {
+    const currentArmor = user.armorTier.concat('Armor');
+    const newArmor = newArmorTier.concat('Armor');
+
+    if (currentArmor !== 'basicArmor') {
+        if (!user.inventory[currentArmor]) {
+            user.inventory[currentArmor] = {
+                amount: 0,
+                consumable: true,
+            }
+        }
+
+        user.inventory[currentArmor].amount += 1;
+        user.inventory[currentArmor].consumable = true; // should be uneccessary
+    }
+
+    user.armorTier = newArmorTier;
+    if (user.inventory[newArmor]) {
+        user.inventory[newArmor].amount --;
+        if (user.inventory[newArmor].amount <= 0) {
+            delete user.inventory[newArmor];
+        }
+    }
+}
+
 // make the only parameter for Item a config
 
 module.exports = {
@@ -189,6 +214,59 @@ module.exports = {
             }
         ],
         craftingStructure: 'workbench',
+    }),
+
+    /*
+    basicArmor: new Item('basicArmor', {
+        primary: false,
+        consumable: true,
+        consumeFunction: (user) => {
+            swapArmor(user, 'basic');
+        },
+        craftingTime: 2000,
+        recipes: [
+
+        ]
+    }),*/
+
+    furArmor: new Item('furArmor', {
+        primary: false,
+        consumable: true,
+        consumeFunction: (user) => {
+            swapArmor(user, 'fur');
+        },
+        craftingTime: 3500,
+        recipes: [
+            {
+                fur: 4
+            }
+        ]
+    }),
+
+    ironArmor: new Item('ironArmor', {
+        primary: false,
+        consumable: true,
+        consumeFunction: (user) => {
+            swapArmor(user, 'iron');
+        },
+        craftingTime: 3500,
+        recipes: [
+            {
+                ironBars: 4
+            }
+        ]
+    }),
+
+    devArmor: new Item('devArmor', {
+        primary: false,
+        consumable: true,
+        consumeFunction: (user) => {
+            swapArmor(user, 'dev');
+        },
+        craftingTime: 1,
+        recipes: [
+
+        ]
     }),
 
     ironBars: new Item('ironBars', {

@@ -185,6 +185,7 @@ export class Enemy {
         this.handSprites[this.handSpriteKey].rotation = angle;
         this.handSprites[this.handSpriteKey].angle += swingAngle // add on the swingAngle angle, in degrees
         this.bodyGraphic.rotation = angle;
+        this.armorSprites[this.armorTier.concat('Armor')].rotation =  this.angle + Math.PI; // add one radian to turn it around 180 degrees
 
         // add graphics to stage
         let handGraphic = this.handSprites[this.handSpriteKey];

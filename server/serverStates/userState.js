@@ -52,6 +52,9 @@ module.exports = class UserState {
             ironBars: {
                 amount: 50,
             },
+            fur: {
+                amount: 50,
+            },
             stone: {
                 amount: 500,
             },
@@ -67,6 +70,10 @@ module.exports = class UserState {
             },
             furnace: {
                 amount: 500,
+                consumable: true,
+            },
+            devArmor: {
+                amount: 1,
                 consumable: true,
             },
         };
@@ -673,11 +680,14 @@ module.exports = class UserState {
         for (let [itemName, itemData] of Object.entries(this.inventory)) {
             inventory[itemName] = {
                 amount: itemData.amount,
-                consumable: gameItems[itemName].consumable
+                consumable: gameItems[itemName].consumable,
             }
         }
         createMap.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
-        createMap.createCrate(serverState, { [this.toolTier.concat('Tools')]: { amount: 1, consumable: true } }, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
+        createMap.createCrate(serverState, { 
+                [this.toolTier.concat('Tools')]: { amount: 1, consumable: true },
+                [this.armorTier.concat('Armor')]: { amount: 1, consumable: true },
+        }, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
     }
 
     clientDataPackage() {

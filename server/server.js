@@ -3,7 +3,9 @@
 /*
     TO DO:
     ISSUES: 
-    need to add scroll bar to crates
+    need to IMPROVE scroll bar to crates
+    crafting bar does not seem to function correctly, perhaps replace with a circular loader and just have number/text?
+    death menu doesn't work
 
     BIG:
     create walking particle
