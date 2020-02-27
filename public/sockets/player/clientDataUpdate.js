@@ -1,10 +1,13 @@
-import { player, boundary } from "../../app";
-import { Player } from "../../gameClasses/player";
+import { player } from "../../app";
+import { renderDeathMenu } from "../../UI/death/menu";
 
 export const clientDataUpdate = (socket) => {
     // update the client inventory, specifically made so react will display the amount of resources the player has
+    socket.on('clientDied', () => {
+        player.died();
+        renderDeathMenu();
+    });
     socket.on('clientDataUpdate', data => {
-
         player.attackFlash = data.attackFlash;
         
         player.inventoryUpdate(data.inventory);
@@ -30,8 +33,5 @@ export const clientDataUpdate = (socket) => {
         
         player.craftingState = data.craftingState;
         player.score = data.score;
-        if (data.dead) {
-            player.died();
-        };
     })
 };

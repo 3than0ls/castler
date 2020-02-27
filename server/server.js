@@ -5,7 +5,7 @@
     ISSUES: 
     need to IMPROVE scroll bar to crates
     crafting bar does not seem to function correctly, perhaps replace with a circular loader and just have number/text?
-    death menu doesn't work
+    death menu doesn't work <-- FIX
 
     BIG:
     create walking particle
@@ -145,7 +145,7 @@ io.on('connection', socket => {
         };
 
         if (user.health <= 0 || user.dead) { // check if client has died
-            clientUpdateData.dead = true;
+            socket.emit('clientDied');
         }
         // user.playerTick(); // tick player
 

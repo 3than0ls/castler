@@ -30,7 +30,7 @@ module.exports = class UserState {
         this.nickname = 'default'
         this.score = 0;
 
-        this.health = 100;
+        this.health = 1;
         this.hunger = 50;
         this.dead = false;
         this.attackFlash = false;

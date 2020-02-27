@@ -9,9 +9,6 @@ import { swing } from "../sockets/player/swing.js";
 import { dust } from "../dust/dust.js";
 
 
-// import { renderDeathMenu } from "../UI/death/menu.js";
-
-
 export class Player {
     constructor(clientID) {
         this.x = window.innerWidth/2;
@@ -489,7 +486,6 @@ export class Player {
     died() {
         socket.disconnect();
         worker.terminate();
-        // renderDeathMenu();
     }
 
     update() {

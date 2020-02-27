@@ -428,7 +428,6 @@ module.exports = class EntityAI {
                     this.flee();
                 } else if (this.neutrality === "neutral") {
                     this.attack();
-                    console.log(this.objectCollision);
                 }
             } else if (this.actionTicker >= this.actionTimer) {
                 this.move();

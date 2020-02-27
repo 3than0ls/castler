@@ -8,7 +8,7 @@ html, body {
 #deathMenuWrapper {
   pointer-events: auto;
   position: fixed;
-  z-index: 3;
+  z-index: 100;
   margin: 0;
   height: 100vh;
   width: 100vw;
@@ -18,7 +18,7 @@ html, body {
   background: rgba(0, 0, 0, 0.465);
 }
 
-.overlayBoxContainer {
+.deathMenuContainer {
   margin: 0;
   border: 0;
   margin: 2.5vh 1vw;
@@ -31,6 +31,11 @@ html, body {
   color: rgb(255, 255, 255);
   background: rgba(0, 0, 0, 0.849);
   border-radius: 2vw;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
 
 .noselect {
