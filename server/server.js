@@ -5,7 +5,7 @@
     ISSUES: 
     need to IMPROVE scroll bar to crates
     crafting bar does not seem to function correctly, perhaps replace with a circular loader and just have number/text?
-    death menu doesn't work <-- FIX
+    attack player flash seems to sometimes not work, maybe make attack flash its own socket event and emit it when attackFlash in userState update
 
     BIG:
     create walking particle
@@ -13,9 +13,9 @@
     turn boundaries into a map/game client side class, where we can implement time cycles normally (read code cleanup description)
 
     SMALL:
-    more different resources, areas, entities, weapons, 
-    create sprites for armor
+    more different resources, areas, entities, weapons,
     custom scroll bars with different IDs/class names
+    create weapon and armor data files
 
 
     CODE CLEANING:
@@ -45,17 +45,6 @@ app.use(cacheControl())
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, './public/')));
-
-/*app.post('/', (req, res, next) => { LOOK INTO AJAX
-    console.log(req.body);
-    /*
-        client(submit form with name)---------------\
-            |                                        |
-        client(create and connect socket)       client(post form data {nickname})
-            |                                                         \
-        server(create socket userState in serverState)              server(send client rest of game )
-    
-})*/
 
 const UserState = require('./serverStates/userState.js');;
 const CreateMap = require('./createMap.js');
@@ -141,7 +130,6 @@ io.on('connection', socket => {
             displayHand: user.displayHand,
             structureHand: user.structureHand,
             swingAngle: user.swingAngle,
-            attackFlash: user.attackFlash,
         };
 
         if (user.health <= 0 || user.dead) { // check if client has died

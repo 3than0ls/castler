@@ -566,7 +566,6 @@ export class Player {
         }
 
 
-
         // emit client info to server
         clientEmit(socket, {
             vx: this.vx,
@@ -588,7 +587,6 @@ export class Player {
 
     updateCollisionPoints() { // the math is a bit off, can check later
         // we will use the current tool tiered as the sample to base all calculations off of, but all tools, no matter tier, are the same
-        console.log(this.toolTier, 'asdasd')
         this.collisionPoints['AxeHand'] = {
             x: this.globalX - 
             (this.handSprites[this.toolTier.concat('AxeHand')].width+this.bodyGraphic.width-50)/2

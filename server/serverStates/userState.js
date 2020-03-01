@@ -30,7 +30,7 @@ module.exports = class UserState {
         this.nickname = 'default'
         this.score = 0;
 
-        this.health = 1;
+        this.health = 100;
         this.hunger = 50;
         this.dead = false;
         this.attackFlash = false;
@@ -77,8 +77,8 @@ module.exports = class UserState {
                 consumable: true,
             },
         };
-        this.toolTier = 'ruby';
-        this.armorTier = 'basic';
+        this.toolTier = 'wood';
+        this.armorTier = 'fur';
         this.toolTierUnlocked = 0;
         this.harvestSpeed = 2;
         this.attackSpeed = 2;
@@ -195,6 +195,9 @@ module.exports = class UserState {
 
         switch (this.armorTier) {
             case 'iron':
+                this.armorDamageReduction = 0.4;
+                break;
+            case 'fur':
                 this.armorDamageReduction = 0.2;
                 break;
             case 'dev':
@@ -695,6 +698,7 @@ module.exports = class UserState {
         if (this.attackFlash) {
             flash = true;
             this.attackFlash = false;
+            console.log('flash')
         }
         return {
             clientID: this.clientID,

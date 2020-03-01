@@ -345,5 +345,16 @@ module.exports = {
             }
         ],
         craftingStructure: 'workbench',
-    })
+    }),
+
+    test: new Item('test', {
+        primary: false,
+        consumable: false,
+        craftingTime: 200000,
+        recipes: [
+            {
+                wood: 1,
+            }
+        ]
+    }),
 }

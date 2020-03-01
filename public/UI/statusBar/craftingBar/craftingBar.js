@@ -1,7 +1,8 @@
 import React from 'react';
 
 // react bootstrap components
-import ProgressBar from 'react-bootstrap/ProgressBar'
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import Spinner from 'react-bootstrap/Spinner';
 
 // custom style sheet
 import './craftingBar.css';
@@ -29,16 +30,18 @@ export class CraftingBar extends React.Component { // used to monitor progress o
     tick() { 
         this.setState({
             crafting: player.craftingState.crafting,
-            craftingComplete: Math.round(player.craftingState.craftingComplete * 125)
+            craftingComplete: Math.round(player.craftingState.craftingComplete*100)
         });
     } // there is a delay between the now and displayed now, how to remove?
 
     render() {
+        console.log(this.state.craftingComplete);
         return(
             <> 
                 {this.state.crafting && 
-                    <div className="statusBarWrapper" id="craftingBar">
-                        <ProgressBar variant={"roundPurple"} className="statusBar" now={this.state.craftingComplete}/>  
+                    <div id="craftingSpinnerContainer">
+                        <Spinner variant="purple" animation="border"/>  
+                        <div className='statusAmount'>{this.state.craftingComplete}%</div>
                     </div>
                 }
             </>
