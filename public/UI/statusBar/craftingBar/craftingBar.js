@@ -35,7 +35,6 @@ export class CraftingBar extends React.Component { // used to monitor progress o
     } // there is a delay between the now and displayed now, how to remove?
 
     render() {
-        console.log(this.state.craftingComplete);
         return(
             <> 
                 {this.state.crafting && 

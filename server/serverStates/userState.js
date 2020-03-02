@@ -1,6 +1,5 @@
 const gameItems = require('./../gameConfigs/items.js');
 const collisions = require('./../collisions.js');
-const createMap = require('./../createMap.js');
 const imageSize = require('image-size');
 const effects = require('./../gameConfigs/effects.js')
 
@@ -157,7 +156,7 @@ module.exports = class UserState {
         }
     }
 
-    update(serverState, map, io) {
+    update(serverState, io) {
         this.playerTick();
         this.updateCollisionPoints();
         // update if dead or not
@@ -258,7 +257,7 @@ module.exports = class UserState {
             this.collisionvx = -this.speed;
         }
 
-        this.boundaryContain(map.size);
+        this.boundaryContain(serverState.size);
 
         this.globalX += this.collisionvx;
         this.globalY += this.collisionvy;
@@ -337,7 +336,7 @@ module.exports = class UserState {
                                 collisionY: this.collisionPoints[this.displayHandType].y,
                                 structureID: structure.structureID,
                             });
-                            structure.destroyed(createMap, serverState);
+                            structure.destroyed(serverState);
                             delete serverState.structures.structure[structure.structureID];
                             delete serverState.structures.structureData[structure.structureID];
                         }
@@ -528,7 +527,7 @@ module.exports = class UserState {
             if (this.inventory[type] && gameItems[type]) {
                 this.inventory[type].amount -= amount;
                 
-                createMap.createCrate(serverState, 
+                serverState.createCrate(serverState, 
                     { 
                         [type]: {
                             amount: amount,
@@ -678,7 +677,7 @@ module.exports = class UserState {
         return itemFilteredStructures;
     }
 
-    die(createMap, serverState) {
+    die(serverState) {
         let inventory = {};
         for (let [itemName, itemData] of Object.entries(this.inventory)) {
             inventory[itemName] = {
@@ -686,8 +685,8 @@ module.exports = class UserState {
                 consumable: gameItems[itemName].consumable,
             }
         }
-        createMap.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
-        createMap.createCrate(serverState, { 
+        serverState.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
+        serverState.createCrate(serverState, { 
                 [this.toolTier.concat('Tools')]: { amount: 1, consumable: true },
                 [this.armorTier.concat('Armor')]: { amount: 1, consumable: true },
         }, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
@@ -698,7 +697,6 @@ module.exports = class UserState {
         if (this.attackFlash) {
             flash = true;
             this.attackFlash = false;
-            console.log('flash')
         }
         return {
             clientID: this.clientID,

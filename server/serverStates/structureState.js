@@ -39,10 +39,10 @@ module.exports = class StructureState {
         }
     }
 
-    destroyed(createMap, serverState) {
+    destroyed(serverState) {
         /* individual bags
         for (let [itemName, itemAmount] of Object.entries(items[this.type].recipes[0])) {
-            createMap.createCrate(serverState, {
+            serverState.createCrate(serverState, {
                 [itemName]: {
                     amount: itemAmount,
                     consumable: items[itemName].consumable
@@ -56,7 +56,7 @@ module.exports = class StructureState {
                 consumable: items[itemName].consumable
             }
         }
-        createMap.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3)
+        serverState.createCrate(inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3)
     }
 
     clear(serverState) {
@@ -74,7 +74,7 @@ module.exports = class StructureState {
         }
     }
 
-    update(serverState, createMap, io) {
+    update(serverState, io) {
         serverState.structures.structureData[this.structureID] = this.structureDataPackage();
         if (this.health <= 0) {
             io.emit('destroyed', {
@@ -82,7 +82,7 @@ module.exports = class StructureState {
                 collisionY: this.globalY,
                 structureID: this.structureID,
             });
-            this.destroyed(createMap, serverState);
+            this.destroyed(serverState);
             delete serverState.structures.structure[this.structureID];
             delete serverState.structures.structureData[this.structureID];
         }

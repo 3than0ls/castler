@@ -11,12 +11,13 @@
     create walking particle
 
     turn boundaries into a map/game client side class, where we can implement time cycles normally (read code cleanup description)
+        - MAKE SERVERSTATE (server side) CLASS WHICH CONTROLS SERVERSTATE PROPERTY AND UPDATE METHODS, CLIENTSTATE CLASS (client side) WHICH CONTROLS CLIENTSTATE PROPERTY, BOUNDARY UPDATING, AND OTHER
 
     SMALL:
     more different resources, areas, entities, weapons,
     custom scroll bars with different IDs/class names
     create weapon and armor data files
-
+    create structure data files
 
     CODE CLEANING:
         - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
@@ -46,43 +47,123 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, './public/')));
 
-const UserState = require('./serverStates/userState.js');;
-const CreateMap = require('./createMap.js');
-const StructureState = require('./serverStates/structureState.js');
 
-const serverState = {
-    users: {
-        userData: {}, // data we send to clients
-        user: {},   // data that controls and has functions of the user
-    },
-    resources: {
-        resourceData: {},
-        resource: {},
-    }, 
-    entities: {
-        entityData: {}, // the data we send to the client holding positioning and other info about entities
-        entity: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
-    },
-    areas: {
-        areaData: {},
-        area: {},
-    },
-    structures: {
-        structureData: {},
-        structure: {},
-    },
-    crates: {
-        crateData: {},
-        crate: {},
-    }, // crates are containers of dropped items from players
-
-    timeTick: 4000,
+function randomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const map = new CreateMap(serverState, [1400, 1400]);
-map.test4(serverState);
+// game states
+const UserState = require('./serverStates/userState.js');
+const EntityAI = require('./serverStates/entityAI.js');
+const ResourceState = require('./serverStates/resourceState.js');
+const StructureState = require('./serverStates/structureState.js');
+const AreaState = require('./serverStates/areaState.js');
+const CrateState = require('./serverStates/crateState.js');
 
+// game config data files
+const entityConfigs = require('./gameConfigs/entityConfigs.js');
+const areaConfigs = require('./gameConfigs/areaConfigs.js');
 const gameItems = require('./gameConfigs/items.js');
+
+class ServerState {
+    constructor(size) {
+        this.size = size;
+        let emptyServerState = {
+            users: {
+                userData: {}, // data we send to clients
+                user: {},   // data that controls and has functions of the user
+            },
+            resources: {
+                resourceData: {},
+                resource: {},
+            }, 
+            entities: {
+                entityData: {}, // the data we send to the client holding positioning and other info about entities
+                entity: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
+            },
+            areas: {
+                areaData: {},
+                area: {},
+            },
+            structures: {
+                structureData: {},
+                structure: {},
+            },
+            crates: {
+                crateData: {},
+                crate: {},
+            }, // crates are containers of dropped items from players
+        
+            timeTick: 4000,
+        };
+        Object.assign(this, emptyServerState);
+    }
+
+    createResources(type, amount, minX, minY, maxX=0, maxY=0) {
+        for (let i = 0; i < amount; i++) {
+            let resource = new ResourceState(randomInt(minX, maxX), randomInt(minY, maxY), type);
+            this.resources.resource[resource.resourceID] = resource;
+            this.resources.resourceData[resource.resourceID] = resource;
+        }
+    }
+
+    createEntities(entityConfig, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
+        for (let i = 0; i < amount; i ++) {
+            let entity = new EntityAI(entityConfig, randomInt(minX, maxX), randomInt(minY, maxY), homeAreaID);
+            this.entities.entity[entity.entityID] = entity;
+            this.entities.entityData[entity.entityID] = entity.entityDataPackage();
+        }
+    }
+
+    createStructures(amount, minX, minY, maxX, maxY, structureConfig) {
+        for (let i = 0; i < amount; i ++) {
+            let config = JSON.parse(JSON.stringify(structureConfig)); // created a deep clone copy of the config and edit it if necessary
+            if (!config.globalX) config.globalX = randomInt(minX, maxX);
+            if (!config.globalY) config.globalY = randomInt(minY, maxY);
+            let structure = new StructureState(config);
+            this.structures.structure[structure.structureID] = structure;
+            this.structures.structureData[structure.structureID] = structure.structureDataPackage();
+            structure.clear(serverState);
+        }
+    }
+
+    createCrate(contents, amount, minX, minY, maxX=0, maxY=0) {
+        for (let i = 0; i < amount; i++) {
+            let crate = new CrateState(randomInt(minX, maxX), randomInt(minY, maxY), contents);
+            this.crates.crate[crate.crateID] = crate;
+            this.crates.crateData[crate.crateID] = crate.crateDataPackage();
+        }
+    }
+    
+    createAreas(amount, minX, minY, maxX, maxY, areaConfig, zIndex) { 
+        // area state takes special variables because inside area state, this file is also imported, which clashes with each other
+        // to fix this, we don't import this file in area state, but rather pass this class off as a parameter that's used in area state to create entities and resources
+
+        for (let i = 0; i < amount; i ++) {
+            let config = JSON.parse(JSON.stringify(areaConfig)); // created a deep clone copy of the config and edit it if necessary
+            if (!config.globalX) config.globalX = randomInt(minX, maxX);
+            if (!config.globalY) config.globalY = randomInt(minY, maxY);
+            let area = new AreaState(config);
+            this.areas.area[area.areaID] = area;
+            this.areas.areaData[area.areaID] = area.areaDataPackage();
+            area.create(this);
+        }
+    }
+
+
+    test() {
+        this.createEntities(entityConfigs.duck, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        this.createResources('rock', 3, -700, -700, 700, 700);
+        this.createStructures(1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, {type:'workbench'});
+        this.createCrate({wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        this.createAreas(1, -this.size[0]/3, -this.size[1]/3, this.size[0]/3, this.size[1]/3, areaConfigs.lake);
+    }
+}
+
+const serverState = new ServerState([1400, 1400]);
+serverState.test();
 
 function createUser(socketID) {
     let newUserState = new UserState(socketID);
@@ -102,7 +183,8 @@ io.on('connection', socket => {
     socket.emit('connected');
 
     socket.emit('playerInit', {
-        mapSize: map.size,
+        // mapSize: map.size,
+        mapSize: serverState.size,
         inventory: serverState.users.user[socket.id].inventory,
         toolTier: serverState.users.user[socket.id].toolTier
     }) // provide the connecting client information it needs when it first connects
@@ -245,11 +327,11 @@ io.on('connection', socket => {
         socket.broadcast.emit('userLeave', socket.id);
         for (let [structureID, structure] of Object.entries(serverState.structures.structure)) {
             if (structure.parentID === socket.id) {
-                serverState.structures.structure[structureID].destroyed(CreateMap, serverState);
+                serverState.structures.structure[structureID].destroyed(serverState);
                 delete serverState.structures.structureData[structureID]; // delete structures that were created by the client
             }
         }
-        serverState.users.user[socket.id].die(CreateMap, serverState);
+        serverState.users.user[socket.id].die(serverState);
         delete serverState.users.user[socket.id]; // delete client data
         delete serverState.users.userData[socket.id];
     });
@@ -263,19 +345,19 @@ function update(serverState) {
 
     // update server states, and some server states, like structures and resources, don't need to be updated. may change
     for (let user of Object.values(serverState.users.user)) {
-        user.update(serverState, map, io);
+        user.update(serverState, io);
     }
     for (let entity of Object.values(serverState.entities.entity)) {
-        entity.update(serverState, map, io);
+        entity.update(serverState, io);
     }
     for (let crate of Object.values(serverState.crates.crate)) {
         crate.update(serverState);
     }
     for (let structure of Object.values(serverState.structures.structure)) {
-        structure.update(serverState, CreateMap, io);
+        structure.update(serverState, io);
     }
     for (let area of Object.values(serverState.areas.area)) {
-        area.update(serverState, CreateMap);
+        area.update(serverState);
     }
 
     // emit data (perhaps combine all into one later)

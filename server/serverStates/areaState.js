@@ -53,7 +53,7 @@ module.exports = class AreaState {
         }
     }
 
-    respawnTick(serverState, CreateMap) {
+    respawnTick(serverState) {
         // entity count will be decreased when an entity dies
         if (this.entityCount < this.entityLimit) {
             this.entityRespawnTick++;
@@ -73,8 +73,8 @@ module.exports = class AreaState {
                     }
                 }
 
-                CreateMap.createEntities(
-                    serverState, config, 1, 
+                serverState.createEntities(
+                    config, 1, 
                     this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                     this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
                     this.areaID
@@ -84,7 +84,7 @@ module.exports = class AreaState {
         }
     }
 
-    create(serverState, CreateMap) {
+    create(serverState) {
         // clear area of previous resources, then insert in new ones
         // clear resources and entities
         this.clearedObjects = 0;
@@ -112,8 +112,8 @@ module.exports = class AreaState {
         // insert new resources and entities
         this.createdObjects = 0;
         for (let i = 0; i < this.config.resources.length; i++) {
-            CreateMap.createResources(
-                serverState, this.config.resources[i].type, this.config.resources[i].amount,
+            serverState.createResources(
+                this.config.resources[i].type, this.config.resources[i].amount,
                 this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                 this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
             );
@@ -121,8 +121,8 @@ module.exports = class AreaState {
         }
 
         for (let i = 0; i < this.config.entities.length; i++) {
-            CreateMap.createEntities(
-                serverState, this.config.entities[i].config, this.config.entities[i].amount, 
+            serverState.createEntities(
+                this.config.entities[i].config, this.config.entities[i].amount, 
                 this.globalX-this.size[0]/2+this.spawnPadding, this.globalY-this.size[1]/2+this.spawnPadding, 
                 this.globalX+this.size[0]/2-this.spawnPadding, this.globalY+this.size[1]/2-this.spawnPadding,
                 this.areaID,
@@ -133,8 +133,8 @@ module.exports = class AreaState {
         // console.log(`Created ${this.createdObjects} object TYPES when constructing a '${this.type}' area`);
     }
 
-    update(serverState, CreateMap) {
-        this.respawnTick(serverState, CreateMap);
+    update(serverState) {
+        this.respawnTick(serverState);
         serverState.areas.areaData[this.areaID] = this.areaDataPackage();
     }
 

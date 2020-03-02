@@ -407,7 +407,7 @@ module.exports = class EntityAI {
         }
     }
 
-    update(serverState, map, io) {
+    update(serverState, io) {
         this.collisionvx = 0;
         this.collisionvy = 0;
         this.objectCollision = false;
@@ -450,7 +450,7 @@ module.exports = class EntityAI {
         
         this.avoidObjects(serverState, io);
         this.avoidArea(serverState.areas.area);
-        this.boundaryContain(map.size);
+        this.boundaryContain(serverState.size);
 
         
         this.walk('updateCall');
