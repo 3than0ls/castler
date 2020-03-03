@@ -105,7 +105,7 @@ module.exports = class UserState {
     }
 
     effectPlayerInsideArea(area) {
-        if (area.objectInsideArea(this)) {
+        if (area.objectInsideArea(this, 0.95)) {
             switch (area.type) {
                 case 'mine': 
                     delete this.effects['swimming'];
@@ -522,12 +522,13 @@ module.exports = class UserState {
         // increase player score for killing the animal
         this.score += 3;
     }
+    
     drop(type, amount, serverState) {
         if (typeof amount === "number" && !Number.isNaN(amount)) { // test if the amount is a number and it is not NaN
             if (this.inventory[type] && gameItems[type]) {
                 this.inventory[type].amount -= amount;
                 
-                serverState.createCrate(serverState, 
+                serverState.createCrate(
                     { 
                         [type]: {
                             amount: amount,

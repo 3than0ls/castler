@@ -1,4 +1,4 @@
-import { stage, socket, renderer, clientState, worker, player } from "../app.js";
+import { stage, socket, renderer, clientState, player } from "../app.js";
 import { loader } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio } from "./../utils/windowResize.js";
@@ -297,23 +297,6 @@ export class Player {
         }
     }
 
-    cycleNight() {
-        if (!this.playerTintOverlay) { // maybe add to render()?
-            this.playerTintOverlay = new PIXI.Graphics();
-            this.playerTintOverlay.beginFill(0x000000, 0.90);
-            this.playerTintOverlay.drawRect(0, 0, 5000, 5000); // window.innerWidth/innerHeight have shown to be unreliable on edge, so we use this
-            this.playerTintOverlay.endFill();
-            this.playerTintOverlay.zIndex = 150;
-        }
-        // include day and night cycle
-        if (clientState.timeTick < 5000) {
-            // day time
-            stage.removeChild(this.playerTintOverlay);
-        } else if (clientState.timeTick >= 5000) { // look into pixi js masks, perhaps they can help recreate this effect of darkening
-            stage.addChild(this.playerTintOverlay);
-        }
-    }
-
     viewpointUpdate() {
         /*
             things that appear to move when the player moves are added to the viewpoint display group
@@ -485,7 +468,7 @@ export class Player {
 
     died() {
         socket.disconnect();
-        worker.terminate();
+        clientState.worker.terminate();
     }
 
     update() {
@@ -507,9 +490,6 @@ export class Player {
 
         // update particles
         this.effectsUpdate();
-
-        // cycle time
-        this.cycleNight();
 
         // update viewpoint
         this.viewpointUpdate();

@@ -41,15 +41,10 @@ module.exports = class AreaState {
         this.areaID = 'a' + Math.random().toString(36).substr(2, 9);
     }
 
-    objectInsideArea(object, invert=false) {
-        if (object.globalX >= -this.size[0]/2 + this.globalX && object.globalX <= this.size[0]/2 + this.globalX &&
-            object.globalY >= -this.size[1]/2 + this.globalY && object.globalY <= this.size[1]/2 + this.globalY) {
-            if (invert) {
-                return false;
-            }
-            return true;
-        } else {
-            return false;
+    objectInsideArea(object, size=1) {
+        if (object.globalX >= (-this.size[0]/2)*size + this.globalX && object.globalX <= (this.size[0]/2)*size + this.globalX &&
+            object.globalY >= (-this.size[1]/2)*size + this.globalY && object.globalY <= (this.size[1]/2)*size + this.globalY) {
+                return true;
         }
     }
 

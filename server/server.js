@@ -35,11 +35,9 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-
 const config = require('../webpack.config.js');
 let configCompiler = webpack(config);
 app.use(webpackDevMiddleware(configCompiler));
-
 
 // app.use(express.static(path.join(__dirname, './src/')));
 app.use(cacheControl())
@@ -47,133 +45,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, './public/')));
 
-
-function randomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// game states
-const UserState = require('./serverStates/userState.js');
-const EntityAI = require('./serverStates/entityAI.js');
-const ResourceState = require('./serverStates/resourceState.js');
-const StructureState = require('./serverStates/structureState.js');
-const AreaState = require('./serverStates/areaState.js');
-const CrateState = require('./serverStates/crateState.js');
-
-// game config data files
-const entityConfigs = require('./gameConfigs/entityConfigs.js');
-const areaConfigs = require('./gameConfigs/areaConfigs.js');
-const gameItems = require('./gameConfigs/items.js');
-
-class ServerState {
-    constructor(size) {
-        this.size = size;
-        let emptyServerState = {
-            users: {
-                userData: {}, // data we send to clients
-                user: {},   // data that controls and has functions of the user
-            },
-            resources: {
-                resourceData: {},
-                resource: {},
-            }, 
-            entities: {
-                entityData: {}, // the data we send to the client holding positioning and other info about entities
-                entity: {},  // controls the entity and tells it where to move, but the functions used don't need to be sent to client
-            },
-            areas: {
-                areaData: {},
-                area: {},
-            },
-            structures: {
-                structureData: {},
-                structure: {},
-            },
-            crates: {
-                crateData: {},
-                crate: {},
-            }, // crates are containers of dropped items from players
-        
-            timeTick: 4000,
-        };
-        Object.assign(this, emptyServerState);
-    }
-
-    createResources(type, amount, minX, minY, maxX=0, maxY=0) {
-        for (let i = 0; i < amount; i++) {
-            let resource = new ResourceState(randomInt(minX, maxX), randomInt(minY, maxY), type);
-            this.resources.resource[resource.resourceID] = resource;
-            this.resources.resourceData[resource.resourceID] = resource;
-        }
-    }
-
-    createEntities(entityConfig, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
-        for (let i = 0; i < amount; i ++) {
-            let entity = new EntityAI(entityConfig, randomInt(minX, maxX), randomInt(minY, maxY), homeAreaID);
-            this.entities.entity[entity.entityID] = entity;
-            this.entities.entityData[entity.entityID] = entity.entityDataPackage();
-        }
-    }
-
-    createStructures(amount, minX, minY, maxX, maxY, structureConfig) {
-        for (let i = 0; i < amount; i ++) {
-            let config = JSON.parse(JSON.stringify(structureConfig)); // created a deep clone copy of the config and edit it if necessary
-            if (!config.globalX) config.globalX = randomInt(minX, maxX);
-            if (!config.globalY) config.globalY = randomInt(minY, maxY);
-            let structure = new StructureState(config);
-            this.structures.structure[structure.structureID] = structure;
-            this.structures.structureData[structure.structureID] = structure.structureDataPackage();
-            structure.clear(serverState);
-        }
-    }
-
-    createCrate(contents, amount, minX, minY, maxX=0, maxY=0) {
-        for (let i = 0; i < amount; i++) {
-            let crate = new CrateState(randomInt(minX, maxX), randomInt(minY, maxY), contents);
-            this.crates.crate[crate.crateID] = crate;
-            this.crates.crateData[crate.crateID] = crate.crateDataPackage();
-        }
-    }
-    
-    createAreas(amount, minX, minY, maxX, maxY, areaConfig, zIndex) { 
-        // area state takes special variables because inside area state, this file is also imported, which clashes with each other
-        // to fix this, we don't import this file in area state, but rather pass this class off as a parameter that's used in area state to create entities and resources
-
-        for (let i = 0; i < amount; i ++) {
-            let config = JSON.parse(JSON.stringify(areaConfig)); // created a deep clone copy of the config and edit it if necessary
-            if (!config.globalX) config.globalX = randomInt(minX, maxX);
-            if (!config.globalY) config.globalY = randomInt(minY, maxY);
-            let area = new AreaState(config);
-            this.areas.area[area.areaID] = area;
-            this.areas.areaData[area.areaID] = area.areaDataPackage();
-            area.create(this);
-        }
-    }
-
-
-    test() {
-        this.createEntities(entityConfigs.duck, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
-        this.createResources('rock', 3, -700, -700, 700, 700);
-        this.createStructures(1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, {type:'workbench'});
-        this.createCrate({wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
-        this.createAreas(1, -this.size[0]/3, -this.size[1]/3, this.size[0]/3, this.size[1]/3, areaConfigs.lake);
-    }
-}
-
-const serverState = new ServerState([1400, 1400]);
+const ServerStates = require('./serverStates/index');
+const serverState = new ServerStates([2000, 2000]);
 serverState.test();
 
-function createUser(socketID) {
-    let newUserState = new UserState(socketID);
-    serverState.users.user[socketID] = newUserState;
-    serverState.users.userData[socketID] = newUserState.clientDataPackage();
-    console.log("Client joined: " + socketID);
-}
+const gameItems = require('./gameConfigs/items.js');
 
 io.on('connection', socket => {
-    createUser(socket.id);
+    serverState.createUser(socket.id);
 
     // initial variable assignments
     socket.on('nickname', nickname => {
@@ -243,13 +122,8 @@ io.on('connection', socket => {
     socket.on('clientCreateStructure', data => {
         if (serverState.users.user[socket.id].inventory[data.type]) { // test if inventory item exists
             if (serverState.users.user[socket.id].inventory[data.type].amount > 0) {
-                let structure = new StructureState({
-                    globalX: data.globalX,
-                    globalY: data.globalY,
-                    type: data.type,
-                }, socket.id);
-                serverState.structures.structure[structure.structureID] = structure;
-                serverState.structures.structureData[structure.structureID] = structure.structureDataPackage();
+                // need to test if structure type exists
+                serverState.createStructures(1, data.globalX, data.globalY, data.globalX, data.globalY, {type: data.type}, socket.id);
                 gameItems[data.type].consumeFunction(serverState.users.user[socket.id]);
             }
         }
@@ -338,7 +212,7 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
-    // serverState.timeTick ++;
+    serverState.timeTick ++;
     if (serverState.timeTick > 10000) {
         serverState.timeTick = 0; // reset to day
     }

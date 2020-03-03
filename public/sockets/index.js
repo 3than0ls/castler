@@ -1,4 +1,4 @@
-import { clientState, player, boundary, leaderboardState, craftableItemsState } from "../app.js";
+import { clientState, player, } from "../app.js";
 
 import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
 import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
@@ -19,8 +19,8 @@ export function clientInit(socket) {
         player.toolTier = initData.toolTier;
 
         // create boundary borders
-        boundary.resize(initData.mapSize);
-        boundary.renderBoundary();
+        clientState.resize(initData.mapSize);
+        clientState.renderBoundary();
         // when other init data is created, add here
     });
 }
@@ -40,9 +40,9 @@ export function socketUpdate(socket) {
     areaUpdate(socket, clientState);
     // update UI data
     // update leaderboard data
-    leaderboardUpdate(socket, leaderboardState);
+    leaderboardUpdate(socket, clientState.leaderboardState);
     // update craftable items data
-    craftableItemsUpdate(socket, craftableItemsState)
+    craftableItemsUpdate(socket, clientState.craftableItemsState)
     // update time cycle
     timeTick(socket, clientState);
 }

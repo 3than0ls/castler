@@ -428,7 +428,6 @@ class Bump {
       // has an issue where if user unfocuses and an entity runs into the player, the overlap causes the player to teleport to other places
       player.collisionvx += (overlap * dx);
       player.collisionvy += (overlap * dy);
-      //console.log(player.collisionvx, player.collisionvy);
       
       //Bounce
       if (bounce) {

@@ -9,8 +9,7 @@ import Col from 'react-bootstrap/Col';
 import './../styles.css';
 import './leaderboard.css';
 
-import { leaderboardState } from '../../app';
-
+import { clientState } from '../../app';
 
 // move nickname here
 
@@ -18,7 +17,7 @@ export class Leaderboard extends React.Component {
     constructor() {
         super();
         this.state = {
-            leaderboard: leaderboardState,
+            leaderboard: clientState.leaderboardState,
             nickname: window.localStorage.getItem('nickname'),
         }
     }
@@ -32,7 +31,7 @@ export class Leaderboard extends React.Component {
 
     tick() { 
         this.setState({
-            leaderboard: leaderboardState,
+            leaderboard: clientState.leaderboardState,
         });
     }
 

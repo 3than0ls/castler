@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 
 // images
-import { player, socket, craftableItemsState } from '../../app';
+import { player, socket, clientState } from '../../app';
 import { clientRequestCraft } from '../../sockets/player/clientRequestCraft';
 
 import { images } from './controlUI.js';
@@ -17,7 +17,7 @@ export class CraftingUI extends React.Component {
         super();
         this.state = {
             playerID: player.clientID,
-            craftableItems: craftableItemsState,
+            craftableItems: clientState.craftableItemsState,
 
             craftingState: player.craftingState,
             images: images,
@@ -32,7 +32,7 @@ export class CraftingUI extends React.Component {
     }
     tick() { 
         this.setState({
-            craftableItems: craftableItemsState,
+            craftableItems: clientState.craftableItemsState,
             craftingState: player.craftingState,
         });
     }
