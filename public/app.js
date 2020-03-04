@@ -8,8 +8,9 @@ ReactDOM.render(<StartMenu />, document.getElementById('menuWrapper'));
 export let socket = undefined;
 
 
-import { charm } from './charm/charm.js';
-import { dust } from './dust/dust.js';
+import { charm } from './vendors/charm/charm.js';
+import { dust } from './vendors/dust/dust.js';
+
 import { Player } from "./gameClasses/player.js";
 import { resize } from "./utils/windowResize.js";
 
@@ -30,9 +31,6 @@ export const clientState = {
 
     timeTick: 0,
 }*/
-
-
-document.title = "Game";
 
 // Create renderer
 export let renderer = undefined;

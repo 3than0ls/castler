@@ -1,9 +1,6 @@
-import { Resource } from "../../gameClasses/resource";
+import { Resource } from "./../../../gameClasses/resource";
 
 export const resourceUpdate = (socket, clientState) => {
-    socket.on('harvested', data => {
-        clientState.resources[data.resourceID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
-    });
     socket.on('resourceStates', serverStateResources => {
         for (let [resourceID, resource] of Object.entries(serverStateResources)) {
             // if new resource found, add it
@@ -26,5 +23,8 @@ export const resourceUpdate = (socket, clientState) => {
             clientState.resources[resourceDifference[i]].delete();
             delete clientState.resources[resourceDifference[i]];
         }
+    });
+    socket.on('harvested', data => {
+        clientState.resources[data.resourceID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
     });
 };

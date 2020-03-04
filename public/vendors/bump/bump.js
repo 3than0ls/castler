@@ -1,5 +1,5 @@
-import { gameWidth, gameHeight } from "../utils/windowResize";
-import { player, windowFocused } from "../app";
+import { gameWidth, gameHeight } from "../../utils/windowResize";
+import { player, windowFocused } from "../../app";
 
 // added an export of an instance of Bump class at the bottom
 

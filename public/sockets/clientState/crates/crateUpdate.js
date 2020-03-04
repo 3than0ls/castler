@@ -1,4 +1,4 @@
-import { Crate } from "../../gameClasses/crate";
+import { Crate } from "../../../gameClasses/crate";
 
 export const crateUpdate = (socket, clientState) => {
     socket.on('crateStates', serverStateCrates => {

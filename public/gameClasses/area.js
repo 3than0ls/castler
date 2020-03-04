@@ -1,6 +1,5 @@
 import { player } from "../app";
 import { loader } from "../utils/loader";
-import { dust } from "../dust/dust";
 
 export class Area {
     constructor(areaID, config) {

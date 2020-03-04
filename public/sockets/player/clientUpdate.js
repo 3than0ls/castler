@@ -1,7 +1,7 @@
 import { player } from "../../app";
 import { renderDeathMenu } from "../../UI/death/menu";
 
-export const clientDataUpdate = (socket) => {
+export const clientUpdate = (socket) => {
     // update the client inventory, specifically made so react will display the amount of resources the player has
     socket.on('clientDied', () => {
         player.died();

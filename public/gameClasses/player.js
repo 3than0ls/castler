@@ -2,11 +2,11 @@ import { stage, socket, renderer, clientState, player } from "../app.js";
 import { loader } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio } from "./../utils/windowResize.js";
-import { bump } from "../bump/bump.js";
-import { charm } from "../charm/charm.js";
+import { bump } from "../vendors/bump/bump.js";
+import { charm } from "../vendors/charm/charm.js";
 import { clientCreateStructure } from "../sockets/player/clientCreateStructure.js";
 import { swing } from "../sockets/player/swing.js";
-import { dust } from "../dust/dust.js";
+import { dust } from "../vendors/dust/dust.js";
 
 
 export class Player {

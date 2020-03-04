@@ -1,4 +1,4 @@
-import { Entity } from "../../gameClasses/entity";
+import { Entity } from "../../../gameClasses/entity";
 
 export const entityUpdate = (socket, clientState) => {
     socket.on('attacked', data => {

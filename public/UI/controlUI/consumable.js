@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 // react bootstrap components
 import Image from 'react-bootstrap/Image';
@@ -13,7 +12,7 @@ import { player, socket } from '../../app';
 import { clientRequestConsume } from '../../sockets/player/clientRequestConsume';
 
 import { images } from './controlUI.js';
-import { dropItem } from '../../sockets/UI/dropItem';
+import { dropItem } from '../../sockets/player/clientDrop';
 
 export class Consumable extends React.Component {
     constructor(props) {

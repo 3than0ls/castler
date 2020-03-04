@@ -8,30 +8,8 @@ import './menu.css';
 import { loader, loadImages } from '../utils/loader';
 import { setup } from '../app';
 
-/*
-    user types in name in input field, data is passed along to a client connect function, which sends the server data about the client name (and other info)
-    the server will then update/create UserState username property, which will then be sent to all clients to be seen
-*/
 
-function post(path, params, method='post') {
-    const form = document.createElement('form');
-    form.method = method;
-    form.action = path;
-  
-    for (const key in params) {
-      if (params.hasOwnProperty(key)) {
-        const hiddenField = document.createElement('input');
-        hiddenField.type = 'hidden';
-        hiddenField.name = key;
-        hiddenField.value = params[key];
-  
-        form.appendChild(hiddenField);
-      }
-    }
-  
-    document.body.appendChild(form);
-    form.submit();
-}
+document.title = "Castler";
 
 export let play = false;
 

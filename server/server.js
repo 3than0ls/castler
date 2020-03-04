@@ -4,20 +4,18 @@
     TO DO:
     ISSUES: 
     need to IMPROVE scroll bar to crates
-    crafting bar does not seem to function correctly, perhaps replace with a circular loader and just have number/text?
+    refactor misleading file names (userUpdate.js) and clean up public/sockets
     attack player flash seems to sometimes not work, maybe make attack flash its own socket event and emit it when attackFlash in userState update
 
     BIG:
     create walking particle
-
-    turn boundaries into a map/game client side class, where we can implement time cycles normally (read code cleanup description)
-        - MAKE SERVERSTATE (server side) CLASS WHICH CONTROLS SERVERSTATE PROPERTY AND UPDATE METHODS, CLIENTSTATE CLASS (client side) WHICH CONTROLS CLIENTSTATE PROPERTY, BOUNDARY UPDATING, AND OTHER
 
     SMALL:
     more different resources, areas, entities, weapons,
     custom scroll bars with different IDs/class names
     create weapon and armor data files
     create structure data files
+    create favicon
 
     CODE CLEANING:
         - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
@@ -235,7 +233,7 @@ function update(serverState) {
     }
 
     // emit data (perhaps combine all into one later)
-    io.sockets.emit('userStates', serverState.users.userData);
+    io.sockets.emit('enemyStates', serverState.users.userData);
     io.sockets.emit('crateStates', serverState.crates.crateData);
     io.sockets.emit('structureStates', serverState.structures.structureData);
     io.sockets.emit('resourceStates', serverState.resources.resourceData);

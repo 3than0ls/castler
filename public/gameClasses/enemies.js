@@ -1,8 +1,8 @@
-import { stage, player } from "../app.js";
+import { player } from "../app.js";
 import { loader } from "./../utils/loader.js";
 import { Player } from "./player.js";
-import { charm } from "../charm/charm.js";
-import { dust } from "../dust/dust.js";
+import { charm } from "../vendors/charm/charm.js";
+import { dust } from "../vendors/dust/dust.js";
 
 
 export class Enemy {

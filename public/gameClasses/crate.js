@@ -1,7 +1,7 @@
 import { player } from "../app";
 import { loader } from "../utils/loader";
-import { dust } from "../dust/dust";
-import { charm } from "../charm/charm";
+import { dust } from "../vendors/dust/dust";
+import { charm } from "../vendors/charm/charm";
 
 export class Crate {
     constructor(crateID, contents, globalX, globalY) {

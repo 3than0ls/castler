@@ -1,8 +1,8 @@
-import { Enemy } from "../../gameClasses/enemies";
+import { Enemy } from "../../../gameClasses/enemies";
 
 
-export const userUpdate = (socket, clientState) => {
-    socket.on('userStates', serverStateUsers => {
+export const enemyUpdate = (socket, clientState) => {
+    socket.on('enemyStates', serverStateUsers => {
         for (let [userID, serverStateUser] of Object.entries(serverStateUsers)) {
             // if new player found, add it
             if (!clientState.enemies[userID] && userID !== socket.id) { // if not user isnt already found and isn't the client

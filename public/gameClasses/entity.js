@@ -1,8 +1,8 @@
 import { player } from "../app";
 import { loader } from "../utils/loader";
-import { bump } from "../bump/bump";
-import { charm } from "../charm/charm";
-import { dust } from "../dust/dust";
+import { bump } from "../vendors/bump/bump.js";
+import { charm } from "../vendors/charm/charm";
+import { dust } from "../vendors/dust/dust";
 
 export class Entity {
     constructor(entityID, type, globalX, globalY) {

@@ -1,10 +1,6 @@
-import { Structure } from "../../gameClasses/structure";
+import { Structure } from "./../../../gameClasses/structure";
 
 export const structureUpdate = (socket, clientState) => {
-    socket.on('hit', data => {
-        if (!data.harvestSpeed) data.harvestSpeed = 4;
-        clientState.structures[data.structureID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
-    });
     socket.on('structureStates', serverStateStructures => {
         for (let [structureID, structure] of Object.entries(serverStateStructures)) {
             if (!clientState.structures[structureID]) {
@@ -23,5 +19,9 @@ export const structureUpdate = (socket, clientState) => {
             clientState.structures[structureDifference[i]].delete();
             delete clientState.structures[structureDifference[i]];
         }
+    });
+    socket.on('hit', data => {
+        if (!data.harvestSpeed) data.harvestSpeed = 4;
+        clientState.structures[data.structureID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
     });
 };

@@ -1,9 +1,8 @@
-import { player, particleContainer } from "../app";
+import { player  } from "../app";
 import { loader } from "../utils/loader";
-import { bump } from "../bump/bump";
-import { ratio, gameWidth } from "../utils/windowResize";
-import { charm } from "../charm/charm.js";
-import { dust } from "../dust/dust.js";
+import { bump } from "../vendors/bump/bump.js";
+import { charm } from "../vendors/charm/charm.js";
+import { dust } from "../vendors/dust/dust.js";
 
 export class Resource {
     constructor(resourceID, type, globalX, globalY) {

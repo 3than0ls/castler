@@ -1,16 +1,17 @@
 import { clientState, player, } from "../app.js";
 
+
+import { clientUpdate } from "./player/clientUpdate.js";
 import { leaderboardUpdate } from "./UI/leaderboardUpdate.js";
 import { craftableItemsUpdate } from "./UI/craftableItemsUpdate.js";
 
-import { userUpdate } from "./player/userUpdate.js";
-import { resourceUpdate } from "./resources/resourceUpdate.js";
-import { entityUpdate } from "./entities/entityUpdate.js";
-import { structureUpdate } from "./structures/structureUpdate.js";
-import { crateUpdate } from "./crates/crateUpdate.js";
-import { areaUpdate } from "./areas/areaUpdate.js";
-import { clientDataUpdate } from "./player/clientDataUpdate.js";
-import { timeTick } from "./timeTick/timeTick.js";
+import { enemyUpdate } from "./clientState/enemies/enemyUpdate.js";
+import { resourceUpdate } from "./clientState/resources/resourceUpdate.js";
+import { entityUpdate } from "./clientState/entities/entityUpdate.js";
+import { structureUpdate } from "./clientState/structures/structureUpdate.js";
+import { crateUpdate } from "./clientState/crates/crateUpdate.js";
+import { areaUpdate } from "./clientState/areas/areaUpdate.js";
+import { timeTick } from "./clientState/timeTick/timeTick.js";
 
 export function clientInit(socket) {
     socket.emit('nickname', window.localStorage.getItem('nickname'));
@@ -27,22 +28,18 @@ export function clientInit(socket) {
 
 export function socketUpdate(socket) {
     // update client data
-    clientDataUpdate(socket);
-    // update enemy puppet data
-    userUpdate(socket, clientState);
-    // update resource and entity data
+    clientUpdate(socket);
+
+    // update client state
+    enemyUpdate(socket, clientState);
     resourceUpdate(socket, clientState);
     entityUpdate(socket, clientState);
-    // update crates
     crateUpdate(socket, clientState);
-    // update areas (may remove) and structures
     structureUpdate(socket, clientState);
     areaUpdate(socket, clientState);
-    // update UI data
-    // update leaderboard data
-    leaderboardUpdate(socket, clientState.leaderboardState);
-    // update craftable items data
-    craftableItemsUpdate(socket, clientState.craftableItemsState)
-    // update time cycle
     timeTick(socket, clientState);
+
+    // update UI data
+    leaderboardUpdate(socket, clientState.leaderboardState);
+    craftableItemsUpdate(socket, clientState.craftableItemsState);
 }

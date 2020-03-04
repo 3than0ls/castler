@@ -1,4 +1,4 @@
-import { Area } from "../../gameClasses/area";
+import { Area } from "../../../gameClasses/area";
 
 export const areaUpdate = (socket, clientState) => {
     socket.on('areaStates', serverStateAreas => {

@@ -6,16 +6,13 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form'
 
-// npm custom numeric input
-import NumericInput from 'react-numeric-input';
-
 
 // images
 import { player, socket } from '../../app';
 import { clientRequestConsume } from '../../sockets/player/clientRequestConsume';
 
 import { images } from './controlUI.js';
-import { dropItem } from '../../sockets/UI/dropItem';
+import { dropItem } from '../../sockets/player/clientDrop';
 
 export class Inventory extends React.Component {
     constructor(props) {
