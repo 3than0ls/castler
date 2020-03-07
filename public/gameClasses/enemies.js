@@ -26,7 +26,7 @@ export class Enemy {
 
     attackFlash() {
         if (this.bodyGraphic.tint === 0xFFFFFF) {
-            let tint = charm.redTint(this.bodyGraphic);
+            let tint = charm.tint(this.bodyGraphic, [185, 255, 255]);
             tint.onComplete = () => {
                 // reset tint to nothing
                 this.bodyGraphic.tint = 0xFFFFFF
@@ -127,6 +127,7 @@ export class Enemy {
         // set positions
         this.bodyGraphic.anchor.x = 0.5;
         this.bodyGraphic.anchor.y = 0.5;
+        this.bodyGraphic.radius = this.bodyGraphic.width;
         this.bodyGraphic.position.set(this.globalX, this.globalY);
 
         // render and create hand sprites
@@ -175,7 +176,7 @@ export class Enemy {
         this.handSpriteKey = this.displayHand === 'hand' ? 'hand' : this.toolTier.concat(this.displayHand);
 
         this.handSprites[this.handSpriteKey].zIndex = 49;
-        this.armorSprites[this.armorTier.concat('Armor')].zIndex = 70;
+        this.armorSprites[this.armorTier.concat('Armor')].zIndex = 52;
 
         // update rendered position
         this.handSprites[this.handSpriteKey].position.set(globalX, globalY); 
@@ -199,6 +200,9 @@ export class Enemy {
         let hand = this.handSprites[this.handSpriteKey];
         let armor = this.armorSprites[this.armorTier.concat('Armor')];
         player.viewpoint.removeChild(bodyGraphic, hand, armor);
+        for (let [effectName, effectEmitter] of Object.entries(this.particleEffects)) {
+            effectEmitter.stop();
+        }
         // add more sprite removals if needed
     }
 }

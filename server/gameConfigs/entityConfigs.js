@@ -1,45 +1,5 @@
 const imageSize = require('image-size');
 
-/* 
-    duck: class DuckData {
-        constructor() {
-            this.type = 'duck',
-            this.neutrality = 'passive';
-            this.loot = {
-                feather: 1,
-                rawMeat: 1,
-            };
-            this.health = 100;
-            this.damage = 0;
-            this.size = [imageSize(`./public/assets/entities/${this.type}.png`).width * 0.798, imageSize(`./public/assets/entities/${this.type}.png`).height * 0.798];
-        }
-    },
-    boar: class BoarData {
-        constructor() {
-            this.type = 'boar',
-            this.neutrality = 'neutral';
-            this.loot = {
-                fur: 1,
-                rawMeat: 2,
-            };
-            this.health = 250;
-            this.damage = 14;
-            this.size = [imageSize(`./public/assets/entities/${this.type}.png`).width * 0.827, imageSize(`./public/assets/entities/${this.type}.png`).height * 0.927];
-        }
-    },
-    beetle: class BeetleData {
-        constructor() {
-            this.type = 'beetle',
-            this.neutrality = 'passive';
-            this.loot = {
-                mandibles: 1,
-            };
-            this.health = 100;
-            this.damage = 0;
-            this.size = [imageSize(`./public/assets/entities/${this.type}.png`).width * 0.798, imageSize(`./public/assets/entities/${this.type}.png`).height * 0.798];
-        }
-    }, */
-
 module.exports = {
     duck: {
         type: 'duck',

@@ -208,12 +208,12 @@ class Charm {
           if (property !== "tint") {
             sprite[property] = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
           } else if (property === "tint") {
-            let value = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
-            let red = parseInt(value);
-            let green, blue;
-            blue = green = parseInt((1/(256**4)) * (red ** 5));
-            let color = '0x' + this.hex(red) + this.hex(green) + this.hex(blue);
-            sprite.tint = color;
+            let rgb = o.endValue.map((value, index) => {
+              return this.hex(Math.round((value * curvedTime) + (o.startValue[index] * (1 - curvedTime))));
+            })
+            let tintColor = '0x';
+            rgb.forEach(color => tintColor += color);
+            sprite.tint = tintColor;
           }
           
 
@@ -349,10 +349,10 @@ class Charm {
   }
 
   //`tint`
-  //similar to pulse, but instead of alpha it's a tint, colored red, so it seems like player has taken damage
-  redTint(sprite, frames = 30) {
+  // custom made tint (more like tintFade) function. It instantly sets the tint to the specified color, and then fades back to no tint over frames time
+  tint(sprite, color, frames = 30) {
     return this.tweenProperty(
-      sprite, "tint", 256 * (2/3), 256, frames, "smoothstep"
+      sprite, "tint", color, [255, 255, 255], frames, "smoothstep"
     );
   }
 

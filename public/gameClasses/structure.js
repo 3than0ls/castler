@@ -47,7 +47,12 @@ export class Structure {
     }
 
     hit(vx, vy, collisionX, collisionY, harvestSpeed) {
-        // create an effect where the resource appears to have bumped when hit
+        // use color matrix filters or charm tint, or none?
+        /*
+        let colorMatrix = new PIXI.filters.ColorMatrixFilter();
+        this.structureGraphic.filters = [colorMatrix];
+        colorMatrix.brightness(1.4, true);
+        */
         let waypoints = [
             [this.globalX, this.globalY],
             [this.globalX+vx, this.globalY+vy],

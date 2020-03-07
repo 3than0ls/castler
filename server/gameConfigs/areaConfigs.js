@@ -1,5 +1,5 @@
 // areas have configs as well, specifying attributes like entity and resource types. This class is created so we do not have to copy and paste config types every time we want to create one
-const entityConfigs = require('./entityConfigs.js')
+const entityConfigs = require('./entityConfigs.js');
 
 module.exports = {
     lake: {

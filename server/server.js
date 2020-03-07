@@ -3,12 +3,10 @@
 /*
     TO DO:
     ISSUES: 
-    need to IMPROVE scroll bar to crates
-    refactor misleading file names (userUpdate.js) and clean up public/sockets
-    attack player flash seems to sometimes not work, maybe make attack flash its own socket event and emit it when attackFlash in userState update
-
+    
     BIG:
     create walking particle
+    close control UI button <------ NEXT
 
     SMALL:
     more different resources, areas, entities, weapons,
@@ -19,8 +17,6 @@
 
     CODE CLEANING:
         - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
-        - create a server state class with appopriate functions whose main purpose is to contain the serverState and update it
-        - create a client state class with appropriate functions, which include containing the clientState, updating it, updating boundaries, running day/night cycles, and other types of things that don't seem to have a place
 */
 
 const express = require('express');
@@ -88,6 +84,7 @@ io.on('connection', socket => {
             attackSpeed: user.attackSpeed,
             displayHand: user.displayHand,
             structureHand: user.structureHand,
+            attackFlash: user.attackFlash,
             swingAngle: user.swingAngle,
         };
 
@@ -200,6 +197,7 @@ io.on('connection', socket => {
         for (let [structureID, structure] of Object.entries(serverState.structures.structure)) {
             if (structure.parentID === socket.id) {
                 serverState.structures.structure[structureID].destroyed(serverState);
+                delete serverState.structures.structure[structureID];
                 delete serverState.structures.structureData[structureID]; // delete structures that were created by the client
             }
         }
@@ -210,7 +208,7 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
-    serverState.timeTick ++;
+    //serverState.timeTick ++;
     if (serverState.timeTick > 10000) {
         serverState.timeTick = 0; // reset to day
     }
@@ -266,7 +264,7 @@ function update(serverState) {
 http.listen(3000, () => {
     setInterval(() => {
         // console.time('update');
-        update(serverState)
+        update(serverState);
         // console.timeEnd('update');
     }, 1000/60);    
 

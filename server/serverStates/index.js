@@ -46,7 +46,7 @@ module.exports = class ServerStates {
                 crate: {},
             }, // crates are containers of dropped items from players
         
-            timeTick: 4000,
+            timeTick: 0,
         };
         Object.assign(this, emptyServerState);
     }
@@ -87,6 +87,7 @@ module.exports = class ServerStates {
     }
 
     createCrate(contents, amount, minX, minY, maxX=0, maxY=0) {
+        console.log('a')
         for (let i = 0; i < amount; i++) {
             let crate = new CrateState(randomInt(minX, maxX), randomInt(minY, maxY), contents);
             this.crates.crate[crate.crateID] = crate;
@@ -111,7 +112,7 @@ module.exports = class ServerStates {
 
 
     test() {
-        this.createEntities(entityConfigs.duck, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        this.createEntities(entityConfigs.duck, 11, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
         this.createResources('rock', 3, -700, -700, 700, 700);
         this.createStructures(1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, {type:'workbench'});
         this.createCrate({wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);

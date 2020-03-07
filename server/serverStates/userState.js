@@ -1,7 +1,9 @@
 const gameItems = require('./../gameConfigs/items.js');
+const effects = require('./../gameConfigs/effects.js')
+const toolConfigs = require('./../gameConfigs/toolConfigs.js');
+const armorConfigs = require('./../gameConfigs/armorConfigs.js');
 const collisions = require('./../collisions.js');
 const imageSize = require('image-size');
-const effects = require('./../gameConfigs/effects.js')
 
 module.exports = class UserState {
     constructor(socketID, globalX, globalY, angle) {
@@ -163,52 +165,24 @@ module.exports = class UserState {
         if (this.health <= 0) {
             this.dead = true;
         }
-        // update tool tier
-        switch (this.toolTier) {
-            case 'wood':
-                this.damage = 25;
-                this.harvestSpeed = 2;
-                this.attackSpeed = 2;
-                break;
-            case 'stone':
-                this.damage = 35;
-                this.harvestSpeed = 2.3;
-                this.attackSpeed = 2.3;
-                break;
-            case 'iron':
-                this.damage = 55;
-                this.harvestSpeed = 2.8;
-                this.attackSpeed = 2.8;
-                break;
-            case 'mandible':
-                this.damage = 55;
-                this.harvestSpeed = 3.1;
-                this.attackSpeed = 2.9;
-                break;
-            case 'ruby':
-                this.damage = 35;
-                this.harvestSpeed = 5;
-                this.attackSpeed = 5;
-                break;
+        // update tool and armor stats
+        this.damage = toolConfigs[this.toolTier].damage;
+        this.harvestSpeed = toolConfigs[this.toolTier].harvestSpeed;
+        this.attackSpeed = toolConfigs[this.toolTier].attackSpeed;
+        if (Array.isArray(toolConfigs[this.toolTier].holdEffects)) { // test if the tool has an effect
+            for (let effect of toolConfigs[this.toolTier].holdEffects) {
+                user.effects[effect] = { tick: 0 };
+            }
         }
 
-        switch (this.armorTier) {
-            case 'iron':
-                this.armorDamageReduction = 0.4;
-                break;
-            case 'fur':
-                this.armorDamageReduction = 0.2;
-                break;
-            case 'dev':
-                this.armorDamageReduction = 1;
-                break;
-            default: 
-                this.armorDamageReduction = 0;
+        this.armorDamageReduction = armorConfigs[this.armorTier].armorDamageReduction;
+        if (Array.isArray(armorConfigs[this.armorTier].effects)) {
+            for (let effect of armorConfigs[this.armorTier].effects) {
+                this.effects[effect] = { tick: 0 };
+            }
         }
-
-        // position updates
-        // perhaps combine this and player tick, and or remove the current player tick from client update state and move it to where this update function is called
-        // update attributes dependent on location relative to areas and structures
+        
+        // update effects dependent on location relative to areas and structures
         for (let area of Object.values(serverState.areas.area).sort((a,b) => (a.zIndex > b.zIndex) ? 1 : ((b.zIndex > a.zIndex) ? -1 : 0))) { // apply effects based on area z index
             this.effectPlayerInsideArea(area);
         }
@@ -216,6 +190,8 @@ module.exports = class UserState {
             this.effectPlayerNearStructure(structure);
         }
         this.effectsUpdate(); // update all effect ticks and handling
+
+        // position updates
         if (this.vx !== 0 && this.vy !== 0) {
             this.globalX += this.vx * this.speed * Math.sin(45);
             this.globalY += this.vy * this.speed * Math.sin(45);
@@ -269,8 +245,9 @@ module.exports = class UserState {
         this.swingRequest = false;
     }
 
-    killUser(user) {
+    killUser(user, serverState) {
         this.score += Math.min(Math.ceil(user.score/4) + 5, 100);
+        user.die(serverState);
         // perhaps some emitting of data to client
     }
 
@@ -377,12 +354,14 @@ module.exports = class UserState {
                 }
                 for (let user of Object.values(serverState.users.user)) {
                     if (collisions.collisionPointObject(this.collisionPoints[this.displayHandType], user) && !this.alreadySwungAt.includes(user.clientID)) {
-                        user.attacked(this.damage)
-                        if (this.toolTier === 'mandible') {
-                            user.effects['poisoned'] = { tick: 0 }
+                        user.attacked(this.damage);
+                        if (Array.isArray(toolConfigs[this.toolTier].hitEffects)) {
+                            for (let effect of toolConfigs[this.toolTier].hitEffects) {
+                                user.effects[effect] = { tick: 0 };
+                            }
                         }
                         if (user.health <= 0 || user.dead) { // user.dead may not be necessary, and this may be buggy
-                            this.killUser(user);
+                            this.killUser(user, serverState);
                         }
                         this.alreadySwungAt.push(user.clientID);
                     }
@@ -686,8 +665,8 @@ module.exports = class UserState {
                 consumable: gameItems[itemName].consumable,
             }
         }
-        serverState.createCrate(serverState, inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
-        serverState.createCrate(serverState, { 
+        serverState.createCrate(inventory, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);
+        serverState.createCrate({ 
                 [this.toolTier.concat('Tools')]: { amount: 1, consumable: true },
                 [this.armorTier.concat('Armor')]: { amount: 1, consumable: true },
         }, 1, this.globalX - this.size[0]/3, this.globalY - this.size[1]/3, this.globalX + this.size[0]/3, this.globalY + this.size[1]/3);

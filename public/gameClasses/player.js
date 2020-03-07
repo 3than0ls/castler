@@ -399,7 +399,7 @@ export class Player {
         }
         if (!this.structureSprites[structureHand]) { // if the sprite texture doesn't exist, create it
             this.structureSprites[structureHand] = new PIXI.Sprite(loader.resources[`structures/${structureHand}`].texture);
-            this.structureSprites[structureHand].zIndex = 51;
+            this.structureSprites[structureHand].zIndex = 100;
             this.structureSprites[structureHand].anchor.x = 0.5;
             this.structureSprites[structureHand].anchor.y = 0.5;
             this.structureSprites[structureHand].circular = true;
@@ -412,24 +412,39 @@ export class Player {
 
         this.placeable = true;
 
-        let objects = {...clientState.resources, ...clientState.structures, ...clientState.entities, ...clientState.crates};
-        for (let [objectID, object] of Object.entries(objects)) {
-            if (Math.hypot(object.globalX - this.globalX, object.globalY - this.globalY) < 750) { // only calculate on resources/objects near the player
-                let test;
-                if (objectID.charAt(0) === 's') { // structures
-                    test = bump.hitTestCircle(object.structureGraphic, this.structureSprites[structureHand]);
-                } else if (objectID.charAt(0) === 'r') { // resources
-                    test = bump.hitTestCircle(object.resourceGraphic, this.structureSprites[structureHand]);
-                } else if (objectID.charAt(0) === 'e') { // entities
-                    test = bump.hitTestCircle(object.entityGraphic, this.structureSprites[structureHand]);
-                } else if (objectID.charAt(0) === 'c') { // crates
-                    test = bump.hitTestCircle(object.crateGraphic, this.structureSprites[structureHand]);
-                } else {
-                    test = false; // unidentified object, does not match the ID system
-                }
+        // search for enemies first (due to ID nomenclature)
+        for (let [enemyID, enemy] of Object.entries(clientState.enemies)) {
+            let test;
+            // only calculate on resources/objects near the player, if the object/enemy is farther than 750 pixels, the result is already known
+            if (Math.hypot(enemy.globalX - this.globalX, enemy.globalY - this.globalY < 750)) {
+                test = bump.hitTestCircle(enemy.bodyGraphic, this.structureSprites[structureHand]);
+                console.log(enemy.bodyGraphic.x - this.structureSprites[structureHand].x, enemy.bodyGraphic.y - this.structureSprites[structureHand].y)
                 if (test) { // if a collision is found, make object unplaceable
                     this.placeable = false;
                     break;
+                }
+            }
+        }
+        if (this.placeable) {
+            let objects = {...clientState.resources, ...clientState.structures, ...clientState.entities, ...clientState.crates};
+            for (let [objectID, object] of Object.entries(objects)) {
+                if (Math.hypot(object.globalX - this.globalX, object.globalY - this.globalY) < 750) {
+                    let test;
+                    if (objectID.charAt(0) === 's') { // structures
+                        test = bump.hitTestCircle(object.structureGraphic, this.structureSprites[structureHand]);
+                    } else if (objectID.charAt(0) === 'r') { // resources
+                        test = bump.hitTestCircle(object.resourceGraphic, this.structureSprites[structureHand]);
+                    } else if (objectID.charAt(0) === 'e') { // entities
+                        test = bump.hitTestCircle(object.entityGraphic, this.structureSprites[structureHand]);
+                    } else if (objectID.charAt(0) === 'c') { // crates
+                        test = bump.hitTestCircle(object.crateGraphic, this.structureSprites[structureHand]);
+                    } else {
+                        test = false; // unidentified object, does not match the ID system
+                    }
+                    if (test) { // if a collision is found, make object unplaceable
+                        this.placeable = false;
+                        break;
+                    }
                 }
             }
         }
@@ -444,7 +459,7 @@ export class Player {
 
     attacked() {
         if (this.bodyGraphic.tint === 0xFFFFFF) {
-            let tint = charm.redTint(this.bodyGraphic);
+            let tint = charm.tint(this.bodyGraphic, [185, 0, 0]);
             tint.onComplete = () => {
                 // reset tint to nothing
                 this.bodyGraphic.tint = 0xFFFFFF

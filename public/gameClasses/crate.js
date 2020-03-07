@@ -24,7 +24,7 @@ export class Crate {
         this.crateGraphic.position.set(this.globalX, this.globalY);
 
         // set zIndex (the parent container, player.viewpoint, enables sortable children)
-        this.crateGraphic.zIndex = 5;
+        this.crateGraphic.zIndex = 2;
 
         player.viewpoint.addChild(this.crateGraphic);
     }

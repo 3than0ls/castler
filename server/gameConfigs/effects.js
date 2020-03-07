@@ -35,5 +35,13 @@ module.exports = {
             user.health ++;
         },
         expires: 300,
+    }),
+
+    dev: new Effect('dev', {
+        effectOverTime: false,
+        effect: function(user) {
+            user.health = 100;
+            user.hunger = 100;
+        },
     })
 }

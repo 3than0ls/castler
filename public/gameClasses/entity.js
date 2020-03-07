@@ -54,7 +54,13 @@ export class Entity {
     }
 
     hit(collisionX, collisionY) {
-        // charm.slide(this.entityGraphic, this.globalX+vx, this.globalY+vy, 60, "deceleration");
+        if (this.entityGraphic.tint === 0xFFFFFF) {
+            let tint = charm.tint(this.entityGraphic, [255, 120, 120], 25);
+            tint.onComplete = () => {
+                // reset tint to nothing
+                this.entityGraphic.tint = 0xFFFFFF
+            }
+        }
         // emit particle when hit
         dust.create(
             collisionX,
