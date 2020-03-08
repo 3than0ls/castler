@@ -3,6 +3,7 @@
 /*
     TO DO:
     ISSUES: 
+    include time as a part of init data
     
     BIG:
     create walking particle
@@ -59,7 +60,9 @@ io.on('connection', socket => {
         // mapSize: map.size,
         mapSize: serverState.size,
         inventory: serverState.users.user[socket.id].inventory,
-        toolTier: serverState.users.user[socket.id].toolTier
+        toolTier: serverState.users.user[socket.id].toolTier,
+        dayTimeLength: serverState.dayTimeLength,
+        timeTick: serverState.timeTick,
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
@@ -110,7 +113,7 @@ io.on('connection', socket => {
     socket.on('clientRequestConsume', data => {
         const user = serverState.users.user[socket.id];
         if (user.inventory[data.item] && gameItems[data.item].consumable) { // check if inventory item exists
-            gameItems[data.item].consumeFunction(user);
+            gameItems[data.item].consumeFunction(user, serverState);
         }
     });
 
@@ -208,10 +211,7 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
-    //serverState.timeTick ++;
-    if (serverState.timeTick > 10000) {
-        serverState.timeTick = 0; // reset to day
-    }
+    serverState.cycleTime();
 
     // update server states, and some server states, like structures and resources, don't need to be updated. may change
     for (let user of Object.values(serverState.users.user)) {

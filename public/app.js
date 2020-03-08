@@ -82,6 +82,8 @@ export function setup() {
 
         clientInit(socket); 
         socketUpdate(socket);
+        
+        clientState.cycleNight(stage);
     
         // render UI
         ReactDOM.render(<App />, document.getElementById('ui'));

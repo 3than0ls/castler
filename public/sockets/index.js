@@ -1,4 +1,4 @@
-import { clientState, player, } from "../app.js";
+import { clientState, player, stage, } from "../app.js";
 
 
 import { clientUpdate } from "./player/clientUpdate.js";
@@ -20,8 +20,9 @@ export function clientInit(socket) {
         player.toolTier = initData.toolTier;
 
         // create boundary borders
-        clientState.resize(initData.mapSize);
-        clientState.renderBoundary();
+        clientState.resize(initData.mapSize, stage);
+        clientState.render(stage);
+        clientState.timeInit(initData.dayTimeLength, initData.timeTick, stage);
         // when other init data is created, add here
     });
 }

@@ -49,6 +49,7 @@ module.exports = class ServerStates {
             timeTick: 0,
         };
         Object.assign(this, emptyServerState);
+        this.dayTimeLength = 5000;
     }
 
     createUser(socketID) {
@@ -87,7 +88,6 @@ module.exports = class ServerStates {
     }
 
     createCrate(contents, amount, minX, minY, maxX=0, maxY=0) {
-        console.log('a')
         for (let i = 0; i < amount; i++) {
             let crate = new CrateState(randomInt(minX, maxX), randomInt(minY, maxY), contents);
             this.crates.crate[crate.crateID] = crate;
@@ -107,6 +107,13 @@ module.exports = class ServerStates {
             this.areas.area[area.areaID] = area;
             this.areas.areaData[area.areaID] = area.areaDataPackage();
             area.create(this);
+        }
+    }
+
+    cycleTime() {
+        this.timeTick ++;
+        if (this.timeTick > this.dayTimeLength) {
+            this.timeTick = 0;
         }
     }
 

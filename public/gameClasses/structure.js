@@ -47,12 +47,7 @@ export class Structure {
     }
 
     hit(vx, vy, collisionX, collisionY, harvestSpeed) {
-        // use color matrix filters or charm tint, or none?
-        /*
-        let colorMatrix = new PIXI.filters.ColorMatrixFilter();
-        this.structureGraphic.filters = [colorMatrix];
-        colorMatrix.brightness(1.4, true);
-        */
+        charm.filter(this.structureGraphic, 'brightness', 1.65, 1);
         let waypoints = [
             [this.globalX, this.globalY],
             [this.globalX+vx, this.globalY+vy],

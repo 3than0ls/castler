@@ -50,26 +50,11 @@ module.exports = class UserState {
                 consumable: true,
                 amount: 100,
             },
-            ironBars: {
-                amount: 50,
-            },
-            fur: {
-                amount: 50,
-            },
-            stone: {
-                amount: 500,
-            },
-            mandibles: {
-                amount: 500,
-            },
-            wood: {
-                amount: 500,
-            },
-            workbench: {
-                amount: 500,
+            hourGlass: {
                 consumable: true,
+                amount: 100,
             },
-            furnace: {
+            wall: {
                 amount: 500,
                 consumable: true,
             },
@@ -77,8 +62,12 @@ module.exports = class UserState {
                 amount: 1,
                 consumable: true,
             },
+            rubyTools: {
+                amount: 1,
+                consumable: true,
+            }
         };
-        this.toolTier = 'wood';
+        this.toolTier = 'stone';
         this.armorTier = 'fur';
         this.toolTierUnlocked = 0;
         this.harvestSpeed = 2;

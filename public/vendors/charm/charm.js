@@ -204,16 +204,23 @@ class Charm {
             curvedTime = this.easingFormulas.spline(normalizedTime, o.startMagnitude, 0, 1, o.endMagnitude);
           }
 
-          //Interpolate the sprite's property based on the curve
-          if (property !== "tint") {
-            sprite[property] = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
-          } else if (property === "tint") {
+          //Interpolate the sprite's property based on the curve, and edit based on property
+          if (property === "tint") {
             let rgb = o.endValue.map((value, index) => {
               return this.hex(Math.round((value * curvedTime) + (o.startValue[index] * (1 - curvedTime))));
-            })
+            });
             let tintColor = '0x';
             rgb.forEach(color => tintColor += color);
             sprite.tint = tintColor;
+          } else if (property.startsWith('filter.')) {
+            if (!sprite.hasOwnProperty('colorMatrix')) {
+              sprite.colorMatrix = new PIXI.filters.ColorMatrixFilter();
+              sprite.filters = [sprite.colorMatrix];
+            }
+            let value = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
+            sprite.colorMatrix[property.replace('filter.', '')](value);
+          } else {
+            sprite[property] = (o.endValue * curvedTime) + (o.startValue * (1 - curvedTime));
           }
           
 
@@ -353,6 +360,14 @@ class Charm {
   tint(sprite, color, frames = 30) {
     return this.tweenProperty(
       sprite, "tint", color, [255, 255, 255], frames, "smoothstep"
+    );
+  }
+
+  //`filter`
+  // custom made brighten that works similarly to tint but affects PIXI color matrix
+  filter(sprite, filterFunction, startValue, endValue, frames = 30) {
+    return this.tweenProperty(
+      sprite, 'filter.'.concat(filterFunction), startValue, endValue, frames, "smoothstep"
     );
   }
 

@@ -418,7 +418,6 @@ export class Player {
             // only calculate on resources/objects near the player, if the object/enemy is farther than 750 pixels, the result is already known
             if (Math.hypot(enemy.globalX - this.globalX, enemy.globalY - this.globalY < 750)) {
                 test = bump.hitTestCircle(enemy.bodyGraphic, this.structureSprites[structureHand]);
-                console.log(enemy.bodyGraphic.x - this.structureSprites[structureHand].x, enemy.bodyGraphic.y - this.structureSprites[structureHand].y)
                 if (test) { // if a collision is found, make object unplaceable
                     this.placeable = false;
                     break;

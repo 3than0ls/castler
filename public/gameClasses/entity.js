@@ -54,8 +54,9 @@ export class Entity {
     }
 
     hit(collisionX, collisionY) {
+        charm.filter(this.entityGraphic, 'brightness', 1.4, 1);
         if (this.entityGraphic.tint === 0xFFFFFF) {
-            let tint = charm.tint(this.entityGraphic, [255, 120, 120], 25);
+            let tint = charm.tint(this.entityGraphic, [255, 80, 80], 25);
             tint.onComplete = () => {
                 // reset tint to nothing
                 this.entityGraphic.tint = 0xFFFFFF

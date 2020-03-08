@@ -264,9 +264,7 @@ module.exports = {
             swapArmor(user, 'dev');
         },
         craftingTime: 1,
-        recipes: [
-
-        ]
+        recipes: []
     }),
 
     ironBars: new Item('ironBars', {
@@ -297,6 +295,22 @@ module.exports = {
             }
         ],
         craftingStructure: 'furnace',
+    }),
+
+    hourGlass: new Item('hourGlass', {
+        primary: false,
+        consumable: true,
+        craftingTime: 10000,
+        consumeFunction: (user, serverState) => {
+            if (serverState.timeTick <= serverState.dayTimeLength/2) {
+                serverState.timeTick = serverState.dayTimeLength/2-1;
+            } else if (serverState.timeTick > serverState.dayTimeLength/2) {
+                serverState.timeTick = -1;
+            }
+            consumed(user, 'hourGlass');
+        },
+        recipes: [/*create a recipe*/],
+        craftingStructure: 'workbench',
     }),
     
     workbench: new Item('workbench', {
@@ -345,16 +359,5 @@ module.exports = {
             }
         ],
         craftingStructure: 'workbench',
-    }),
-
-    test: new Item('test', {
-        primary: false,
-        consumable: false,
-        craftingTime: 200000,
-        recipes: [
-            {
-                wood: 1,
-            }
-        ]
     }),
 }
