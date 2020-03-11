@@ -33,12 +33,15 @@ export class Inventory extends React.Component {
         }
         this.handleChange = this.handleChange.bind(this);
     }
+    
     componentDidMount() {
         this.timerID = setInterval(() => this.tick(), 60); // learn more about this
     }
+
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
+
     tick() { 
         this.setState({
             playerInventory: player.inventory,

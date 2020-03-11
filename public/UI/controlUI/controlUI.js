@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 // react bootstrap components
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
+import Collapse from 'react-bootstrap/Collapse';
 
 // custom style sheets
 import './controlUI.css';
@@ -32,11 +33,19 @@ export class ControlUI extends React.Component {
         super();
         this.state = {
             uiView: 'inventory',
+            open: true,
         }
+        this.openControlUI = this.openControlUI.bind(this);
 
         this.inventoryClick = this.inventoryClick.bind(this);
         this.craftingClick = this.craftingClick.bind(this);
         this.consumableClick = this.consumableClick.bind(this);
+    }
+
+    openControlUI() {
+        this.setState({
+            open: !this.state.open,
+        });
     }
 
     inventoryClick() {
@@ -73,6 +82,41 @@ export class ControlUI extends React.Component {
         return(
             <> 
                 <div id="controlUIWrapper">
+                    <Button
+                        variant='openControlUI'
+                        onClick={this.openControlUI}>
+                            {`${this.state.open ? 'Collapse' : 'Expand'} Inventory`}
+                    </Button>
+                    <div id="collapseWrapper">
+                    <Collapse 
+                        dimension='width' 
+                        in={this.state.open} 
+                        className="collapseContentWrapper"
+                    >
+                        <div className="noMarginPadding">   
+                            <div className="collapseContent">
+                                <Row>
+                                    <Button variant='uiItem' key={'inventory'} active={this.state.uiView==='inventory'} onClick={this.inventoryClick}>
+                                        Inv
+                                    </Button>
+                                    <Button variant='uiItem' key={'consumable'} active={this.state.uiView==='consumable'} onClick={this.consumableClick}>
+                                        Con
+                                    </Button>
+                                    <Button variant='uiItem' key={'crafting'} active={this.state.uiView==='crafting'} onClick={this.craftingClick}>
+                                        Cra
+                                    </Button>
+                                </Row>
+                                {visibleComponent}
+                            </div>
+                        </div>
+                    </Collapse>
+                    </div>
+                </div>
+            </>
+        )
+    }
+}
+/*
                     <div id="controlUIContainer">
                         <Row>
                             <Button variant='uiItem' key={'inventory'} active={this.state.uiView==='inventory'} onClick={this.inventoryClick}>
@@ -86,9 +130,6 @@ export class ControlUI extends React.Component {
                             </Button>
                         </Row>
                         {visibleComponent}
-                    </div>
-                </div>
-            </>
-        )
-    }
-}
+                    </div>*/
+
+                    //  id="controlUIContainer"

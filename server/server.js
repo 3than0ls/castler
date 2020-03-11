@@ -4,6 +4,8 @@
     TO DO:
     ISSUES: 
     include time as a part of init data
+
+    client time is fricked up again, whenever clients join in daytime, it sets to night and the wakes up to day
     
     BIG:
     create walking particle

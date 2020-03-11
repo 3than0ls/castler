@@ -16,7 +16,6 @@ export class ClientStates {
         this.player = player;
         this.size = [];
 
-        this.cycleNightInit = false;
         this.dayTimeLength;
 
         this.leaderboardState = [];
@@ -51,19 +50,18 @@ export class ClientStates {
     timeInit(dayTimeLength, timeTick, stage) {
         this.dayTimeLength = dayTimeLength;
         this.timeTick = timeTick;
-        if (!this.cycleNightInit) {
+        if (!this.colorMatrix) {
             this.colorMatrix = new PIXI.filters.ColorMatrixFilter();
             stage.filters = [this.colorMatrix];
-            if (this.timeTick >= this.dayTimeLength/2) {
+            if (this.timeTick > this.dayTimeLength/2) {
                 this.colorMatrix.brightness(0.1);
-            }
+            } 
         }
     }
 
     cycleNight(stage) {
         if (this.timeTick === 0) {
             charm.filter(stage, 'brightness', 0.1, 1, this.dayTimeLength/10);
-            
         } else if (this.timeTick === this.dayTimeLength/2) {
             charm.filter(stage, 'brightness', 1, 0.1, this.dayTimeLength/10);
         }
