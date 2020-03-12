@@ -48,6 +48,8 @@ module.exports = class ServerStates {
         
             timeTick: 0,
         };
+
+
         Object.assign(this, emptyServerState);
         this.dayTimeLength = 5000;
     }
@@ -69,7 +71,21 @@ module.exports = class ServerStates {
 
     createEntities(entityConfig, amount, minX, minY, maxX=0, maxY=0, homeAreaID) {
         for (let i = 0; i < amount; i ++) {
-            let entity = new EntityAI(entityConfig, randomInt(minX, maxX), randomInt(minY, maxY), homeAreaID);
+            let x = randomInt(minX, maxX);
+            let y = randomInt(minY, maxY);
+
+            if (homeAreaID === 'map') { // if home area is the map, then attempt to place entity outside of an inner area
+                let attempts = 25;
+                for (let i = 0; i < attempts; i++) {
+                    for (let area of Object.values(this.areas.area)) {
+                        if (area.objectInsideArea({globalX: x, globalY: y, size: 0})) { // create custom object to test
+                            x = randomInt(minX, maxX); // tested values are inside area, randomly re-assign values and re-looop
+                            y = randomInt(minY, maxY);
+                        }
+                    }
+                }
+            }
+            let entity = new EntityAI(entityConfig, x, y, homeAreaID);
             this.entities.entity[entity.entityID] = entity;
             this.entities.entityData[entity.entityID] = entity.entityDataPackage();
         }
@@ -95,7 +111,7 @@ module.exports = class ServerStates {
         }
     }
     
-    createAreas(amount, minX, minY, maxX, maxY, areaConfig, zIndex) { 
+    createAreas(amount, minX, minY, maxX, maxY, areaConfig) { 
         // area state takes special variables because inside area state, this file is also imported, which clashes with each other
         // to fix this, we don't import this file in area state, but rather pass this class off as a parameter that's used in area state to create entities and resources
 
@@ -110,6 +126,36 @@ module.exports = class ServerStates {
         }
     }
 
+    respawnTick() {
+        // entity count will be decreased when an entity dies
+        if (this.entityCount < this.entityLimit) {
+            this.entityRespawnTick++;
+            if (this.entityRespawnTick >= this.entityRespawnTime) {
+                this.entityRespawnTick = 0;
+
+                let config; // figure out which entity (entity config) to generate
+                if (this.entityConfig.entities.length === 1) {
+                    config = this.entityConfig.entities[0].config;
+                } else if (this.entityConfig.entities.length > 1) {
+                    let selector = Math.random();
+                    for (let i = 0; i < this.entityConfig.entities.length; i++) { // calculates a random entity from the entity config
+                        if (selector > i/this.entityConfig.entities.length && selector <= (i+1)/this.entityConfig.entities.length) {
+                            config = this.entityConfig.entities[i].config;
+                            break;
+                        }
+                    }
+                }
+                this.createEntities(
+                    config, 1, 
+                    -this.size[0]/2, -this.size[1]/2, 
+                    this.size[0]/2, this.size[1]/2,
+                    'map'
+                );
+                this.entityCount++;
+            }
+        }
+    }
+
     cycleTime() {
         this.timeTick ++;
         if (this.timeTick > this.dayTimeLength) {
@@ -117,11 +163,35 @@ module.exports = class ServerStates {
         }
     }
 
+    update() {
+        this.cycleTime();
+        this.respawnTick();
+    }
+
 
     test() {
-        this.createEntities(entityConfigs.duck, 11, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        this.entityConfig = {
+            entities: [
+                {config: entityConfigs.duck, amount: 10}
+            ],
+        }
+        // entity respawning in an area
+        this.entityCount = 0;
+        this.entityConfig.entities.forEach(entityData => { 
+            this.createEntities(
+                entityData.config, 
+                entityData.amount, 
+                -this.size[0]/2, -this.size[1]/2, 
+                this.size[0]/2, this.size[1]/2,
+                'map'
+            );
+            this.entityCount += entityData.amount 
+        });
+        this.entityLimit = 11;
+        this.entityRespawnTime = 10;
+        this.entityRespawnTick = 0;
+
         this.createResources('rock', 3, -700, -700, 700, 700);
-        this.createStructures(1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, {type:'workbench'});
         this.createCrate({wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
         this.createAreas(1, -this.size[0]/3, -this.size[1]/3, this.size[0]/3, this.size[1]/3, areaConfigs.lake);
     }

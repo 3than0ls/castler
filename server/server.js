@@ -9,7 +9,8 @@
     
     BIG:
     create walking particle
-    close control UI button <------ NEXT
+    global map respawning
+    night time effects
 
     SMALL:
     more different resources, areas, entities, weapons,
@@ -17,6 +18,7 @@
     create weapon and armor data files
     create structure data files
     create favicon
+    move leaderboard state to ServerState class
 
     CODE CLEANING:
         - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
@@ -43,7 +45,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, './public/')));
 
 const ServerStates = require('./serverStates/index');
-const serverState = new ServerStates([2000, 2000]);
+const serverState = new ServerStates([2900, 2900]);
 serverState.test();
 
 const gameItems = require('./gameConfigs/items.js');
@@ -152,41 +154,6 @@ io.on('connection', socket => {
         socket.emit('inventoryUpdate', serverState.users.userData[socket.id].inventory) // update the clients inventory
     });
 
-    socket.on('attack', data => {
-        // subtract the amount of health that the entity took
-        let entity = serverState.entities.entity[data.entityID];
-        entity.attacked(serverState.users.user[data.id].damage, serverState.users.user[data.id]);
-
-        /* if the entity was killed */
-        if (entity.killed()) {
-            // add the amount harvested from kill to client inventory
-            serverState.users.user[socket.id].kill(entity.loot);
-            io.emit('killed', {
-                collisionX: data.collisionX,
-                collisionY: data.collisionY,
-                entityID: data.entityID,
-            });
-
-            if (entity.homeAreaID && entity.homeAreaID !== 'map') { // if entity had a home area and it isn't the map, decrease areas entity amount
-                serverState.areas.area[entity.homeAreaID].entityCount--;
-            }
-
-            socket.emit('inventoryUpdate', serverState.users.userData[socket.id].inventory) // update the clients inventory
-            delete serverState.entities.entity[entityState.entityID];
-            delete serverState.entities.entityData[entityData.entityID];
-        } else {
-            // emit attack event occuring
-            io.emit('attacked', { // attacked only provides a visual effect, and nothing else
-                vx: data.vx,
-                vy: data.vy,
-                collisionX: data.collisionX,
-                collisionY: data.collisionY,
-                entityID: data.entityID,
-                entitySpeed: data.entitySpeed
-            });
-        }
-    });
-
     socket.on('dropItem', data => {
         serverState.users.user[socket.id].drop(data.type, data.amount, serverState);
     });
@@ -213,7 +180,7 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
-    serverState.cycleTime();
+    serverState.update();
 
     // update server states, and some server states, like structures and resources, don't need to be updated. may change
     for (let user of Object.values(serverState.users.user)) {

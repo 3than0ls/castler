@@ -59,9 +59,9 @@ module.exports = class AreaState {
                 if (this.config.entities.length === 1) {
                     config = areaConfigs[this.type].entities[0].config;
                 } else if (areaConfigs[this.type].entities.length > 1) {
-                    config = Math.random();
+                    let selector = Math.random();
                     for (let i = 0; i < areaConfigs[this.type].entities.length; i++) {
-                        if (config > i/areaConfigs[this.type].entities.length && type <= (i+1)/areaConfigs[this.type].entities.length) {
+                        if (selector > i/areaConfigs[this.type].entities.length && selector <= (i+1)/areaConfigs[this.type].entities.length) {
                             config = areaConfigs[this.type].entities[i].config;
                             break;
                         }

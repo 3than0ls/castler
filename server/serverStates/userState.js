@@ -325,6 +325,8 @@ module.exports = class UserState {
                             });
                             if (entity.homeAreaID && entity.homeAreaID !== 'map') { // if entity had a home area and it isn't the map, decrease areas entity amount
                                 serverState.areas.area[entity.homeAreaID].entityCount--;
+                            } else {
+                                serverState.entityCount --;
                             }
 
                             delete serverState.entities.entity[entity.entityID];

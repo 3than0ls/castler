@@ -309,7 +309,12 @@ module.exports = {
             }
             consumed(user, 'hourGlass');
         },
-        recipes: [/*create a recipe*/],
+        recipes: [
+            {
+                wood: 5,
+                rubies: 10,
+            }
+        ],
         craftingStructure: 'workbench',
     }),
     

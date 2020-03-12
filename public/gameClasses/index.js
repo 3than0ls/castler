@@ -39,7 +39,7 @@ export class ClientStates {
 
         this.background = new PIXI.Graphics();
         this.background.beginFill(0x3d7d00);
-        this.background.drawRect(0, 0, this.size[0], this.size[1]);
+        this.background.drawRect(0, 0, window.innerWidth, window.innerHeight);
         this.background.endFill();
         this.background.zIndex = -5;
 
