@@ -328,9 +328,6 @@ module.exports = class UserState {
                             } else {
                                 serverState.entityCount --;
                             }
-
-                            delete serverState.entities.entity[entity.entityID];
-                            delete serverState.entities.entityData[entity.entityID];
                         }
                         
                         // emit attack event occuring

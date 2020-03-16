@@ -1,4 +1,4 @@
-import { player } from "../app.js";
+import { player, glowContainer, clientState } from "../app.js";
 import { loader } from "./../utils/loader.js";
 import { Player } from "./player.js";
 import { charm } from "../vendors/charm/charm.js";
@@ -129,6 +129,21 @@ export class Enemy {
         this.bodyGraphic.anchor.y = 0.5;
         this.bodyGraphic.radius = this.bodyGraphic.width;
         this.bodyGraphic.position.set(this.globalX, this.globalY);
+        
+        // create glow sprite
+        this.glow = new PIXI.Sprite(loader.resources['particles/glow'].texture);
+        this.glow.anchor.x = 0.5;
+        this.glow.anchor.y = 0.5;
+        this.glow.position.set(this.globalX - player.globalX + this.vx + player.x, this.globalY - player.globalY + this.vy + player.y);
+        this.glow.zIndex = 2;
+        this.glow.tint = 0xF7f1DC;
+        this.glowColorMatrix = new PIXI.filters.ColorMatrixFilter();
+        this.glowColorMatrix.padding = 700;
+        this.glowColorMatrix.brightness(1.1);
+        this.glowBlurFilter = new PIXI.filters.BlurFilter();
+        this.glowBlurFilter.padding = 700;
+        this.glowBlurFilter.blur = 15;
+        this.glow.filters = [this.glowColorMatrix, this.glowBlurFilter];
 
         // render and create hand sprites
         Player.createHandSprites(this.handSprites, this.globalX, this.globalY, this.toolTier);
@@ -152,6 +167,7 @@ export class Enemy {
         this.globalX = globalX;
         this.globalY = globalY;
 
+
         this.vx = this.globalX - this.cachedGlobalX; // used in swimming particle playing
         this.vy = this.globalY - this.cachedGlobalY;
 
@@ -161,6 +177,15 @@ export class Enemy {
         // update effects
         this.effects = effects;
         this.effectsUpdate();
+
+        // update a glow to act as light. We have to render it to the glow container in order to bypass the color filter on stage. 
+        // Also, we have to translate it onto the position since it isn't being rendered in player viewpoint
+        this.glow.position.set(this.globalX - player.globalX + this.vx + player.x, this.globalY - player.globalY+ this.vy + player.y);
+        if (clientState.timeTick >= clientState.dayTimeLength/2) {
+            glowContainer.addChild(this.glow);
+        } else if (clientState.timeTick < clientState.dayTimeLength/2) {
+            glowContainer.removeChild(this.glow);
+        }
 
         // remove current displayed hand and armor (which may be different) and then update it
         player.viewpoint.removeChild(this.handSprites[this.handSpriteKey]);
@@ -193,6 +218,7 @@ export class Enemy {
         let bodyGraphic = this.bodyGraphic;
         let armorGraphic = this.armorSprites[this.armorTier.concat('Armor')];
         player.viewpoint.addChild(handGraphic,  armorGraphic, bodyGraphic); // hands drawn below body
+        glowContainer.addChild(this.glow);
     }
 
     delete() { // delete user when disconnected
@@ -200,6 +226,7 @@ export class Enemy {
         let hand = this.handSprites[this.handSpriteKey];
         let armor = this.armorSprites[this.armorTier.concat('Armor')];
         player.viewpoint.removeChild(bodyGraphic, hand, armor);
+        glowContainer.removeChild(this.glow);
         for (let [effectName, effectEmitter] of Object.entries(this.particleEffects)) {
             effectEmitter.stop();
         }

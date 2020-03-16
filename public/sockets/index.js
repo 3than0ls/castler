@@ -20,14 +20,15 @@ export function clientInit(socket) {
         player.toolTier = initData.toolTier;
 
         // create boundary borders
-        clientState.resize(initData.mapSize, stage);
-        clientState.render(stage);
+        clientState.render(initData.mapSize);
         clientState.timeInit(initData.dayTimeLength, initData.timeTick, stage);
         // when other init data is created, add here
     });
 }
 
 export function socketUpdate(socket) {
+
+
     // update client data
     clientUpdate(socket);
 

@@ -15,7 +15,7 @@ module.exports = class StructureState {
         this.type = config.type;
         this.size = [imageSize(`./public/assets/structures/${config.type}.png`).width, imageSize(`./public/assets/structures/${config.type}.png`).height];
         this.config = config;
-        this.parentID = parentID || null;
+        this.parentID = parentID || 'map';
 
         this.health;
         switch (this.type) {

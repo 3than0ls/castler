@@ -305,7 +305,7 @@ module.exports = {
             if (serverState.timeTick <= serverState.dayTimeLength/2) {
                 serverState.timeTick = serverState.dayTimeLength/2-1;
             } else if (serverState.timeTick > serverState.dayTimeLength/2) {
-                serverState.timeTick = -1;
+                serverState.timeTick = -2;
             }
             consumed(user, 'hourGlass');
         },

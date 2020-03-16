@@ -21,7 +21,9 @@
     max-width: 170px;
 
     border-radius: 0 0 10px 0;
-    font-size: calc(5px + 0.6vw);
+    font-size: calc(4px + 0.65vw);
+
+    padding: 4px;
     
     pointer-events: auto;
 }

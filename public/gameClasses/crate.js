@@ -50,7 +50,7 @@ export class Crate {
     emit() {
         if (!this.particleStream) {
             this.particleStream = dust.emitter(
-                240, () => {
+                500, () => {
                     dust.create(
                         this.globalX,
                         this.globalY,
@@ -60,7 +60,7 @@ export class Crate {
                             return sprite
                         },
                         player.viewpoint,
-                        Math.max(2, Math.ceil((Object.values(this.contents)[0].amount/20))),
+                        1, 
                         0,
                         true,
                         0, 6.28,

@@ -58,7 +58,6 @@ module.exports = class EntityAI {
         this.aggroDistance = 500;
         this.hit = false;
         this.target;
-        this.targetSocket;
         this.attackTargetRadius;
         // attack
         this.attackSpeed = 100;
@@ -459,8 +458,13 @@ module.exports = class EntityAI {
         this.globalX -= this.collisionvx;
         this.globalY -= this.collisionvy;
 
-        // update the data that the server sends to clients
-        serverState.entities.entityData[this.entityID] = this.entityDataPackage();
+        if (this.killed()) {
+            delete serverState.entities.entityData[this.entityID];
+            delete serverState.entities.entity[this.entityID];
+        } else {
+            // update the data that the server sends to clients
+            serverState.entities.entityData[this.entityID] = this.entityDataPackage();
+        }
     }
 
     killed() {

@@ -47,4 +47,15 @@ module.exports = {
         speed: 2,
         size: [imageSize(`./public/assets/entities/frog.png`).width * 0.865, imageSize(`./public/assets/entities/frog.png`).height * 0.865]
     },
+    ghoul: {
+        type: 'ghoul',
+        neutrality: 'aggressive',
+        loot: {
+            
+        },
+        health: 100,
+        damage: 15,
+        speed: 1.25,
+        size: [imageSize(`./public/assets/entities/ghoul.png`).width * 0.865, imageSize(`./public/assets/entities/ghoul.png`).height * 0.865]
+    },
 }

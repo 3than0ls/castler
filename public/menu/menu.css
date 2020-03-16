@@ -1,6 +1,7 @@
 html, body {
   background: rgb(255, 255, 255);
   pointer-events: initial;
+  overflow: none;
 }
 
 #menuWrapper {

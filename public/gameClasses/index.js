@@ -1,4 +1,6 @@
 import { charm } from "../vendors/charm/charm";
+import { stage, globalContainer } from "../app";
+import { ratio } from "../utils/windowResize";
 
 export class ClientStates {
     constructor(player) {
@@ -25,21 +27,19 @@ export class ClientStates {
         this.worker = new Worker('./../worker/worker.js', { type: 'module' });
     }
 
-    resize(size) {
+    render(size) {
         this.size = size;
-    }
 
-    render(stage) {
         this.boundaryRect = new PIXI.Graphics();
-        this.boundaryRect.lineStyle(4, 0x000000, 0.3);
+        this.boundaryRect.lineStyle(4, 0x343434, 0.3);
         this.boundaryRect.drawRect(0, 0, this.size[0], this.size[1]);
-        this.boundaryRect.zIndex = -1;
+        this.boundaryRect.zIndex = 100;
         this.boundaryRect.pivot.x = this.size[0]/2;
         this.boundaryRect.pivot.y = this.size[1]/2;
 
         this.background = new PIXI.Graphics();
         this.background.beginFill(0x3d7d00);
-        this.background.drawRect(0, 0, window.innerWidth, window.innerHeight);
+        this.background.drawRect(0, 0, window.innerWidth/ratio, window.innerHeight/ratio);
         this.background.endFill();
         this.background.zIndex = -5;
 
@@ -55,15 +55,39 @@ export class ClientStates {
             stage.filters = [this.colorMatrix];
             if (this.timeTick > this.dayTimeLength/2) {
                 this.colorMatrix.brightness(0.1);
+                console.log('init night!')
             } 
         }
     }
 
-    cycleNight(stage) {
+    resize() {
+        if (!this.background) {
+            this.background = new PIXI.Graphics();
+        } else {
+            this.background.clear();
+        }
+        this.background.beginFill(0x3d7d00);
+        this.background.drawRect(0, 0, window.innerWidth/ratio, window.innerHeight/ratio);
+        this.background.endFill();
+        this.background.zIndex = -5;
+        stage.addChild(this.background);
+    }
+
+    update() {
         if (this.timeTick === 0) {
-            charm.filter(stage, 'brightness', 0.1, 1, this.dayTimeLength/10);
+            console.log('day')
+            this.colorMatrix.brightness(0.1);
+            if (this.nightTransition) {
+                this.nightTransition.pause();
+            }
+            this.dayTransition = charm.filter(stage, 'brightness', 0.1, 1, this.dayTimeLength/10);
         } else if (this.timeTick === this.dayTimeLength/2) {
-            charm.filter(stage, 'brightness', 1, 0.1, this.dayTimeLength/10);
+            console.log('night')
+            if (this.dayTransition) {
+                dayTransition.pause();
+            }
+            this.colorMatrix.brightness(1);
+            this.nightTransition = charm.filter(stage, 'brightness', 1, 0.1, this.dayTimeLength/10);
         }
     }
 }

@@ -36,6 +36,10 @@ export const clientState = {
 export let renderer = undefined;
 // Create Stage
 export let stage = undefined
+// Create glow container (has to be seperate from stage because stage has filters we do not want applied on glowing elements)
+export let glowContainer = undefined;
+// Create a global container that contains both stage and glow container
+export let globalContainer = undefined;
 
 // create player
 export let player = undefined;
@@ -50,29 +54,45 @@ function animate() {
     dust.update();
 
     player.update();
-    clientState.cycleNight(stage);
-    
+    clientState.update();
+
     requestAnimationFrame(() => {
-        renderer.render(stage);
+        globalContainer.addChild(glowContainer)
+        renderer.render(globalContainer);
     });
 }
 
 export function setup() {
     socket = io();
+    socket.on('refresh', () => { // reload page
+        window.location.reload(true);
+    })
     socket.on('connected', ()=> {
         // handle renderer and stage PIXI settings
         renderer = PIXI.autoDetectRenderer();
         renderer.view.style.position = "absolute";
         renderer.view.style.display = "block";
         renderer.autoDensity = true;
-        renderer.backgroundColor = 0x3d7d00;
+        // renderer.backgroundColor = 0x3d7d00;
+        renderer.transparent = true;
         renderer.antialias = true;
+        
         renderer.resize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.view); // add renderer to html document
 
+        globalContainer = new PIXI.Container();
+        globalContainer.sortableChildren = true;
+        renderer.render(globalContainer);
+
+        glowContainer = new PIXI.Container();
+        glowContainer.sortableChildren = true;
+        glowContainer.zIndex = 5;
+        globalContainer.addChild(glowContainer);
+
         stage = new PIXI.Container();
         stage.sortableChildren = true;
-        renderer.render(stage); // add stage to renderer
+        stage.zIndex = 1;
+        globalContainer.addChild(stage);
     
         // create player and clientState and initiate sockets
         player = new Player(socket.id);
@@ -83,13 +103,14 @@ export function setup() {
         clientInit(socket); 
         socketUpdate(socket);
         
-        clientState.cycleNight(stage);
+        clientState.update();
     
         // render UI
         ReactDOM.render(<App />, document.getElementById('ui'));
     
         // resize renderer and game when needed
         resize();
+        window.onload = resize;
         window.onresize = resize;
         
         clientState.worker.addEventListener('message', function(e) {

@@ -18,8 +18,11 @@ function randomInt(min, max) {
 
 
 module.exports = class ServerStates {
-    constructor(size) {
-        this.size = size;
+    constructor() {
+        this.size = [];
+        this.timeChange = true; // default to true
+        this.dayTimeLength = 5000;
+
         let emptyServerState = {
             users: {
                 userData: {}, // data we send to clients
@@ -46,12 +49,11 @@ module.exports = class ServerStates {
                 crate: {},
             }, // crates are containers of dropped items from players
         
-            timeTick: 0,
+            timeTick: 2350,
         };
 
 
         Object.assign(this, emptyServerState);
-        this.dayTimeLength = 5000;
     }
 
     createUser(socketID) {
@@ -91,7 +93,7 @@ module.exports = class ServerStates {
         }
     }
 
-    createStructures(amount, minX, minY, maxX, maxY, structureConfig, parentID=undefined) {
+    createStructures(amount, minX, minY, maxX, maxY, structureConfig, parentID='map') {
         for (let i = 0; i < amount; i ++) {
             let config = JSON.parse(JSON.stringify(structureConfig)); // created a deep clone copy of the config and edit it if necessary
             if (!config.globalX) config.globalX = randomInt(minX, maxX);
@@ -156,23 +158,60 @@ module.exports = class ServerStates {
         }
     }
 
-    cycleTime() {
-        this.timeTick ++;
-        if (this.timeTick > this.dayTimeLength) {
-            this.timeTick = 0;
+    cycleTime(io) {
+        if (this.timeChange) {
+            this.timeTick ++;
+            if (this.timeTick > this.dayTimeLength) {
+                this.timeTick = 0;
+            }
+        } else {
+            this.timeTick = undefined;
+        }
+
+        // night time (after a bit of delay), start spawning monsters
+        if (this.timeTick > this.dayTimeLength/2 + 50) {
+            if (this.timeTick % 100 === 0) {
+                // this.createEntities(entityConfigs.ghoul, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2)
+            }
+        } else if (this.timeTick <= this.dayTimeLength/2) {
+            for (let entity of Object.values(this.entities.entity)) {
+                if (entity.type === 'ghoul') {
+                    if (this.timeTick % randomInt(90, 150) === 0) {
+                        entity.health -= randomInt(20, 40);
+                        
+                        io.emit('attacked', {
+                            collisionX: entity.globalX,
+                            collisionY: entity.globalY,
+                            entityID: entity.entityID,
+                        });
+
+                        if (entity.killed()) {
+                            io.emit('killed', {
+                                collisionX: entity.globalX,
+                                collisionY: entity.globalY,
+                                entityID: entity.entityID,
+                            });
+                        }
+                    }
+                }
+            }
         }
     }
 
-    update() {
-        this.cycleTime();
+    update(io) {
+        this.cycleTime(io);
         this.respawnTick();
     }
 
 
     test() {
+        this.size = [1900, 1900];
+        this.timeChange = false;
+
         this.entityConfig = {
             entities: [
-                {config: entityConfigs.duck, amount: 10}
+                {config: entityConfigs.duck, amount: 20},
+                {config: entityConfigs.boar, amount: 20}
             ],
         }
         // entity respawning in an area
@@ -187,12 +226,45 @@ module.exports = class ServerStates {
             );
             this.entityCount += entityData.amount 
         });
-        this.entityLimit = 11;
-        this.entityRespawnTime = 10;
+        this.entityLimit = 60;
+        this.entityRespawnTime = 1000;
         this.entityRespawnTick = 0;
 
-        this.createResources('rock', 3, -700, -700, 700, 700);
-        this.createCrate({wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
-        this.createAreas(1, -this.size[0]/3, -this.size[1]/3, this.size[0]/3, this.size[1]/3, areaConfigs.lake);
+        this.createResources('rock', 14, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        this.createResources('tree', 14, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        // this.createCrate({wood:{amount:5,consumable:false}}, 1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2);
+        this.createAreas(2, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, areaConfigs.lake);
+        this.createAreas(2, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, areaConfigs.mine);
+        this.createAreas(1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, areaConfigs.rubyMine);
+    }
+
+    test2() {
+        this.size = [1400, 1400];
+        // this.timeChange = false;
+        this.dayTimeLength = 30000;
+
+        this.entityConfig = {
+            entities: [
+                {config: entityConfigs.duck, amount: 2},
+                {config: entityConfigs.boar, amount: 2}
+            ],
+        }
+        // entity respawning in an area
+        this.entityCount = 0;
+        this.entityConfig.entities.forEach(entityData => { 
+            this.createEntities(
+                entityData.config, 
+                entityData.amount, 
+                -this.size[0]/2, -this.size[1]/2, 
+                this.size[0]/2, this.size[1]/2,
+                'map'
+            );
+            this.entityCount += entityData.amount 
+        });
+        this.entityLimit = 5;
+        this.entityRespawnTime = 1000;
+        this.entityRespawnTick = 0;
+
+        this.createStructures(1, -this.size[0]/2, -this.size[1]/2, this.size[0]/2, this.size[1]/2, {type: 'furnace'})
     }
 }

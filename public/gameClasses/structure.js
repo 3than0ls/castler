@@ -1,4 +1,4 @@
-import { player } from "../app";
+import { player, glowContainer } from "../app";
 import { loader } from "../utils/loader";
 import { bump } from "../vendors/bump/bump.js";
 import { charm } from "../vendors/charm/charm";
@@ -40,9 +40,30 @@ export class Structure {
         this.structureGraphic.position.set(this.globalX, this.globalY);
         this.structureGraphic.zIndex = 26;
         this.structureGraphic.circular = true; // bump js settings
-
         this.structureGraphic.zIndex = -1;
 
+        if (this.type === 'furnace') {
+            console.log('fafa')
+            this.glow = new PIXI.Sprite(loader.resources['particles/glow'].texture);
+            this.glow.anchor.x = 0.5;
+            this.glow.anchor.y = 0.5;
+            this.glow.position.set(this.globalX - player.globalX + player.x, this.globalY - player.globalY + player.y);
+            this.glow.zIndex = 5;
+            this.glow.tint = 0xD6935C;
+
+            this.glow.width = 400;
+            this.glow.height = 400;
+
+            this.glowColorMatrix = new PIXI.filters.ColorMatrixFilter();
+            this.glowColorMatrix.padding = 500;
+            this.glowColorMatrix.brightness(1.1);
+            this.glowBlurFilter = new PIXI.filters.BlurFilter();
+            this.glowBlurFilter.padding = 500;
+            this.glowBlurFilter.blur = 15;
+            this.glow.filters = [this.glowColorMatrix, this.glowBlurFilter];
+        }
+
+        glowContainer.addChild(this.glow);
         player.viewpoint.addChild(this.structureGraphic);
     }
 
@@ -82,7 +103,7 @@ export class Structure {
         if (!this.particleStream) {
             if (this.type === 'furnace') {
                 this.particleStream = dust.emitter(
-                    240, () => {
+                    440, () => {
                         dust.create(
                             this.globalX+15*(Math.random()-0.5),
                             this.globalY+15*(Math.random()-0.5),
@@ -119,6 +140,8 @@ export class Structure {
         }
 
         this.emit();
+        this.glow.position.set(this.globalX - player.globalX + player.x, this.globalY - player.globalY + player.y);
+        glowContainer.addChild(this.glow);
         player.viewpoint.addChild(this.structureGraphic);
     }
 

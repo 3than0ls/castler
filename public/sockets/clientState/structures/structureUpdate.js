@@ -22,6 +22,7 @@ export const structureUpdate = (socket, clientState) => {
     });
     socket.on('hit', data => {
         if (!data.harvestSpeed) data.harvestSpeed = 4;
+        console.log(data.structureID)
         clientState.structures[data.structureID].hit(data.vx, data.vy, data.collisionX, data.collisionY, data.harvestSpeed);
     });
 };

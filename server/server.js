@@ -3,22 +3,20 @@
 /*
     TO DO:
     ISSUES: 
-    include time as a part of init data
+    when transitioning from night to day with hourglass, renderering filter fails to work
+    resizing does not work when dead
 
-    client time is fricked up again, whenever clients join in daytime, it sets to night and the wakes up to day
+    check if all effects work, because it seems like the furnace warmth effect is broken
     
     BIG:
     create walking particle
-    global map respawning
-    night time effects
+    night time effects (increased hostile mob spawns)
+    make entities fade in when spawning
+    move leaderboard state to ServerState class
 
     SMALL:
     more different resources, areas, entities, weapons,
-    custom scroll bars with different IDs/class names
-    create weapon and armor data files
-    create structure data files
     create favicon
-    move leaderboard state to ServerState class
 
     CODE CLEANING:
         - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
@@ -45,20 +43,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, './public/')));
 
 const ServerStates = require('./serverStates/index');
-const serverState = new ServerStates([2900, 2900]);
-serverState.test();
+const serverState = new ServerStates();
+serverState.test2();
 
 const gameItems = require('./gameConfigs/items.js');
 
 io.on('connection', socket => {
     serverState.createUser(socket.id);
 
+    socket.emit('connected');
+
     // initial variable assignments
     socket.on('nickname', nickname => {
         serverState.users.user[socket.id].nickname = nickname;
     }); // update the server info of the clients nickname when client connects
-
-    socket.emit('connected');
 
     socket.emit('playerInit', {
         // mapSize: map.size,
@@ -70,42 +68,46 @@ io.on('connection', socket => {
     }) // provide the connecting client information it needs when it first connects
 
     socket.on('clientState', data => {
-        let user = serverState.users.user[data.id];
-        user.updateClientInfo(data.vx, data.vy, data.angle, data.swingAngle, data.displayHand, data.structureHand, data.focused, data.openCrate);
-
-        let clientUpdateData = {
-            globalX: user.globalX,
-            globalY: user.globalY,
-            inventory: user.inventory,
-            health: user.health,
-            hunger: user.hunger,
-            score: user.score,
-            craftingState:  {
-                crafting: user.crafting,
-                craftingComplete: user.craftingComplete,
-            },
-            effects: user.effects,
-            toolTier: user.toolTier,
-            armorTier: user.armorTier,
-            harvestSpeed: user.harvestSpeed,
-            attackSpeed: user.attackSpeed,
-            displayHand: user.displayHand,
-            structureHand: user.structureHand,
-            attackFlash: user.attackFlash,
-            swingAngle: user.swingAngle,
-        };
-
-        if (user.health <= 0 || user.dead) { // check if client has died
-            socket.emit('clientDied');
+        if (!serverState.users.user[data.id]) {
+            socket.emit('refresh');
+        } else {
+            let user = serverState.users.user[data.id];
+            user.updateClientInfo(data.vx, data.vy, data.angle, data.swingAngle, data.displayHand, data.structureHand, data.focused, data.openCrate);
+    
+            let clientUpdateData = {
+                globalX: user.globalX,
+                globalY: user.globalY,
+                inventory: user.inventory,
+                health: user.health,
+                hunger: user.hunger,
+                score: user.score,
+                craftingState:  {
+                    crafting: user.crafting,
+                    craftingComplete: user.craftingComplete,
+                },
+                effects: user.effects,
+                toolTier: user.toolTier,
+                armorTier: user.armorTier,
+                harvestSpeed: user.harvestSpeed,
+                attackSpeed: user.attackSpeed,
+                displayHand: user.displayHand,
+                structureHand: user.structureHand,
+                attackFlash: user.attackFlash,
+                swingAngle: user.swingAngle,
+            };
+    
+            if (user.health <= 0 || user.dead) { // check if client has died
+                socket.emit('clientDied');
+            }
+            // user.playerTick(); // tick player
+    
+            let items = user.craftableItems(gameItems, serverState);
+            if (items) {
+                socket.emit('craftableItemsUpdate', items);
+            }
+    
+            socket.emit('clientDataUpdate', clientUpdateData);
         }
-        // user.playerTick(); // tick player
-
-        let items = user.craftableItems(gameItems, serverState);
-        if (items) {
-            socket.emit('craftableItemsUpdate', items);
-        }
-
-        socket.emit('clientDataUpdate', clientUpdateData);
     });
 
     socket.on('clientRequestCraft', data => {
@@ -180,7 +182,7 @@ io.on('connection', socket => {
 })
 
 function update(serverState) {
-    serverState.update();
+    serverState.update(io);
 
     // update server states, and some server states, like structures and resources, don't need to be updated. may change
     for (let user of Object.values(serverState.users.user)) {

@@ -1,4 +1,4 @@
-import { stage, socket, renderer, clientState, player } from "../app.js";
+import { stage, socket, renderer, clientState, player, glowContainer } from "../app.js";
 import { loader } from "./../utils/loader.js";
 import { clientEmit } from "../sockets/player/clientEmit.js";
 import { ratio } from "./../utils/windowResize.js";
@@ -196,6 +196,21 @@ export class Player {
         this.bodyGraphic.anchor.x = 0.5;
         this.bodyGraphic.anchor.y = 0.5;
         this.bodyGraphic.position.set(this.x, this.y);
+        
+        // create glow sprite
+        this.glow = new PIXI.Sprite(loader.resources['particles/glow'].texture);
+        this.glow.anchor.x = 0.5;
+        this.glow.anchor.y = 0.5;
+        this.glow.position.set(this.x, this.y);
+        this.glow.zIndex = 2;
+        this.glow.tint = 0xF7f1DC;
+        this.glowColorMatrix = new PIXI.filters.ColorMatrixFilter();
+        this.glowColorMatrix.padding = 700;
+        this.glowColorMatrix.brightness(1.1);
+        this.glowBlurFilter = new PIXI.filters.BlurFilter();
+        this.glowBlurFilter.padding = 700;
+        this.glowBlurFilter.blur = 15;
+        this.glow.filters = [this.glowColorMatrix, this.glowBlurFilter];
 
         // render and create hands
         Player.createHandSprites(this.handSprites, this.x, this.y, this.toolTier);
@@ -496,6 +511,12 @@ export class Player {
         Player.createHandSprites(this.handSprites, this.x, this.y, this.toolTier);
         Player.createArmorSprites(this.armorSprites, this.x, this.y, this.armorTier);
 
+        // update a glow to act as light. We have to render it to the glow container in order to bypass the color filter on stage
+        if (clientState.timeTick >= clientState.dayTimeLength/2) {
+            glowContainer.addChild(this.glow);
+        } else if (clientState.timeTick < clientState.dayTimeLength/2) {
+            glowContainer.removeChild(this.glow);
+        }
 
         // update positioning to x and y display (not global). x and y will only ever change in screen resizes
         this.bodyGraphic.position.set(this.x, this.y);
@@ -577,6 +598,7 @@ export class Player {
         // re adjusts viewpoint and position of player when the window is resized
         this.x = x;
         this.y = y;
+        this.glow.position.set(this.x, this.y);
     }
 
     updateCollisionPoints() { // the math is a bit off, can check later

@@ -71,7 +71,7 @@ module.exports = {
             entity.collisionvx += (overlap * dx);
             entity.collisionvy += (overlap * dy);
 
-            if (entity.hit) {
+            if (entity.hit && object.structureID) { // has to be a structure, not a resource
                 if (entity.attackTick >= entity.attackSpeed) {
                     entity.objectCollision = true;
                     object.health -= entity.damage;
