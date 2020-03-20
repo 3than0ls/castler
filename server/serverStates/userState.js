@@ -98,14 +98,13 @@ module.exports = class UserState {
     effectPlayerInsideArea(area) {
         if (area.objectInsideArea(this, 0.95)) {
             switch (area.type) {
-                case 'mine': 
-                    delete this.effects['swimming'];
-                    break;
                 case 'lake':
                     this.effects['swimming'] = {
                         tick: 0,
                     }
                     break;
+                default: 
+                    delete this.effects['swimming'];
             }
         }
     }
@@ -131,7 +130,7 @@ module.exports = class UserState {
         for (let [effectName, effectData] of Object.entries(this.effects)) {
             if (effects[effectName].effectOverTime) {
                 if (effectData.tick % effects[effectName].effectSpeed === 0 && effectData.tick !== 0) {
-                    effects[effectName].effect(this)
+                    effects[effectName].effect(this);
                 }
             } else {
                 effects[effectName].effect(this);
@@ -141,7 +140,7 @@ module.exports = class UserState {
                 delete this.effects[effectName];
             }
 
-            if (this.effects[effectName]) {
+            if (this.effects[effectName]) { 
                 this.effects[effectName].tick ++;
             }
         }

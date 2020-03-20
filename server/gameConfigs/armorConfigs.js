@@ -5,7 +5,7 @@ module.exports = {
     },
     fur: {
         armorDamageReduction: 0.25,
-        effects: ['warmed'],
+        effects: ['fur'],
     },
     dev: {
         armorDamageReduction: 1,

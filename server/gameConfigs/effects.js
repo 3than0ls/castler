@@ -34,7 +34,14 @@ module.exports = {
         effect: function(user) {
             user.health ++;
         },
-        expires: 300,
+        expires: 125,
+    }),
+
+    fur: new Effect('fur', {
+        effectOverTime: true,
+        effect: function(user) {
+            user.health += 0.01;
+        },
     }),
 
     dev: new Effect('dev', {
