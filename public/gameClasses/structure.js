@@ -43,7 +43,6 @@ export class Structure {
         this.structureGraphic.zIndex = -1;
 
         if (this.type === 'furnace') {
-            console.log('fafa')
             this.glow = new PIXI.Sprite(loader.resources['particles/glow'].texture);
             this.glow.anchor.x = 0.5;
             this.glow.anchor.y = 0.5;

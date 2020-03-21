@@ -52,8 +52,28 @@ module.exports = class ServerStates {
             timeTick: 2350,
         };
 
-
+        this.leaderboardState = [];
         Object.assign(this, emptyServerState);
+    }
+
+    leaderboardUpdate() {
+        // emit leaderboard status (based on player score)
+        const orderedPlayerScores = [];
+        for (let playerID in this.users.userData) {
+            let score = this.users.userData[playerID].score;
+            orderedPlayerScores.push([playerID, score]); // playe data
+        }
+        orderedPlayerScores.sort(function(a, b) {
+            return b[1] - a[1];
+        });
+        this.leaderboardState = [];
+        orderedPlayerScores.forEach(playerData => {
+            this.leaderboardState.push({
+                clientID: playerData[0],
+                score: playerData[1],
+                nickname: this.users.userData[playerData[0]].nickname, // playerData[0] is the player ID
+            });
+        });
     }
 
     createUser(socketID) {

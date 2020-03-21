@@ -181,11 +181,6 @@ export class Enemy {
         // update a glow to act as light. We have to render it to the glow container in order to bypass the color filter on stage. 
         // Also, we have to translate it onto the position since it isn't being rendered in player viewpoint
         this.glow.position.set(this.globalX - player.globalX + this.vx + player.x, this.globalY - player.globalY+ this.vy + player.y);
-        if (clientState.timeTick >= clientState.dayTimeLength/2) {
-            glowContainer.addChild(this.glow);
-        } else if (clientState.timeTick < clientState.dayTimeLength/2) {
-            glowContainer.removeChild(this.glow);
-        }
 
         // remove current displayed hand and armor (which may be different) and then update it
         player.viewpoint.removeChild(this.handSprites[this.handSpriteKey]);
@@ -218,7 +213,13 @@ export class Enemy {
         let bodyGraphic = this.bodyGraphic;
         let armorGraphic = this.armorSprites[this.armorTier.concat('Armor')];
         player.viewpoint.addChild(handGraphic,  armorGraphic, bodyGraphic); // hands drawn below body
-        glowContainer.addChild(this.glow);
+        
+        if (clientState.timeTick >= clientState.dayTimeLength/2) {
+            glowContainer.addChild(this.glow);
+        } else {
+            glowContainer.removeChild(this.glow);
+        }
+
     }
 
     delete() { // delete user when disconnected

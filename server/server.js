@@ -1,22 +1,17 @@
-
-
 /*
     TO DO:
     ISSUES: 
     when transitioning from night to day with hourglass, renderering filter fails to work
     resizing does not work when dead
-
-    check if all effects work, because it seems like the furnace warmth effect is broken
     
     BIG:
     create walking particle
-    night time effects (increased hostile mob spawns)
-    make entities fade in when spawning
-    move leaderboard state to ServerState class
+    make entities fade in when spawning <--- NEXT
+    update game without webworkers, see if this is possible <---- NEXT
 
     SMALL:
     more different resources, areas, entities, weapons,
-    create favicon
+    create official favicon
 
     CODE CLEANING:
         - transfer EVERY config (entity data, resource data, weapon stats, armor stats) to config files into gameConfigs, and eliminate all need for switch statements
@@ -179,7 +174,7 @@ io.on('connection', socket => {
         delete serverState.users.user[socket.id]; // delete client data
         delete serverState.users.userData[socket.id];
     });
-})
+});
 
 function update(serverState) {
     serverState.update(io);
@@ -211,26 +206,10 @@ function update(serverState) {
     io.sockets.emit('timeTick', serverState.timeTick);
 
     // emit leaderboard status (based on player score)
-    const orderedPlayerScores = [];
-    for (let playerID in serverState.users.userData) {
-        let score = serverState.users.userData[playerID].score;
-        orderedPlayerScores.push([playerID, score]);
-    }
-    orderedPlayerScores.sort(function(a, b) {
-        return b[1] - a[1];
-    });
-    const leaderboardState = [];
-    orderedPlayerScores.forEach(element => {
-        leaderboardState.push({
-            clientID: element[0],
-            score: element[1],
-            nickname: serverState.users.userData[element[0]].nickname, // element[0] is the player ID
-        });
-    });
+    serverState.leaderboardUpdate();
     
-    io.sockets.emit('leaderboardUpdate', leaderboardState);
-}
-  
+    io.sockets.emit('leaderboardUpdate', serverState.leaderboardState);
+};
 
 http.listen(3000, () => {
     setInterval(() => {

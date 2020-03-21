@@ -54,7 +54,7 @@ export class ClientStates {
             this.colorMatrix = new PIXI.filters.ColorMatrixFilter();
             stage.filters = [this.colorMatrix];
             if (this.timeTick > this.dayTimeLength/2) {
-                this.colorMatrix.brightness(0.1);
+                this.colorMatrix.brightness(0.15);
             } 
         }
     }
@@ -75,17 +75,17 @@ export class ClientStates {
     update() {
         let transitionTime = this.dayTimeLength/10 > 600 ? 600 : this.dayTimeLength/10;
         if (this.timeTick === 0) {
-            this.colorMatrix.brightness(0.1);
+            this.colorMatrix.brightness(0.15);
             if (this.nightTransition) {
                 this.nightTransition.pause();
             }
-            this.dayTransition = charm.filter(stage, 'brightness', 0.1, 1, transitionTime);
+            this.dayTransition = charm.filter(stage, 'brightness', 0.15, 1, transitionTime);
         } else if (this.timeTick === this.dayTimeLength/2) {
             if (this.dayTransition) {
                 dayTransition.pause();
             }
             this.colorMatrix.brightness(1);
-            this.nightTransition = charm.filter(stage, 'brightness', 1, 0.1, transitionTime);
+            this.nightTransition = charm.filter(stage, 'brightness', 1, 0.15, transitionTime);
         }
     }
 }
