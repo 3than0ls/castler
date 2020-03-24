@@ -33,7 +33,7 @@ export class ClientStates {
         this.boundaryRect = new PIXI.Graphics();
         this.boundaryRect.lineStyle(4, 0x343434, 0.3);
         this.boundaryRect.drawRect(0, 0, this.size[0], this.size[1]);
-        this.boundaryRect.zIndex = 100;
+        this.boundaryRect.zIndex = -4;
         this.boundaryRect.pivot.x = this.size[0]/2;
         this.boundaryRect.pivot.y = this.size[1]/2;
 

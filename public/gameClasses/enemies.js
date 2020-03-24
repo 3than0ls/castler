@@ -26,7 +26,7 @@ export class Enemy {
 
     attackFlash() {
         if (this.bodyGraphic.tint === 0xFFFFFF) {
-            let tint = charm.tint(this.bodyGraphic, [185, 255, 255]);
+            let tint = charm.tint(this.bodyGraphic, [185, 0, 0]);
             tint.onComplete = () => {
                 // reset tint to nothing
                 this.bodyGraphic.tint = 0xFFFFFF

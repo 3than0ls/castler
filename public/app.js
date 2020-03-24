@@ -62,8 +62,8 @@ function animate() {
     requestAnimationFrame(() => {
         globalContainer.addChild(glowContainer)
         renderer.render(globalContainer);
-    });*/
-    requestAnimationFrame(animate);
+    });
+    requestAnimationFrame(animate);*/
 }
 
 export function setup() {
@@ -118,15 +118,15 @@ export function setup() {
         window.onresize = resize;
         
         
-        /*
+        
         clientState.worker.addEventListener('message', function(e) {
             animate();
             // issue: animate function calls are clumped, and are not even, so the socket emits data a lot of times for 1 moment and then stops for a period of time
         });
 
         // set off worker
-        clientState.worker.postMessage('tick');*/
+        clientState.worker.postMessage('tick');
         
-        requestAnimationFrame(animate);
+        // requestAnimationFrame(animate);
     });
 }
